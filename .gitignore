@@ -17,3 +17,6 @@ CMakeCache.txt
 /build/
 *.xcodeproj/
 Debug/
+Release/
+MinSizeRel/
+RelWithDebInfo/
