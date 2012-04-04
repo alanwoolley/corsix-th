@@ -22,6 +22,8 @@ SOFTWARE.
 
 #include "config.h"
 #include "lua.hpp"
+#include <android/log.h>
+
 extern "C" {
 #include "../../LFS/lfs.h"
 int luaopen_lpeg(lua_State *L);
@@ -39,6 +41,11 @@ int luaopen_random(lua_State *L);
 #error "config.h is out of date - please rerun CMake"
 #endif
 // End of config file checking
+
+#define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__))
+#define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "native-activity", __VA_ARGS__))
+
+char path[512];
 
 int CorsixTH_lua_main_no_eval(lua_State *L)
 {
@@ -156,6 +163,8 @@ int CorsixTH_lua_main_no_eval(lua_State *L)
     const char sLuaCorsixTHLua[] =
     "local name, sep, code = \"CorsixTH.lua\", package.config:sub(1, 1)\n"
     "local root = (... or \"\"):match(\"^(.*[\"..sep..\"])\") or \"\"\n"
+	"code = loadfile(\"%s\"..name)\n"
+    "if code then return code end\n"
 #ifdef __APPLE__ // Darrell: Search inside the bundle first.
                  // There's probably a better way of doing this.
 #if defined(IS_CORSIXTH_APP)
@@ -174,7 +183,10 @@ int CorsixTH_lua_main_no_eval(lua_State *L)
     "  end \n"
     "end \n"
     "return loadfile(name)";
-
+	char sLuaCorsixTHLua[sizeof(sLuaCorsixTHLuaOld) + sizeof(path)];
+    sprintf(sLuaCorsixTHLua, sLuaCorsixTHLuaOld, path);
+    LOGI(sLuaCorsixTHLua);
+	
     // return assert(loadfile"CorsixTH.lua")(...)
     if(!bGotScriptFile)
     {
@@ -236,4 +248,15 @@ int CorsixTH_lua_panic(lua_State *L)
     // A stack trace would be nice, but they cannot be done in a panic.
 
     return 0;
+}
+
+extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_setGamePath(
+		JNIEnv* env, jobject obj, jstring javaString) {
+
+	const char *nativeString = env->GetStringUTFChars(javaString, 0);
+	strcpy(path, nativeString);
+	char buf[512];
+	sprintf(buf,"Setting path to: %s", path);
+	LOGI(buf);
+	env->ReleaseStringUTFChars(javaString, nativeString);
 }

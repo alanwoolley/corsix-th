@@ -524,12 +524,12 @@ function App:fixConfig()
     end
     
     -- For resolution, check that resolution is at least 640x480
-    if key == "width" and type(value) == "number" and value < 640 then
-      self.config[key] = 640
+    if key == "width" and type(value) == "number" and value < 100 then
+      self.config[key] = 100
     end
     
-    if key == "height" and type(value) == "number" and value < 480 then
-      self.config[key] = 480
+    if key == "height" and type(value) == "number" and value < 100 then
+      self.config[key] = 100
     end
   end
 end
