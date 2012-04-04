@@ -160,7 +160,7 @@ int CorsixTH_lua_main_no_eval(lua_State *L)
     // ../../../CorsixTH.lua
     // ../../../CorsixTH/CorsixTH.lua
     // It is simpler to write this in Lua than in C.
-    const char sLuaCorsixTHLua[] =
+    const char sLuaCorsixTHLuaOld[] =
     "local name, sep, code = \"CorsixTH.lua\", package.config:sub(1, 1)\n"
     "local root = (... or \"\"):match(\"^(.*[\"..sep..\"])\") or \"\"\n"
 	"code = loadfile(\"%s\"..name)\n"
