@@ -483,7 +483,7 @@ end
 ]]
 function Object:onClick(ui, button, data)
   if ignore_next == true then
-	ignore_next = fales
+	ignore_next = false
 	if button == "left" then
 		return
 	end
