@@ -185,7 +185,7 @@ int CorsixTH_lua_main_no_eval(lua_State *L)
     "return loadfile(name)";
 	char sLuaCorsixTHLua[sizeof(sLuaCorsixTHLuaOld) + sizeof(path)];
     sprintf(sLuaCorsixTHLua, sLuaCorsixTHLuaOld, path);
-    LOGI(sLuaCorsixTHLua);
+    //LOGI(sLuaCorsixTHLua);
 	
     // return assert(loadfile"CorsixTH.lua")(...)
     if(!bGotScriptFile)
