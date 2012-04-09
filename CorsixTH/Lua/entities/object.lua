@@ -482,18 +482,11 @@ end
 !param data (table) If some data should be retained after moving an object it is in this table.
 ]]
 function Object:onClick(ui, button, data)
-  if ignore_next == true then
-	ignore_next = false
-	if button == "left" then
-		return
-	end
-  end
+
   local window = ui:getWindow(UIEditRoom)
-  if button == "middle" then
-	ignore_next = true
-  end
+
   
-  if button == "middle" or (button == "left" and window and window.in_pickup_mode) then
+  if button == "right" or (button == "left" and window and window.in_pickup_mode) then
     -- This flag can be used if for example some things should only happen as long as the
     -- object is not picked up. How lovely when it is so logical. :-)
     local object_list = {{object = self.object_type, qty = 1, existing_object = self}}
