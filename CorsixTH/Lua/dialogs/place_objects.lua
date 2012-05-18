@@ -448,12 +448,7 @@ function UIPlaceObjects:tryNextOrientation()
 end
 
 function UIPlaceObjects:onMouseUp(button, x, y)
-	if ignore_next == true then
-		ignore_next = false
-		if button == "left" then
-			return
-		end	
-	end
+
 	
   local repaint = Window.onMouseUp(self, button, x, y)
 
@@ -461,9 +456,8 @@ function UIPlaceObjects:onMouseUp(button, x, y)
     return
   end
   
-  if button == "middle" then
+  if button == "right" then
     self:tryNextOrientation()
-	ignore_next = true
     repaint = true
   elseif button == "left" then
     if #self.objects > 0 then
