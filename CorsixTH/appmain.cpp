@@ -75,20 +75,28 @@ extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthRestartGame(
 extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthSaveGame(
 		JNIEnv* env, jclass jcls, jstring path) {
 	LOGI("Saving game");
-/*
-	const char *nativeString = env->GetStringUTFChars(path, 0);
 
+	const char *nativeString = env->GetStringUTFChars(path, 0);
+	lua_getglobal(L, "TheApp");
+	lua_getfield(L, -1, "save");
+	lua_pushvalue(L, -2);
+	lua_pushstring(L, nativeString);
+	lua_call(L, 2,0);
 	env->ReleaseStringUTFChars(path, nativeString);
-	*/
+
 }
 
 extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthLoadGame(
 		JNIEnv* env, jclass jcls, jstring path) {
 	LOGI("Loading game");
-/*
-	const char *nativeString = env->GetStringUTFChars(path, 0);
 
-	env->ReleaseStringUTFChars(path, nativeString);*/
+	const char *nativeString = env->GetStringUTFChars(path, 0);
+	lua_getglobal(L, "TheApp");
+	lua_getfield(L, -1, "load");
+	lua_pushvalue(L, -2);
+	lua_pushstring(L, nativeString);
+	lua_call(L, 2,0);
+	env->ReleaseStringUTFChars(path, nativeString);
 }
 
 //! Program entry point
