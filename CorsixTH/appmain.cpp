@@ -69,34 +69,70 @@ extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthRestartGame(
 	lua_getglobal(L, "TheApp");
 	lua_getfield(L, -1, "restart");
 	lua_pushvalue(L, -2);
-	lua_call(L, 1,0);
+	lua_remove(L, -3);
+	LOGI("Calling LUA restart");
+	if (lua_pcall(L, 1, 0, 0) != 0) {
+		char *error = (char*) malloc(1024 * sizeof(char));
+		sprintf(error, "Error running function: %s", lua_tostring(L, -1));
+		LOGI(error);
+		free(error);
+	} else {
+		LOGI("Appeared to restart successfully");
+	}
+	LOGI("Done");
 }
 
 extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthSaveGame(
 		JNIEnv* env, jclass jcls, jstring path) {
-	LOGI("Saving game");
 
 	const char *nativeString = env->GetStringUTFChars(path, 0);
+	char *msg = (char*) malloc(256 * sizeof(char));
+	sprintf(msg, "Saving game: %s", nativeString);
+	LOGI(msg);
 	lua_getglobal(L, "TheApp");
 	lua_getfield(L, -1, "save");
 	lua_pushvalue(L, -2);
+	lua_remove(L, -3);
 	lua_pushstring(L, nativeString);
-	lua_call(L, 2,0);
+	LOGI("Calling LUA save");
+	if (lua_pcall(L, 2, 0, 0) != 0) {
+		char *error = (char*) malloc(1024 * sizeof(char));
+		sprintf(error, "Error running function: %s", lua_tostring(L, -1));
+		LOGI(error);
+		free(error);
+	} else {
+		LOGI("Appeared to save successfully");
+	}
 	env->ReleaseStringUTFChars(path, nativeString);
+	LOGI("Done");
+	free(msg);
 
 }
 
 extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthLoadGame(
 		JNIEnv* env, jclass jcls, jstring path) {
-	LOGI("Loading game");
 
 	const char *nativeString = env->GetStringUTFChars(path, 0);
+	char *msg = (char*) malloc(256 * sizeof(char));
+	sprintf(msg, "Loading game: %s", nativeString);
+	LOGI(msg);
 	lua_getglobal(L, "TheApp");
 	lua_getfield(L, -1, "load");
 	lua_pushvalue(L, -2);
+	lua_remove(L, -3);
 	lua_pushstring(L, nativeString);
-	lua_call(L, 2,0);
+	LOGI("Calling LUA load");
+	if (lua_pcall(L, 2, 0, 0) != 0) {
+		char *error = (char*) malloc(1024 * sizeof(char));
+		sprintf(error, "Error running function: %s", lua_tostring(L, -1));
+		LOGI(error);
+		free(error);
+	} else {
+		LOGI("Appeared to load successfully");
+	}
 	env->ReleaseStringUTFChars(path, nativeString);
+	LOGI("Done");
+	free(msg);
 }
 
 //! Program entry point
