@@ -469,10 +469,15 @@ void THPathfinder::pushResult(lua_State *L) const
 
 void THPathfinder::_openHeapPush(THPathfinder::node_t* pNode)
 {
+	node_t **tmp;
     if(m_iOpenCount == m_iOpenSize)
     {
         m_iOpenSize = (m_iOpenSize + 1) * 2;
-        m_ppOpenHeap = (node_t**)realloc(m_ppOpenHeap, sizeof(node_t*) * m_iOpenSize);
+        tmp = (node_t**)realloc(m_ppOpenHeap, sizeof(node_t*) * m_iOpenSize);
+
+		if (tmp != NULL) {
+			m_ppOpenHeap = tmp;
+		}
     }
     int i = m_iOpenCount++;
     m_ppOpenHeap[i] = pNode;
