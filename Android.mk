@@ -3,10 +3,9 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := appmain
-LOCAL_ARM_MODE := arm
 
 SDL_PATH := ../SDL
-LUA_PATH := ../LuaJIT-1.1.8/src
+LUA_PATH := ../LUA
 SDL_MIXER_PATH :=../SDL_mixer
 AGG_PATH := ../AGG
 CORSIX_TH_SRC := CorsixTH/Src
@@ -68,6 +67,5 @@ LOCAL_STATIC_LIBRARIES := libfreetype
 
 LOCAL_LDLIBS := -lGLESv1_CM -llog 
 LOCAL_LDLIBS += -L$(LOCAL_PATH)/libs/
-LOCAL_LDLIBS += $(LOCAL_PATH)/libluajit.a
 
 include $(BUILD_SHARED_LIBRARY)
