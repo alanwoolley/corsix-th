@@ -66,6 +66,7 @@ static int hidekeyboard(lua_State *L) {
 extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthRestartGame(
 		JNIEnv* env, jclass cls) {
 	LOGI("Restarting game");
+	lua_checkstack(L, 2);
 	lua_getglobal(L, "TheApp");
 	lua_getfield(L, -1, "restart");
 	lua_pushvalue(L, -2);
@@ -84,11 +85,12 @@ extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthRestartGame(
 
 extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthSaveGame(
 		JNIEnv* env, jclass jcls, jstring path) {
-
+	
 	const char *nativeString = env->GetStringUTFChars(path, 0);
 	char *msg = (char*) malloc(256 * sizeof(char));
 	sprintf(msg, "Saving game: %s", nativeString);
 	LOGI(msg);
+	lua_checkstack(L, 3);
 	lua_getglobal(L, "TheApp");
 	lua_getfield(L, -1, "save");
 	lua_pushvalue(L, -2);
@@ -116,6 +118,7 @@ extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthLoadGame(
 	char *msg = (char*) malloc(256 * sizeof(char));
 	sprintf(msg, "Loading game: %s", nativeString);
 	LOGI(msg);
+	lua_checkstack(L, 3);
 	lua_getglobal(L, "TheApp");
 	lua_getfield(L, -1, "load");
 	lua_pushvalue(L, -2);
