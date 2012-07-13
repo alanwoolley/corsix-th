@@ -24,11 +24,15 @@ SOFTWARE.
 #include "lua_sdl.h"
 #include "th_lua.h"
 #include <string.h>
+#include <android/log.h>
 #ifndef _MSC_VER
 #define stricmp strcasecmp
 #else
 #pragma warning (disable: 4996) // CRT deprecation
 #endif
+
+#define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__))
+#define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "native-activity", __VA_ARGS__))
 
 static int l_init(lua_State *L)
 {
@@ -146,7 +150,8 @@ static int l_mainloop(lua_State *L)
     fps_ctrl *fps_control = (fps_ctrl*)lua_touserdata(L, lua_upvalueindex(1));
     SDL_TimerID timer = SDL_AddTimer(30, timer_frame_callback, NULL);
     SDL_Event e;
-    
+    char buf[255];
+    char d[255];
     while(SDL_WaitEvent(&e) != 0)
     {
         bool do_frame = false;
@@ -201,6 +206,26 @@ static int l_mainloop(lua_State *L)
                 lua_pushliteral(dispatcher, "music_over");
                 nargs = 1;
                 break;
+            case SDL_USEREVENT_LOAD:
+            	lua_pushliteral(dispatcher, "load");
+            	strcpy(d, (const char*)e.user.data1);
+            	sprintf(buf, "Loading %s", d);
+            	LOGI(buf);
+            	lua_pushstring(dispatcher, (const char*)d);
+            	nargs = 2;
+            	break;
+            case SDL_USEREVENT_SAVE:
+            	lua_pushliteral(dispatcher, "save");
+            	strcpy(d, (const char*)e.user.data1);
+                sprintf(buf, "Saving %s", d);
+                LOGI(buf);
+            	lua_pushstring(dispatcher, (const char*)d);
+            	nargs = 2;
+            	break;
+            case SDL_USEREVENT_RESTART:
+            	lua_pushliteral(dispatcher, "restart");
+            	nargs = 1;
+            	break;
             case SDL_USEREVENT_CPCALL:
                 if(luaT_cpcall(L, (lua_CFunction)e.user.data1, e.user.data2))
                 {

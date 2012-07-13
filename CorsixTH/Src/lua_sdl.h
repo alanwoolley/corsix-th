@@ -35,6 +35,11 @@ SOFTWARE.
 // SDL_USEREVENT_CPCALL - calls lua_cpcall with SDL_Event user.data1 and data2
 #define SDL_USEREVENT_CPCALL (SDL_USEREVENT + 2)
 
+// Alan's Android Stuff
+#define SDL_USEREVENT_LOAD (SDL_USEREVENT + 3)
+#define SDL_USEREVENT_SAVE (SDL_USEREVENT + 4)
+#define SDL_USEREVENT_RESTART (SDL_USEREVENT + 5)
+
 int luaopen_sdl(lua_State *L);
 
 #endif // CORSIX_TH_LUA_SDL_H_

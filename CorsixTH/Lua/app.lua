@@ -49,6 +49,9 @@ function App:App()
     motion = self.onMouseMove,
     active = self.onWindowActive,
     music_over = self.onMusicOver,
+    load = self.load,
+    restart = self.restart,
+    save = self.save,
   }
   self.strings = {}
   self.savegame_version = SAVEGAME_VERSION
@@ -951,15 +954,18 @@ function App:getVersion()
 end
 
 function App:save(filename)
+  print "saving"
   return SaveGameFile(self.savegame_dir .. filename)
 end
 
 function App:load(filename)
+  print "loading"
   return LoadGameFile(self.savegame_dir .. filename)
 end
 
 --! Restarts the current level (offers confirmation window first)
 function App:restart()
+  print "restarting"
   assert(self.map, "Trying to restart while no map is loaded.")
   self.ui:addWindow(UIConfirmDialog(self.ui, _S.confirmation.restart_level,
   --[[persistable:app_confirm_restart]] function()
