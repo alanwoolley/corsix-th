@@ -29,6 +29,7 @@
 #include <jni.h>
 #include <unistd.h>
 #include "Src/lua_sdl.h"
+#include "commands.h"
 
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__))
 #define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "native-activity", __VA_ARGS__))
@@ -51,44 +52,36 @@ struct types_equal<T1, T1> {
 JNIEnv* jEnv;
 lua_State* L;
 
+static int sendCommand(jint cmd) {
+	jclass cls = jEnv->FindClass("uk/co/armedpineapple/corsixth/SDLActivity");
+	jmethodID method = jEnv->GetStaticMethodID(cls, "sendCommand", "(I)V");
+	jEnv->CallStaticVoidMethod(cls, method, cmd);
+	return 0;
+}
+
 static int showkeyboard(lua_State *L) {
 	LOGI("Showing keyboard");
-	jclass cls = jEnv->FindClass("uk/co/armedpineapple/corsixth/SDLActivity");
-	jmethodID method = jEnv->GetStaticMethodID(cls, "showSoftKeyboard", "()V");
-	jEnv->CallStaticVoidMethod(cls, method);
-	return 0;
+	return sendCommand(COMMAND_SHOW_KEYBOARD);
 }
 
 static int hidekeyboard(lua_State *L) {
 	LOGI("Hiding keyboard");
-	jclass cls = jEnv->FindClass("uk/co/armedpineapple/corsixth/SDLActivity");
-	jmethodID method = jEnv->GetStaticMethodID(cls, "hideSoftKeyboard", "()V");
-	jEnv->CallStaticVoidMethod(cls, method);
-	return 0;
+	return sendCommand(COMMAND_HIDE_KEYBOARD);
 }
 
 static int showmenu(lua_State *L) {
 	LOGI("Showing Menu");
-	jclass cls = jEnv->FindClass("uk/co/armedpineapple/corsixth/SDLActivity");
-	jmethodID method = jEnv->GetStaticMethodID(cls, "showMenu", "()V");
-	jEnv->CallStaticVoidMethod(cls, method);
-	return 0;
+	return sendCommand(COMMAND_SHOW_MENU);
 }
 
 static int quickload(lua_State *L) {
 	LOGI("Quick Load");
-	jclass cls = jEnv->FindClass("uk/co/armedpineapple/corsixth/SDLActivity");
-	jmethodID method = jEnv->GetStaticMethodID(cls, "doQuickLoad", "()V");
-	jEnv->CallStaticVoidMethod(cls, method);
-	return 0;
+	return sendCommand(COMMAND_QUICK_LOAD);
 }
 
 static int showloaddialog(lua_State *L) {
 	LOGI("Showing Load Dialog");
-	jclass cls = jEnv->FindClass("uk/co/armedpineapple/corsixth/SDLActivity");
-	jmethodID method = jEnv->GetStaticMethodID(cls, "showLoadDialog", "()V");
-	jEnv->CallStaticVoidMethod(cls, method);
-	return 0;
+	return sendCommand(COMMAND_SHOW_LOAD_DIALOG);
 }
 
 extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthRestartGame(
