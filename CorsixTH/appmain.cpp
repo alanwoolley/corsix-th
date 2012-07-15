@@ -75,6 +75,22 @@ static int showmenu(lua_State *L) {
 	return 0;
 }
 
+static int quickload(lua_State *L) {
+	LOGI("Quick Load");
+	jclass cls = jEnv->FindClass("uk/co/armedpineapple/corsixth/SDLActivity");
+	jmethodID method = jEnv->GetStaticMethodID(cls, "doQuickLoad", "()V");
+	jEnv->CallStaticVoidMethod(cls, method);
+	return 0;
+}
+
+static int showloaddialog(lua_State *L) {
+	LOGI("Showing Load Dialog");
+	jclass cls = jEnv->FindClass("uk/co/armedpineapple/corsixth/SDLActivity");
+	jmethodID method = jEnv->GetStaticMethodID(cls, "showLoadDialog", "()V");
+	jEnv->CallStaticVoidMethod(cls, method);
+	return 0;
+}
+
 extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthRestartGame(
 		JNIEnv* env, jclass cls) {
 	LOGI("Restarting game");
@@ -147,6 +163,8 @@ int SDL_main(int argc, char** argv, JNIEnv* env) {
 		lua_register(L, "showkeyboard", showkeyboard);
 		lua_register(L, "hidekeyboard", hidekeyboard);
 		lua_register(L, "showmenu", showmenu);
+		lua_register(L, "showloaddialog", showloaddialog);
+		lua_register(L, "quickload", quickload);
 		lua_settop(L, 0);
 		lua_pushcfunction(L, CorsixTH_lua_stacktrace);
 		lua_pushcfunction(L, CorsixTH_lua_main);

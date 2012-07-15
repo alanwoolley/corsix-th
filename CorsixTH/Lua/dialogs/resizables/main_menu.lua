@@ -28,7 +28,7 @@ local col_bg = {
 }
 
 function UIMainMenu:UIMainMenu(ui)
-  self:UIResizable(ui, 250, 255, col_bg)
+  self:UIResizable(ui, 280, 390, col_bg)
   
   local app = ui.app
   self.esc_closes = false
@@ -43,11 +43,13 @@ function UIMainMenu:UIMainMenu(ui)
   
   -- individual buttons
   self.default_button_sound = "selectx.wav"
-  self:addBevelPanel(20, 20, 210, 40, col_bg):setLabel(_S.main_menu.new_game):makeButton(0, 0, 210, 40, nil, self.buttonNewGame):setTooltip(_S.tooltip.main_menu.new_game)
-  self:addBevelPanel(20, 65, 210, 40, col_bg):setLabel(_S.main_menu.custom_level):makeButton(0, 0, 210, 40, nil, self.buttonCustomGame):setTooltip(_S.tooltip.main_menu.custom_level)
-  self:addBevelPanel(20, 110, 210, 40, col_bg):setLabel(_S.main_menu.load_game):makeButton(0, 0, 210, 40, nil, self.buttonLoadGame):setTooltip(_S.tooltip.main_menu.load_game)
-
-  self:addBevelPanel(20, 175, 210, 40, col_bg):setLabel(_S.main_menu.exit):makeButton(0, 0, 210, 40, nil, self.buttonExit):setTooltip(_S.tooltip.main_menu.exit)
+  self:addBevelPanel(20, 20, 240, 60, col_bg):setLabel(_S.main_menu.new_game):makeButton(0, 0, 240, 60, nil, self.buttonNewGame):setTooltip(_S.tooltip.main_menu.new_game)
+  self:addBevelPanel(20, 85, 240, 60, col_bg):setLabel(_S.main_menu.custom_level):makeButton(0, 0, 240, 60, nil, self.buttonCustomGame):setTooltip(_S.tooltip.main_menu.custom_level)
+  self:addBevelPanel(20, 150, 240, 60, col_bg):setLabel(_S.main_menu.load_game):makeButton(0, 0, 240, 60, nil, self.buttonLoadGame):setTooltip(_S.tooltip.main_menu.load_game)
+  
+  self:addBevelPanel(20, 215, 240, 60, col_bg):setLabel("Quick Load"):makeButton(0, 0, 240, 60, nil, self.buttonQuickLoad):setTooltip("Quick Load")
+ 
+  self:addBevelPanel(20, 295, 240, 60, col_bg):setLabel(_S.main_menu.exit):makeButton(0, 0, 240, 60, nil, self.buttonExit):setTooltip(_S.tooltip.main_menu.exit)
 end
 
 function UIMainMenu:getSavedWindowPositionName()
@@ -70,12 +72,12 @@ function UIMainMenu:draw(canvas, x, y)
   x, y = self.x + x, self.y + y
 
   -- Move the version string up a bit if also showing the savegame version.
-  local ly = y + 240
+  local ly = y + 375
   if TheApp.config.debug then
-    self.label_font:draw(canvas, _S.main_menu.savegame_version .. TheApp.savegame_version, x + 5, ly, 240, 0, "right")
+    self.label_font:draw(canvas, _S.main_menu.savegame_version .. TheApp.savegame_version, x + 5, ly, 270, 0, "right")
     ly = ly - 15
   end
-  self.label_font:draw(canvas, _S.main_menu.version .. self.version_number, x + 5, ly, 240, 0, "right")
+  self.label_font:draw(canvas, _S.main_menu.version .. self.version_number, x + 5, ly, 270, 0, "right")
 end
 
 function UIMainMenu:hitTest(x, y)
@@ -102,7 +104,6 @@ end
 function UIMainMenu:buttonNewGame()
   local window = UINewGame(self.ui)
   self.ui:addWindow(window)
-  
 end
 
 function UIMainMenu:buttonCustomGame()
@@ -115,8 +116,11 @@ function UIMainMenu:buttonCustomGame()
 end
 
 function UIMainMenu:buttonLoadGame()
-  local window = UILoadGame(self.ui, "menu")
-  self.ui:addWindow(window)
+  showloaddialog()
+end
+
+function UIMainMenu:buttonQuickLoad()
+  quickload()
 end
 
 function UIMainMenu:buttonOptions()
