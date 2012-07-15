@@ -41,9 +41,11 @@ function GameUI:GameUI(app, local_hospital)
     self.adviser = UIAdviser(self)
     self.bottom_panel = UIBottomPanel(self)
     self.menu_bar = UIMenuBar(self)
+	self.menu_button = UIMenuButton(self)
     self.bottom_panel:addWindow(self.adviser)
     self:addWindow(self.bottom_panel)
-    self:addWindow(self.menu_bar)
+	self:addWindow(self.menu_button)
+    -- self:addWindow(self.menu_bar)
   end
 
   local scr_w = app.config.width

@@ -61,6 +61,17 @@ static int showkeyboard(lua_State *L) {
 
 static int hidekeyboard(lua_State *L) {
 	LOGI("Hiding keyboard");
+	jclass cls = jEnv->FindClass("uk/co/armedpineapple/corsixth/SDLActivity");
+	jmethodID method = jEnv->GetStaticMethodID(cls, "hideSoftKeyboard", "()V");
+	jEnv->CallStaticVoidMethod(cls, method);
+	return 0;
+}
+
+static int showmenu(lua_State *L) {
+	LOGI("Showing Menu");
+	jclass cls = jEnv->FindClass("uk/co/armedpineapple/corsixth/SDLActivity");
+	jmethodID method = jEnv->GetStaticMethodID(cls, "showMenu", "()V");
+	jEnv->CallStaticVoidMethod(cls, method);
 	return 0;
 }
 
@@ -135,6 +146,7 @@ int SDL_main(int argc, char** argv, JNIEnv* env) {
 		luaL_openlibs(L);
 		lua_register(L, "showkeyboard", showkeyboard);
 		lua_register(L, "hidekeyboard", hidekeyboard);
+		lua_register(L, "showmenu", showmenu);
 		lua_settop(L, 0);
 		lua_pushcfunction(L, CorsixTH_lua_stacktrace);
 		lua_pushcfunction(L, CorsixTH_lua_main);
