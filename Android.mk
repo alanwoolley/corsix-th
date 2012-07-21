@@ -6,7 +6,7 @@ LOCAL_MODULE := appmain
 LOCAL_ARM_MODE := arm
 
 SDL_PATH := ../SDL
-LUA_PATH := ../LuaJIT-1.1.8/src
+LUA_PATH := ../LuaJIT-2.0.0-beta10/src
 SDL_MIXER_PATH :=../SDL_mixer
 AGG_PATH := ../AGG
 CORSIX_TH_SRC := CorsixTH/Src
