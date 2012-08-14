@@ -34,6 +34,7 @@ end
 
 function UIMenuButton:buttonPressed()
   print "pressed menu button"
+  gamespeedupdated(self.world:getCurrentSpeed())
   showmenu()
   end
 

@@ -52,6 +52,16 @@ struct types_equal<T1, T1> {
 JNIEnv* jEnv;
 lua_State* L;
 
+const char *speeds[] = { "Pause", "Slowest", "Slower", "Normal", "Max Speed",
+		"And then some more" };
+
+static int sendCommandInt(jint cmd, jint data) {
+	jclass cls = jEnv->FindClass("uk/co/armedpineapple/corsixth/SDLActivity");
+	jmethodID method = jEnv->GetStaticMethodID(cls, "sendCommand", "(II)V");
+	jEnv->CallStaticVoidMethod(cls, method, cmd, data);
+	return 0;
+}
+
 static int sendCommand(jint cmd) {
 	jclass cls = jEnv->FindClass("uk/co/armedpineapple/corsixth/SDLActivity");
 	jmethodID method = jEnv->GetStaticMethodID(cls, "sendCommand", "(I)V");
@@ -84,24 +94,40 @@ static int showloaddialog(lua_State *L) {
 	return sendCommand(COMMAND_SHOW_LOAD_DIALOG);
 }
 
+static int gamespeedupdated(lua_State *L) {
+	LOGI("Game speed updated");
+	int speedvar;
+	int argc = lua_gettop(L);
+	const char* gamespeed = lua_tostring(L, 1);
+	LOGI(gamespeed);
+
+	for (int n = 0; n < 6; n++) {
+		if (strcmp(gamespeed, speeds[n]) == 0) {
+			return sendCommandInt(COMMAND_GAME_SPEED_UPDATED, n);
+		}
+	}
+	LOGI("Couldn't find game speed. Going with Normal.");
+	return sendCommandInt(COMMAND_GAME_SPEED_UPDATED, 4);
+}
+
 extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthRestartGame(
 		JNIEnv* env, jclass cls) {
 	LOGI("Restarting game");
 	SDL_Event e;
-    e.type = SDL_USEREVENT_RESTART;
-    SDL_PushEvent(&e);
-    LOGI("Done");
+	e.type = SDL_USEREVENT_RESTART;
+	SDL_PushEvent(&e);
+	LOGI("Done");
 }
 
 extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthSaveGame(
 		JNIEnv* env, jclass jcls, jstring path) {
-	
+
 	const char *nativeString = env->GetStringUTFChars(path, 0);
 	LOGI("Saving game");
 	SDL_Event e;
-    e.type = SDL_USEREVENT_SAVE;
-    e.user.data1 = (void*)nativeString;
-    SDL_PushEvent(&e);
+	e.type = SDL_USEREVENT_SAVE;
+	e.user.data1 = (void*) nativeString;
+	SDL_PushEvent(&e);
 	//env->ReleaseStringUTFChars(path, nativeString);
 	LOGI("Done");
 
@@ -113,9 +139,9 @@ extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthLoadGame(
 	const char *nativeString = env->GetStringUTFChars(path, 0);
 	LOGI("Loading game");
 	SDL_Event e;
-    e.type = SDL_USEREVENT_LOAD;
-    e.user.data1 = (void*)nativeString;
-    SDL_PushEvent(&e);
+	e.type = SDL_USEREVENT_LOAD;
+	e.user.data1 = (void*) nativeString;
+	SDL_PushEvent(&e);
 	//env->ReleaseStringUTFChars(path, nativeString);
 	LOGI("Done");
 }
@@ -148,16 +174,20 @@ int SDL_main(int argc, char** argv, JNIEnv* env) {
 
 		if (L == NULL) {
 			fprintf(stderr, "Fatal error starting CorsixTH: "
-					"Cannot open Lua state.\n");
+			"Cannot open Lua state.\n");
 			return 0;
 		}
 		lua_atpanic(L, CorsixTH_lua_panic);
 		luaL_openlibs(L);
+
+		// Register C functions
 		lua_register(L, "showkeyboard", showkeyboard);
 		lua_register(L, "hidekeyboard", hidekeyboard);
 		lua_register(L, "showmenu", showmenu);
 		lua_register(L, "showloaddialog", showloaddialog);
 		lua_register(L, "quickload", quickload);
+		lua_register(L, "gamespeedupdated", gamespeedupdated);
+
 		lua_settop(L, 0);
 		lua_pushcfunction(L, CorsixTH_lua_stacktrace);
 		lua_pushcfunction(L, CorsixTH_lua_main);
