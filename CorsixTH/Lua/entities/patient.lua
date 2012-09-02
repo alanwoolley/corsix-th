@@ -544,9 +544,9 @@ function Patient:tickDay()
     
     self.world:findObjectNear(self, "litter", 2, function(x, y)
       local litter = self.world:getObject(x, y, "litter")
-	  if not litter then
-		return
-	  end
+    if not litter then
+    return
+    end
       if litter:vomitInducing() then
         local alreadyFound = false
         for i=1,numVomit do
@@ -580,9 +580,9 @@ function Patient:tickDay()
   -- It is nice to see plants, but dead plants make you unhappy
   self.world:findObjectNear(self, "plant", 2, function(x, y)
     local plant = self.world:getObject(x, y, "plant")
-	if not plant then
-		return
-	end
+  if not plant then
+    return
+  end
     if plant:isPleasing() then
       self:changeAttribute("happiness", 0.0002) 
     else
@@ -767,7 +767,7 @@ function Patient:tickDay()
   end
 end
 
--- Called each time the patients moves to a new tile.
+-- Called each time the patient moves to a new tile.
 function Patient:setTile(x, y)
   -- Is the patient about to drop some litter?
   if self.litter_countdown then
@@ -781,7 +781,10 @@ function Patient:setTile(x, y)
         litter:setLitterType(trash, math.random(0, 1))
         if not self.hospital.hospital_littered then
           self.hospital.hospital_littered = true
-          self.world.ui.adviser:say(_A.staff_advice.need_handyman_litter)
+          -- A callout is only needed if there are no handymen employed
+          if not self.hospital:hasStaffOfCategory("Handyman") then
+            self.world.ui.adviser:say(_A.staff_advice.need_handyman_litter)
+          end
         end
       end
       self.litter_countdown = nil

@@ -35,9 +35,12 @@ EVT_RIBBONBUTTONBAR_CLICKED(wxID_NEW, frmMain::_onNew)
 EVT_RIBBONBUTTONBAR_CLICKED(wxID_OPEN, frmMain::_onOpen)
 EVT_RIBBONBUTTONBAR_CLICKED(wxID_SAVE, frmMain::_onSave)
 EVT_RIBBONBUTTONBAR_DROPDOWN_CLICKED(wxID_SAVE, frmMain::_onSaveMenu)
+EVT_MENU(ID_SAVE_IN_DROPDOWN, frmMain::_onSaveMenuSave)
+EVT_MENU(ID_SAVEAS, frmMain::_onSaveMenuSaveAs)
 EVT_RIBBONBUTTONBAR_CLICKED(ID_VIEW_WALLS, frmMain::_onViewWalls)
 EVT_RIBBONBUTTONBAR_CLICKED(ID_VIEW_FLAGS, frmMain::_onViewFlags)
 EVT_RIBBONBUTTONBAR_CLICKED(ID_VIEW_PARCELS, frmMain::_onViewParcels)
+EVT_RIBBONBUTTONBAR_CLICKED(ID_VIEW_POSITIONS, frmMain::_onViewPositions)
 EVT_SIZE(frmMain::_onResize)
 END_EVENT_TABLE()
 
@@ -216,8 +219,8 @@ void frmMain::_onSave(wxRibbonButtonBarEvent& evt)
 void frmMain::_onSaveMenu(wxRibbonButtonBarEvent& evt)
 {
     wxMenu mnuPopup;
-    mnuPopup.Append(wxID_SAVE, "Save");
-    mnuPopup.Append(wxID_SAVEAS, "Save As");
+    mnuPopup.Append(ID_SAVE_IN_DROPDOWN, "Save");
+    mnuPopup.Append(ID_SAVEAS, "Save As");
     evt.PopupMenu(&mnuPopup);
 }
 
@@ -309,6 +312,13 @@ void frmMain::_onViewParcels(wxRibbonButtonBarEvent& evt)
             pParcelPanel->Destroy();
     }
     m_pRibbon->Realize();
+}
+
+void frmMain::_onViewPositions(wxRibbonButtonBarEvent& evt)
+{
+    m_bViewPositions = evt.IsChecked();
+    _applyViewOverlay();
+    m_pGamePanel->Refresh();
 }
 
 wxBitmap frmMain::_asBitmap(THSpriteSheet* pSheet, unsigned int iSprite)
@@ -473,6 +483,8 @@ int frmMain::_l_init_with_lua_app(lua_State *L)
     pViewButtons->ToggleButton(ID_VIEW_FLAGS, pThis->m_bViewFlags = false);
     pViewButtons->AddToggleButton(ID_VIEW_PARCELS, wxT("Parcels"), BITMAP("parcels"));
     pViewButtons->ToggleButton(ID_VIEW_PARCELS, pThis->m_bViewParcels = false);
+    pViewButtons->AddToggleButton(ID_VIEW_POSITIONS, wxT("Positions"), BITMAP("positions"));
+    pViewButtons->ToggleButton(ID_VIEW_POSITIONS, pThis->m_bViewPositions = false);
     
 
 #undef BITMAP
@@ -488,7 +500,7 @@ void frmMain::_applyViewWalls()
 
 void frmMain::_applyViewOverlay()
 {
-    if(m_bViewFlags || m_bViewParcels)
+    if(m_bViewFlags || m_bViewParcels || m_bViewPositions)
     {
         lua_State *L = m_pGamePanel->getLua();
         luaT_execute(L, "return TheApp.gfx:loadBuiltinFont(), TheApp.map.cell_outline");
@@ -498,6 +510,7 @@ void frmMain::_applyViewOverlay()
 
         THMapTypicalOverlay *pFlags = NULL;
         THMapTypicalOverlay *pParcels = NULL;
+        THMapPositionsOverlay *pPositions = NULL;
         if(m_bViewFlags)
         {
             pFlags = new THMapFlagsOverlay;
@@ -510,10 +523,20 @@ void frmMain::_applyViewOverlay()
             pParcels->setFont(pFont, false);
             pParcels->setSprites(pSprites, false);
         }
+        if(m_bViewPositions)
+        {
+            pPositions = new THMapPositionsOverlay;
+            pPositions->setFont(pFont, false);
+            pPositions->setSprites(pSprites, false);
+            pPositions->setBackgroundSprite(2);
+        }
         THMapOverlayPair *pOverlays = new THMapOverlayPair;
         pOverlays->setFirst(pParcels, true);
         pOverlays->setSecond(pFlags, true);
-        m_pGamePanel->getMap()->setOverlay(pOverlays, true);
+        THMapOverlayPair *pOverlays2 = new THMapOverlayPair;
+        pOverlays2->setFirst(pOverlays, true);
+        pOverlays2->setSecond(pPositions, true);
+        m_pGamePanel->getMap()->setOverlay(pOverlays2, true);
     }
     else
         m_pGamePanel->getMap()->setOverlay(NULL, false);

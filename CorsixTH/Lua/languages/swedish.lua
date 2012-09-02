@@ -60,6 +60,10 @@ tooltip.casebook.cure_type.unknown = utf8 "Du vet ännu inte hur denna sjukdom b
 tooltip.research_policy.no_research = "Det pågår ingen forskning i den här kategorin just nu"
 tooltip.research_policy.research_progress = "Framsteg inför nästa upptäckt i denna kategori: %1%/%2%"
 
+handyman_window.all_parcels = "Alla tomter"
+handyman_window.parcel = "Tomt"
+tooltip.handyman_window.parcel_select = "Tomten där vaktmästaren accepterar uppdrag. Klicka för att ändra"
+
 menu_options = {
   lock_windows = utf8 "  LÅS FÖNSTER  ",
   edge_scrolling = "  KANTRULLNING  ",
@@ -361,6 +365,7 @@ cheats_window = {
     all_research = "All forskning",
     emergency = "Skapa akutfall",
     vip = "Skapa VIP",
+    earthquake = "Skapa jordbävning",
     create_patient = "Skapa patient",
     end_month = utf8 "Månadsslut",
     end_year = utf8 "Hoppa till nyår",
@@ -377,6 +382,7 @@ tooltip.cheats_window = {
     all_research = utf8 "Färdigställer all forskning.",
     emergency = "Skapar ett akutfall.",
     vip = "Skapar en Mycket Viktig Person (VIP)",
+    earthquake = "Skapar en jordbävning med slumpad styrka",
     create_patient = "Skapar en patient vid kanten av kartan.",
     end_month = utf8 "Hoppar till slutet av månaden.",
     end_year = utf8 "Hoppar till slutet av året.",

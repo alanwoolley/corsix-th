@@ -256,12 +256,12 @@ options_window = {
 }
 
 tooltip.handyman_window = {
-	parcel_select = "The parcel where the handyman accepts tasks, click to change setting"
+  parcel_select = "The parcel where the handyman accepts tasks, click to change setting"
 }
 
 handyman_window = {
-	all_parcels = "All parcels",
-	parcel = "Parcel"
+  all_parcels = "All parcels",
+  parcel = "Parcel"
 }
 
 tooltip.options_window = {
@@ -383,6 +383,7 @@ cheats_window = {
     all_research = "All Research Cheat",
     emergency = "Create Emergency",
     vip = "Create VIP",
+    earthquake = "Create Earthquake",
     create_patient = "Create Patient",
     end_month = "End of Month",
     end_year = "End of Year",
@@ -399,6 +400,7 @@ tooltip.cheats_window = {
     all_research = "Completes all research.",
     emergency = "Creates an emergency.",
     vip = "Creates a VIP.",
+    earthquake = "Creates an earthquake.",
     create_patient = "Creates a Patient at the map border.",
     end_month = "Jumps to the end of the month.",
     end_year = "Jumps to the end of the year.",

@@ -268,12 +268,12 @@ options_window = {
 }
 
 tooltip.handyman_window = {
-	parcel_select = "La parcela donde el bedel acepta encargos, haz clic para cambiar el ajuste"
+  parcel_select = "La parcela donde el bedel acepta encargos, haz clic para cambiar el ajuste"
 }
 
 handyman_window = {
-	all_parcels = "Todas las parcelas",
-	parcel = "Parcela"
+  all_parcels = "Todas las parcelas",
+  parcel = "Parcela"
 }
 
 tooltip.options_window = {
@@ -395,6 +395,7 @@ cheats_window = {
     all_research = "Truco de todo investigado",
     emergency = "Crear una emergencia",
     vip = "Crear un VIP",
+    earthquake = "Crear terremoto",
     create_patient = "Crear un paciente",
     end_month = "Fin de mes",
     end_year = utf8 "Fin del año",
@@ -411,6 +412,7 @@ tooltip.cheats_window = {
     all_research = "Completar todas las investigaciones.",
     emergency = "Crear una emergencia.",
     vip = "Crear un VIP.",
+    earthquake = "Crear un terremoto.",
     create_patient = "Crear un paciente en el borde del mapa.",
     end_month = "Avanza hasta el fin del mes actual.",
     end_year = utf8 "Avanza hasta el final del año actual.",

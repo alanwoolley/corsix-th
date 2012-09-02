@@ -28,7 +28,7 @@ local assert, io, type, dofile, loadfile, pcall, tonumber, print, setmetatable
 
 -- Increment each time a savegame break would occur
 -- and add compatibility code in afterLoad functions
-local SAVEGAME_VERSION = 51
+local SAVEGAME_VERSION = 53
 
 class "App"
 
@@ -157,7 +157,7 @@ function App:init()
     self.gfx:loadRaw("Load01V", 640, 480):draw(self.video,
       (self.config.width - 640) / 2, (self.config.height - 480) / 2)
     self.video:endFrame()
-    -- Add some noticies to the loading screen
+    -- Add some notices to the loading screen
     local notices = {}
     local font = self.gfx:loadBuiltinFont()
     if TH.freetype_font and self.gfx:hasLanguageFont("unicode") then
@@ -407,8 +407,9 @@ function App:dumpStrings()
   local function is_table(o)
     return type(val(o)) == "table"
   end
-  
-  local fi = assert(io.open("debug-strings-orig.txt", "wt"))
+  local dir = self.command_line["config-file"] or ""
+  dir = string.sub(dir, 0, -11)
+  local fi = assert(io.open(dir .. "debug-strings-orig.txt", "wt"))
   for i, sec in ipairs(_S.deprecated) do
     for j, str in ipairs(sec) do
       fi:write("[" .. i .. "," .. j .. "] " .. ("%q\n"):format(val(str)))
@@ -456,11 +457,11 @@ function App:dumpStrings()
     end
   end
   
-  fi = assert(io.open("debug-strings-new-lines.txt", "wt"))
+  fi = assert(io.open(dir .. "debug-strings-new-lines.txt", "wt"))
   dump_by_line(fi, _S, "")
   fi:close()
   
-  fi = assert(io.open("debug-strings-new-grouped.txt", "wt"))
+  fi = assert(io.open(dir .. "debug-strings-new-grouped.txt", "wt"))
   dump_grouped(fi, _S, "")
   fi:close()
   
@@ -492,7 +493,7 @@ function App:dumpStrings()
         end
       end
     end
-    fi = assert(io.open("debug-strings-diff.txt", "wt"))
+    fi = assert(io.open(dir .. "debug-strings-diff.txt", "wt"))
     fi:write("------------------------------------\n")
     fi:write("MISSING STRINGS IN LANGUAGE \"" .. self.config.language:upper() .. "\":\n")
     fi:write("------------------------------------\n")
@@ -602,7 +603,7 @@ end
 
 function App:run()
   -- The application "main loop" is an SDL event loop written in C, which calls
-  -- a coroutine whenver an event occurs. Initially it may seem odd to involve
+  -- a coroutine whenever an event occurs. Initially it may seem odd to involve
   -- coroutines, but it does give a few advantages:
   --  1) Lua can signal the main loop to exit by finishing the coroutine
   --  2) If an error occurs, the call stack is preserved in the coroutine, so
@@ -661,7 +662,7 @@ function App:run()
     end
     if self.world and self.last_dispatch_type == "timer" and self.world.current_tick_entity then
       -- Disconnecting the tick handler is quite a drastic measure, so give
-      -- the option of just disconnecting the offending entity and attemping
+      -- the option of just disconnecting the offending entity and attempting
       -- to continue.
       local handler = self.eventHandlers[self.last_dispatch_type]
       local entity = self.world.current_tick_entity
@@ -943,8 +944,10 @@ end
 --! Returns the version number (name) of the local copy of the game based on
 --! which save game version it is. This was added after the Beta 8
 --! release, which is why the checks prior to that version aren't made.
-function App:getVersion()
-  local ver = self.savegame_version
+--!param version An optional value if you want to find what game version
+-- a specific savegame verion is from.
+function App:getVersion(version)
+  local ver = version or self.savegame_version
   if ver > 51 then
     return "Trunk"
   elseif ver > 45 then
@@ -1023,12 +1026,15 @@ function App:afterLoad()
   end
   
   if new == old then
+    self.world:gameLog("Savegame version is " .. new .. " (" .. self:getVersion() .. ")")
     return
   elseif new > old then
-    self.world:gameLog("Savegame version changed from " .. old .. " to " .. new .. ".")
+    self.world:gameLog("Savegame version changed from " .. old .. " (" .. self:getVersion(old) ..
+                       ") to " .. new .. " (" .. self:getVersion() .. ").")
   else
     -- TODO: This should maybe be forbidden completely.
-    self.world:gameLog("Warning: loaded savegame version " .. old .. " in older version " .. new .. ".")
+    self.world:gameLog("Warning: loaded savegame version " .. old .. " (" .. self:getVersion(old) ..
+                       ")" .. " in older version " .. new .. " (" .. self:getVersion() .. ").")
   end
   self.world.savegame_version = new
   

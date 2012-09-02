@@ -19,12 +19,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+#include <algorithm>
 #include "scrollable_game.h"
 
 BEGIN_EVENT_TABLE(ScrollableGamePanel, wxPanel)
-EVT_SIZE(ScrollableGamePanel::_onResize)
-EVT_COMMAND_SCROLL(ID_X_SCROLL, ScrollableGamePanel::_onScroll)
-EVT_COMMAND_SCROLL(ID_Y_SCROLL, ScrollableGamePanel::_onScroll)
+  EVT_SIZE(ScrollableGamePanel::_onResize)
+  EVT_COMMAND_SCROLL(ID_X_SCROLL, ScrollableGamePanel::_onScroll)
+  EVT_COMMAND_SCROLL(ID_Y_SCROLL, ScrollableGamePanel::_onScroll)
+  EVT_TIMER(wxID_ANY, ScrollableGamePanel::_onTimer)
 END_EVENT_TABLE()
 
 ScrollableGamePanel::ScrollableGamePanel(wxWindow *pParent)
@@ -46,6 +48,9 @@ ScrollableGamePanel::ScrollableGamePanel(wxWindow *pParent)
     pSizer->Add(m_pMapScrollX = new wxScrollBar(this, ID_X_SCROLL, 
         wxDefaultPosition, wxDefaultSize, wxHORIZONTAL), 0, wxEXPAND);
     pSizer->AddSpacer(0);
+    
+    m_pTimer = new wxTimer(this, wxID_ANY);
+    m_pTimer->Start(100, false);
 
     SetSizer(pSizer);
 }
@@ -230,6 +235,44 @@ int ScrollableGamePanel::_l_on_ui_scroll_map(lua_State *L)
 }
 
 void ScrollableGamePanel::_onScroll(wxScrollEvent& evt)
+{    
+    _positionMap();
+}
+
+void ScrollableGamePanel::_onTimer(wxTimerEvent& evt)
+{
+    const int KEY_SENSITIVITY = 20;
+    int x = m_pMapScrollX->GetThumbPosition();
+    int y = m_pMapScrollY->GetThumbPosition();
+    bool bChanges = false;
+    
+    if(wxGetKeyState(WXK_LEFT))
+    {
+        m_pMapScrollX->SetThumbPosition(std::max(0, x - KEY_SENSITIVITY));
+        bChanges = true;
+    }
+    if(wxGetKeyState(WXK_RIGHT))
+    {
+        m_pMapScrollX->SetThumbPosition(std::min(m_pMapScrollX->GetRange(), x + KEY_SENSITIVITY));
+        bChanges = true;
+    }
+    if(wxGetKeyState(WXK_UP))
+    {
+        m_pMapScrollY->SetThumbPosition(std::max(0, y - KEY_SENSITIVITY));
+        bChanges = true;
+    }
+    if(wxGetKeyState(WXK_DOWN))
+    {
+        m_pMapScrollY->SetThumbPosition(std::min(m_pMapScrollY->GetRange(), y + KEY_SENSITIVITY));
+        bChanges = true;
+    }
+    if (bChanges)
+    {
+        _positionMap();
+    }
+}
+
+void ScrollableGamePanel::_positionMap()
 {
     lua_State *L = getLua();
     if(!L)
@@ -252,7 +295,7 @@ void ScrollableGamePanel::_onScroll(wxScrollEvent& evt)
     lua_getfield(L, -1, "scrollMapTo");
     lua_insert(L, -2);
     lua_pushinteger(L, m_pMapScrollX->GetThumbPosition() - m_pMapScrollX->GetRange() / 2 + m_pMapScrollX->GetThumbSize() / 2);
-    lua_pushinteger(L, m_pMapScrollY->GetThumbPosition() + m_pMapScrollY->GetThumbSize() / 2);
+    lua_pushinteger(L, m_pMapScrollY->GetThumbPosition());
     m_bShouldRespondToScroll = false;
     lua_call(L, 3, 1);
     m_bShouldRespondToScroll = true;
