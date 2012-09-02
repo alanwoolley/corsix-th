@@ -146,6 +146,15 @@ extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthLoadGame(
 	LOGI("Done");
 }
 
+extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthGameSpeed(JNIEnv* env, jclass jcls, jint speed) {
+	LOGI("Setting game speed");
+	SDL_Event e;
+	e.type = SDL_USEREVENT_GAMESPEED;
+	e.user.data1 = (void*) speeds[speed];
+	SDL_PushEvent(&e);
+	LOGI("Done");
+}
+
 //! Program entry point
 /*!
  Prepares a Lua state for, and catches errors from, CorsixTH_lua_main(). By

@@ -52,6 +52,7 @@ function App:App()
     load = self.load,
     restart = self.restart,
     save = self.save,
+    gamespeed = self.gamespeed,
   }
   self.strings = {}
   self.savegame_version = SAVEGAME_VERSION
@@ -962,6 +963,12 @@ function App:load(filename)
   print "loading"
   return LoadGameFile(self.savegame_dir .. filename)
 end
+
+function App:gamespeed(speed)
+  print "Changing speed"
+  return self.world:setSpeed(speed)
+end
+
 
 --! Restarts the current level (offers confirmation window first)
 function App:restart()

@@ -222,6 +222,14 @@ static int l_mainloop(lua_State *L)
             	lua_pushstring(dispatcher, (const char*)d);
             	nargs = 2;
             	break;
+            case SDL_USEREVENT_GAMESPEED:
+            	lua_pushliteral(dispatcher, "gamespeed");
+            	strcpy(d, (const char*)e.user.data1);
+            	sprintf(buf, "Game speed: %s", d);
+            	LOGI(buf);
+            	lua_pushstring(dispatcher, (const char*)d);
+            	nargs = 2;
+            	break;
             case SDL_USEREVENT_RESTART:
             	lua_pushliteral(dispatcher, "restart");
             	nargs = 1;
