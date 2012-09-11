@@ -52,7 +52,7 @@ struct types_equal<T1, T1> {
 JNIEnv* jEnv;
 lua_State* L;
 
-const char *speeds[] = { "Pause", "Slowest", "Slower", "Normal", "Max Speed",
+const char *speeds[] = { "Pause", "Slowest", "Slower", "Normal", "Max speed",
 		"And then some more" };
 
 static int sendCommandInt(jint cmd, jint data) {
@@ -163,6 +163,12 @@ extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthGameSpeed(JNIE
  for CorsixTH_lua_main().
  */
 int SDL_main(int argc, char** argv, JNIEnv* env) {
+
+	FILE* fo = freopen( "/mnt/sdcard/cthlog.txt", "w", stdout );
+	FILE* fe = freopen( "/mnt/sdcard/ctherrlog.txt", "w", stderr );
+	setvbuf (fo, 0, _IONBF, 0);
+	setvbuf (fe, 0, _IONBF, 0);
+	fprintf(stdout, "Starting CTH Android\n");
 	jEnv = env;
 
 	struct compile_time_lua_check {
@@ -184,6 +190,7 @@ int SDL_main(int argc, char** argv, JNIEnv* env) {
 		if (L == NULL) {
 			fprintf(stderr, "Fatal error starting CorsixTH: "
 			"Cannot open Lua state.\n");
+			fflush(fe);
 			return 0;
 		}
 		lua_atpanic(L, CorsixTH_lua_panic);
@@ -211,14 +218,17 @@ int SDL_main(int argc, char** argv, JNIEnv* env) {
 			const char* err = lua_tostring(L, -1);
 			if (err != NULL) {
 				fprintf(stderr, "%s\n", err);
+				fflush(fe);
 			} else {
 				fprintf(stderr, "An error has occured in CorsixTH:\n"
 						"Uncaught non-string Lua error\n");
+				fflush(fe);
 			}
 			lua_pushcfunction(L, Bootstrap_lua_error_report);
 			lua_insert(L, -2);
 			if (lua_pcall(L, 1, 0, 0) != 0) {
 				fprintf(stderr, "%s\n", lua_tostring(L, -1));
+				fflush(fe);
 			}
 		}
 
@@ -248,6 +258,7 @@ int SDL_main(int argc, char** argv, JNIEnv* env) {
 
 		if (bRun) {
 			printf("Restarting...\n");
+			fflush(fo);
 		}
 	}
 	return 0;
