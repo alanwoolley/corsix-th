@@ -30,9 +30,7 @@
 #include <unistd.h>
 #include "Src/lua_sdl.h"
 #include "commands.h"
-
-#define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__))
-#define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "native-activity", __VA_ARGS__))
+#include "logging.h"
 
 // Template magic for checking type equality
 template<typename T1, typename T2>
@@ -70,66 +68,66 @@ static int sendCommand(jint cmd) {
 }
 
 static int showkeyboard(lua_State *L) {
-	LOGI("Showing keyboard");
+	LOG_INFO("Showing keyboard");
 	return sendCommand(COMMAND_SHOW_KEYBOARD);
 }
 
 static int hidekeyboard(lua_State *L) {
-	LOGI("Hiding keyboard");
+	LOG_INFO("Hiding keyboard");
 	return sendCommand(COMMAND_HIDE_KEYBOARD);
 }
 
 static int showmenu(lua_State *L) {
-	LOGI("Showing Menu");
+	LOG_INFO("Showing Menu");
 	return sendCommand(COMMAND_SHOW_MENU);
 }
 
 static int quickload(lua_State *L) {
-	LOGI("Quick Load");
+	LOG_INFO("Quick Load");
 	return sendCommand(COMMAND_QUICK_LOAD);
 }
 
 static int showloaddialog(lua_State *L) {
-	LOGI("Showing Load Dialog");
+	LOG_INFO("Showing Load Dialog");
 	return sendCommand(COMMAND_SHOW_LOAD_DIALOG);
 }
 
 static int gamespeedupdated(lua_State *L) {
-	LOGI("Game speed updated");
+	LOG_INFO("Game speed updated");
 	int speedvar;
 	int argc = lua_gettop(L);
 	const char* gamespeed = lua_tostring(L, 1);
-	LOGI(gamespeed);
+	LOG_INFO(gamespeed);
 
 	for (int n = 0; n < 6; n++) {
 		if (strcmp(gamespeed, speeds[n]) == 0) {
 			return sendCommandInt(COMMAND_GAME_SPEED_UPDATED, n);
 		}
 	}
-	LOGI("Couldn't find game speed. Going with Normal.");
+	LOG_INFO("Couldn't find game speed. Going with Normal.");
 	return sendCommandInt(COMMAND_GAME_SPEED_UPDATED, 4);
 }
 
 extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthRestartGame(
 		JNIEnv* env, jclass cls) {
-	LOGI("Restarting game");
+	LOG_INFO("Restarting game");
 	SDL_Event e;
 	e.type = SDL_USEREVENT_RESTART;
 	SDL_PushEvent(&e);
-	LOGI("Done");
+	LOG_INFO("Done");
 }
 
 extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthSaveGame(
 		JNIEnv* env, jclass jcls, jstring path) {
 
 	const char *nativeString = env->GetStringUTFChars(path, 0);
-	LOGI("Saving game");
+	LOG_INFO("Saving game");
 	SDL_Event e;
 	e.type = SDL_USEREVENT_SAVE;
 	e.user.data1 = (void*) nativeString;
 	SDL_PushEvent(&e);
 	//env->ReleaseStringUTFChars(path, nativeString);
-	LOGI("Done");
+	LOG_INFO("Done");
 
 }
 
@@ -137,22 +135,22 @@ extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthLoadGame(
 		JNIEnv* env, jclass jcls, jstring path) {
 
 	const char *nativeString = env->GetStringUTFChars(path, 0);
-	LOGI("Loading game");
+	LOG_INFO("Loading game");
 	SDL_Event e;
 	e.type = SDL_USEREVENT_LOAD;
 	e.user.data1 = (void*) nativeString;
 	SDL_PushEvent(&e);
 	//env->ReleaseStringUTFChars(path, nativeString);
-	LOGI("Done");
+	LOG_INFO("Done");
 }
 
 extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthGameSpeed(JNIEnv* env, jclass jcls, jint speed) {
-	LOGI("Setting game speed");
+	LOG_INFO("Setting game speed");
 	SDL_Event e;
 	e.type = SDL_USEREVENT_GAMESPEED;
 	e.user.data1 = (void*) speeds[speed];
 	SDL_PushEvent(&e);
-	LOGI("Done");
+	LOG_INFO("Done");
 }
 
 //! Program entry point
@@ -164,11 +162,10 @@ extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthGameSpeed(JNIE
  */
 int SDL_main(int argc, char** argv, JNIEnv* env) {
 
-	FILE* fo = freopen( "/mnt/sdcard/cthlog.txt", "w", stdout );
-	FILE* fe = freopen( "/mnt/sdcard/ctherrlog.txt", "w", stderr );
-	setvbuf (fo, 0, _IONBF, 0);
-	setvbuf (fe, 0, _IONBF, 0);
-	fprintf(stdout, "Starting CTH Android\n");
+	START_LOGGING(argv[1]);
+
+	LOG_INFO("Starting CTH Android\n");
+
 	jEnv = env;
 
 	struct compile_time_lua_check {
@@ -190,7 +187,6 @@ int SDL_main(int argc, char** argv, JNIEnv* env) {
 		if (L == NULL) {
 			fprintf(stderr, "Fatal error starting CorsixTH: "
 			"Cannot open Lua state.\n");
-			fflush(fe);
 			return 0;
 		}
 		lua_atpanic(L, CorsixTH_lua_panic);
@@ -218,17 +214,14 @@ int SDL_main(int argc, char** argv, JNIEnv* env) {
 			const char* err = lua_tostring(L, -1);
 			if (err != NULL) {
 				fprintf(stderr, "%s\n", err);
-				fflush(fe);
 			} else {
 				fprintf(stderr, "An error has occured in CorsixTH:\n"
 						"Uncaught non-string Lua error\n");
-				fflush(fe);
 			}
 			lua_pushcfunction(L, Bootstrap_lua_error_report);
 			lua_insert(L, -2);
 			if (lua_pcall(L, 1, 0, 0) != 0) {
 				fprintf(stderr, "%s\n", lua_tostring(L, -1));
-				fflush(fe);
 			}
 		}
 
@@ -258,7 +251,6 @@ int SDL_main(int argc, char** argv, JNIEnv* env) {
 
 		if (bRun) {
 			printf("Restarting...\n");
-			fflush(fo);
 		}
 	}
 	return 0;

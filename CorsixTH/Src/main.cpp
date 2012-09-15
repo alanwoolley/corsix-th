@@ -22,7 +22,7 @@ SOFTWARE.
 
 #include "config.h"
 #include "lua.hpp"
-#include <android/log.h>
+#include "../logging.h"
 
 extern "C" {
 #include "../../LFS/lfs.h"
@@ -42,8 +42,6 @@ int luaopen_random(lua_State *L);
 #endif
 // End of config file checking
 
-#define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__))
-#define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "native-activity", __VA_ARGS__))
 
 char path[512];
 
@@ -185,7 +183,7 @@ int CorsixTH_lua_main_no_eval(lua_State *L)
     "return loadfile(name)";
 	char sLuaCorsixTHLua[sizeof(sLuaCorsixTHLuaOld) + sizeof(path)];
     sprintf(sLuaCorsixTHLua, sLuaCorsixTHLuaOld, path);
-    //LOGI(sLuaCorsixTHLua);
+    //LOG_INFO(sLuaCorsixTHLua);
 	
     // return assert(loadfile"CorsixTH.lua")(...)
     if(!bGotScriptFile)
@@ -257,6 +255,6 @@ extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_setGamePath(
 	strcpy(path, nativeString);
 	char buf[512];
 	sprintf(buf,"Setting path to: %s", path);
-	LOGI(buf);
+	LOG_INFO(buf);
 	env->ReleaseStringUTFChars(javaString, nativeString);
 }

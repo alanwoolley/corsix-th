@@ -33,6 +33,7 @@ LOCAL_CFLAGS := -DPLAY_MOD
 # Add your application source files here...
 LOCAL_SRC_FILES := $(SDL_PATH)/src/main/android/SDL_android_main.cpp \
 			$(CORSIX_TH_SRC)/../appmain.cpp \
+			$(CORSIX_TH_SRC)/../logging.cpp \
 			$(CORSIX_TH_SRC)/main.cpp \
 			$(CORSIX_TH_SRC)/bootstrap.cpp \
 			$(CORSIX_TH_SRC)/th_lua.cpp \
