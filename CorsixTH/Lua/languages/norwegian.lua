@@ -136,7 +136,7 @@ menu_debug_overlay = {
   byte_5                        = "  BYTE 5  ",
   byte_6                        = "  BYTE 6  ",
   byte_7                        = "  BYTE 7  ",
-  parcel                        = "  PAKKE  ",
+  parcel                        = "  TOMT  ",
 }
 
 -- 5. Adviser
@@ -274,6 +274,7 @@ cheats_window = {
     lose_level = utf8 "Tap nivå",
     all_research = "All forskning",
     end_year = utf8 "Slutten av året",
+    earthquake = "Lag jordskjelv",
   },
 }
 
@@ -289,6 +290,7 @@ tooltip.cheats_window = {
   lose_level = utf8 "Tap dette nivået.",
   all_research = utf8 "Fullförer all forskning.",
   end_year = utf8 "Gå til slutten av dette året.",
+  earthquake = "Forårsaker et jordskjelv.",
   },
 }
   
@@ -1612,7 +1614,7 @@ tooltip = {
     center_view        = "Sentrer i skjermbildet", -- contains "handyman"
     sack               = "Si opp",
     pick_up            = "Plukk opp",
-    parcel_select      = "Stedet hvor Vaktmesteren velger oppgaver. Klikk for å endre innstilling.",
+    parcel_select      = "Steder hvor Vaktmesteren utfører oppgaver. Klikk for å endre innstilling.",
   },
   
   -- Place objects window
@@ -2853,8 +2855,8 @@ queue_window = {
 
 -- Handyman window
 handyman_window = {
-    parcel           = "Parsell",
-    all_parcels      = "Alle parseller",
+    parcel           = "Tomt",
+    all_parcels      = "Alle tomter",
 }
 -- Dynamic info
 dynamic_info = {
