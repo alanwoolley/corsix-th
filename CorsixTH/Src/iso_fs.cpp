@@ -334,7 +334,7 @@ void IsoFilesystem::visitDirectoryFiles(const char* sPath,
                              void* pCallbackData) const
 {
     size_t iLen = strlen(sPath) + 1;
-    char *sNormedPath = (char*)malloc(iLen);
+    char *sNormedPath = (char*)alloca(iLen);
     for(size_t i = 0; i < iLen; ++i)
         sNormedPath[i] = _normalise(sPath[i]);
 
@@ -357,7 +357,7 @@ void IsoFilesystem::visitDirectoryFiles(const char* sPath,
 IsoFilesystem::file_handle_t IsoFilesystem::findFile(const char* sPath) const
 {
     size_t iLen = strlen(sPath) + 1;
-    char *sNormedPath = (char*)malloc(iLen);
+    char *sNormedPath = (char*)alloca(iLen);
     for(size_t i = 0; i < iLen; ++i)
         sNormedPath[i] = _normalise(sPath[i]);
 

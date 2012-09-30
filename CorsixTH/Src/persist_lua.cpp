@@ -650,7 +650,6 @@ public:
 
     virtual void writeByteStream(const uint8_t *pBytes, size_t iCount)
     {
-		uint8_t *tmp;
         if(m_bHadError)
         {
             // If an error occured, then silently fail to write any
@@ -661,10 +660,7 @@ public:
         while(m_iDataLength + iCount > m_iDataBufferLength)
         {
             m_iDataBufferLength *= 2;
-            tmp = (uint8_t*)realloc(m_pData, m_iDataBufferLength);
-			if (tmp != NULL) {
-				m_pData = tmp;
-			}
+            m_pData = (uint8_t*)realloc(m_pData, m_iDataBufferLength);
         }
         memcpy(m_pData + m_iDataLength, pBytes, iCount);
         m_iDataLength += iCount;
@@ -672,7 +668,6 @@ public:
 
     virtual void setError(const char *sError)
     {
-		uint8_t *tmp;
         // If multiple errors occur, only record the first.
         if(m_bHadError)
             return;
@@ -680,12 +675,8 @@ public:
 
         // Use the written data buffer to store the error message
         m_iDataLength = strlen(sError) + 1;
-        if(m_iDataBufferLength < m_iDataLength) {
-            tmp = (uint8_t*)realloc(m_pData, m_iDataBufferLength);
-			if (tmp!= NULL) {
-				m_pData = tmp;
-			}
-		}
+        if(m_iDataBufferLength < m_iDataLength)
+            m_pData = (uint8_t*)realloc(m_pData, m_iDataBufferLength);
         strcpy((char*)m_pData, sError);
     }
 
@@ -762,17 +753,12 @@ public:
 
     virtual void setError(const char *sError)
     {
-		char* tmp;
         m_bHadError = true;
         size_t iErrLength = strlen(sError) + 1;
         if(iErrLength > m_iStringBufferLength)
         {
-            
-			tmp = (char*)realloc(m_sStringBuffer, iErrLength);
-            if (tmp != NULL) {
-				m_sStringBuffer = tmp;
-				m_iStringBufferLength = iErrLength;
-			}
+            m_sStringBuffer = (char*)realloc(m_sStringBuffer, iErrLength);
+            m_iStringBufferLength = iErrLength;
         }
         strcpy(m_sStringBuffer, sError);
     }
@@ -866,12 +852,7 @@ public:
                 while(iLength > m_iStringBufferLength)
                 {
                     m_iStringBufferLength *= 2;
-                    char* tmp;
-					tmp = (char*)realloc(m_sStringBuffer, m_iStringBufferLength);
-					if (tmp != NULL) {
-						m_sStringBuffer = tmp;
-					}
-
+                    m_sStringBuffer = (char*)realloc(m_sStringBuffer, m_iStringBufferLength);
                 }
                 if(!readByteStream((uint8_t*)m_sStringBuffer, iLength))
                     return false;

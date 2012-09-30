@@ -72,7 +72,7 @@ public:
         }
         else
         {
-            uint8_t *pBytes = (uint8_t*)malloc(iNumBytes);
+            uint8_t *pBytes = (uint8_t*)alloca(iNumBytes);
             pBytes[iNumBytes - 1] = 0x7F & (uint8_t)(tValue);
             for(int i = 1; i < iNumBytes; ++i)
             {
