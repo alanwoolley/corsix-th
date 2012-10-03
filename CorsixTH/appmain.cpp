@@ -47,13 +47,15 @@ struct types_equal<T1, T1> {
 	};
 };
 
-JNIEnv* jEnv;
+JavaVM* jvm;
 lua_State* L;
 
 const char *speeds[] = { "Pause", "Slowest", "Slower", "Normal", "Max speed",
 		"And then some more" };
 
 static int sendCommandInt(jint cmd, jint data) {
+	JNIEnv* jEnv;
+	jvm->AttachCurrentThread(&jEnv, NULL);
 	jclass cls = jEnv->FindClass("uk/co/armedpineapple/corsixth/SDLActivity");
 	jmethodID method = jEnv->GetStaticMethodID(cls, "sendCommand", "(II)V");
 	jEnv->CallStaticVoidMethod(cls, method, cmd, data);
@@ -61,6 +63,8 @@ static int sendCommandInt(jint cmd, jint data) {
 }
 
 static int sendCommand(jint cmd) {
+	JNIEnv* jEnv;
+	jvm->AttachCurrentThread(&jEnv, NULL);
 	jclass cls = jEnv->FindClass("uk/co/armedpineapple/corsixth/SDLActivity");
 	jmethodID method = jEnv->GetStaticMethodID(cls, "sendCommand", "(I)V");
 	jEnv->CallStaticVoidMethod(cls, method, cmd);
@@ -144,7 +148,8 @@ extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthLoadGame(
 	LOG_INFO("Done");
 }
 
-extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthGameSpeed(JNIEnv* env, jclass jcls, jint speed) {
+extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthGameSpeed(
+		JNIEnv* env, jclass jcls, jint speed) {
 	LOG_INFO("Setting game speed");
 	SDL_Event e;
 	e.type = SDL_USEREVENT_GAMESPEED;
@@ -160,13 +165,15 @@ extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthGameSpeed(JNIE
  sooner, hence this function does as little as possible and leaves the rest
  for CorsixTH_lua_main().
  */
-int SDL_main(int argc, char** argv, JNIEnv* env) {
+int SDL_main(int argc, char** argv, JavaVM* vm) {
 
 	START_LOGGING(argv[1]);
 
-	LOG_INFO("Starting CTH Android\n");
+	LOG_INFO("0\n");
+	LOG_INFO("Starting CTH Android");
+	LOG_INFO("1\n");
 
-	jEnv = env;
+	jvm = vm;
 
 	struct compile_time_lua_check {
 		// Lua 5.1, not 5.0, is required
@@ -180,13 +187,14 @@ int SDL_main(int argc, char** argv, JNIEnv* env) {
 	bool bRun = true;
 
 	while (bRun) {
+		LOG_INFO("2");
 		L = NULL;
 
 		L = luaL_newstate();
 
 		if (L == NULL) {
 			fprintf(stderr, "Fatal error starting CorsixTH: "
-			"Cannot open Lua state.\n");
+					"Cannot open Lua state.\n");
 			return 0;
 		}
 		lua_atpanic(L, CorsixTH_lua_panic);

@@ -12,9 +12,9 @@ void LOG_ERROR(std::string strtext) {
 		}
 	}
 
-	char *cstr = (char*) strtext.c_str();
-	LOGW(cstr);
-	fprintf(stderr, cstr);
+	LOGW(strtext.c_str());
+	fprintf(stderr, strtext.c_str());
+
 }
 
 void LOG_INFO(std::string strtext) {
@@ -25,12 +25,13 @@ void LOG_INFO(std::string strtext) {
 		}
 	}
 
-	char *cstr = (char*) strtext.c_str();
-	LOGI(cstr);
-	fprintf(stdout, cstr);
+	LOGI(strtext.c_str());
+	fprintf(stdout, strtext.c_str());
+
 }
 
 void START_LOGGING(const char* root) {
+
 	std::string logfile = std::string(root) + "/cthlog.txt";
 	std::string errlogfile = std::string(root) + "/ctherrlog.txt";
 	// Redirect stdout and stderr
@@ -42,5 +43,6 @@ void START_LOGGING(const char* root) {
 	setvbuf(fe, 0, _IONBF, 0);
 
 	LOG_INFO(root);
+
 }
 
