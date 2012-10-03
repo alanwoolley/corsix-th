@@ -169,9 +169,7 @@ int SDL_main(int argc, char** argv, JavaVM* vm) {
 
 	START_LOGGING(argv[1]);
 
-	LOG_INFO("0\n");
 	LOG_INFO("Starting CTH Android");
-	LOG_INFO("1\n");
 
 	jvm = vm;
 
