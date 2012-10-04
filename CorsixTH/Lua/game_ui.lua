@@ -32,8 +32,8 @@ local pathsep = package.config:sub(1, 1)
 local scrolling = false
 local auto_dx = 0.0
 local auto_dy = 0.0
-local auto_multiplier = 0.9
-local auto_threshold = 0.2
+local auto_multiplier = 0.85
+local auto_threshold = 0.5
 
 function GameUI:GameUI(app, local_hospital)
   self:UI(app)
