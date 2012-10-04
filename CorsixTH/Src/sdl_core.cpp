@@ -23,6 +23,7 @@ SOFTWARE.
 #include "config.h"
 #include "lua_sdl.h"
 #include "th_lua.h"
+#include "SDL_framerate.h"
 #include <string.h>
 #include "../logging.h"
 #ifndef _MSC_VER
@@ -31,7 +32,7 @@ SOFTWARE.
 #pragma warning (disable: 4996) // CRT deprecation
 #endif
 
-
+#define MAX_FPS 18
 
 static int l_init(lua_State *L)
 {
@@ -148,6 +149,10 @@ static int l_mainloop(lua_State *L)
 
     fps_ctrl *fps_control = (fps_ctrl*)lua_touserdata(L, lua_upvalueindex(1));
     SDL_TimerID timer = SDL_AddTimer(30, timer_frame_callback, NULL);
+    FPSmanager fps_manager;
+    SDL_initFramerate(&fps_manager);
+    SDL_setFramerate(&fps_manager, MAX_FPS);
+
     SDL_Event e;
     char buf[255];
     char d[255];
@@ -286,7 +291,7 @@ static int l_mainloop(lua_State *L)
                 lua_settop(dispatcher, 0);
             } while(fps_control->limit_fps == false && SDL_PollEvent(NULL) == 0);
         }
-
+        SDL_framerateDelay(&fps_manager);
         // No events pending - a good time to do a bit of garbage collection
         lua_gc(L, LUA_GCSTEP, 2);
     }
