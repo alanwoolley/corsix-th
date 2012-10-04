@@ -29,6 +29,12 @@ local SDL = require "sdl"
 local lfs = require "lfs"
 local pathsep = package.config:sub(1, 1)
 
+local scrolling = false
+local auto_dx = 0.0
+local auto_dy = 0.0
+local auto_multiplier = 0.9
+local auto_threshold = 0.2
+
 function GameUI:GameUI(app, local_hospital)
   self:UI(app)
 
@@ -380,7 +386,7 @@ end
 -- TODO: try to remove duplication with UI:onMouseMove
 function GameUI:onMouseMove(x, y, dx, dy)
   local repaint = UpdateCursorPosition(self.app.video, x, y)
-  
+  scrolling = false
   self.cursor_x = x
   self.cursor_y = y
   if self:onCursorWorldPositionChange() or self.simulated_cursor then
@@ -388,7 +394,10 @@ function GameUI:onMouseMove(x, y, dx, dy)
   end
   if self.buttons_down.mouse_middle then
     local zoom = self.zoom_factor
-    self:scrollMap(-dx / zoom, -dy / zoom)
+    scrolling = true
+    auto_dx = -dx / zoom
+    auto_dy = -dy / zoom
+    self:scrollMap(auto_dx, auto_dy)
     repaint = true
   end
   
@@ -459,6 +468,7 @@ function GameUI:onMouseMove(x, y, dx, dy)
 end
 
 function GameUI:onMouseUp(code, x, y)
+  scrolling = false
   if code == 4 or code == 5 then
     -- Mouse wheel
     local window = self:getWindow(UIFullscreen)
@@ -512,6 +522,17 @@ end
 
 function GameUI:onTick()
   local repaint = UI.onTick(self)
+  if scrolling == false then
+    if auto_dy < auto_threshold and auto_dy > -auto_threshold and auto_dx < auto_threshold and auto_dx > -auto_threshold then
+      auto_dy = 0
+      auto_dx = 0
+    else
+      print("we're on the move" .. auto_dx .. " - " .. auto_dy)
+      auto_dy = auto_dy * auto_multiplier
+      auto_dx = auto_dx * auto_multiplier
+      self:scrollMap(auto_dx, auto_dy)
+    end
+  end
   do
     local ticks_since_last_announcement = self.ticks_since_last_announcement
     if ticks_since_last_announcement >= self.random_announcement_ticks_target then
