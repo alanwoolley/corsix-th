@@ -176,12 +176,11 @@ extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthGameSpeed(
  sooner, hence this function does as little as possible and leaves the rest
  for CorsixTH_lua_main().
  */
-int SDL_main(int argc, char** argv, JavaVM* vm) {
+int SDL_main(int argc, char** argv, JavaVM* vm, const char* logpath) {
 
-	START_LOGGING(argv[1]);
+	START_LOGGING(logpath);
 
 	LOG_INFO("Starting CTH Android");
-
 	jvm = vm;
 
 	struct compile_time_lua_check {
