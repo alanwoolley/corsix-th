@@ -28,7 +28,7 @@ local assert, io, type, dofile, loadfile, pcall, tonumber, print, setmetatable
 
 -- Increment each time a savegame break would occur
 -- and add compatibility code in afterLoad functions
-local SAVEGAME_VERSION = 53
+local SAVEGAME_VERSION = 55
 
 class "App"
 
@@ -472,7 +472,7 @@ function App:dumpStrings()
   -- end
 end
 
---!Compares strings provided by language file of given language WITHOUT inheritance
+--! Compares strings provided by language file of given language WITHOUT inheritance
 -- with strings provided by english language with inheritance (i.e. all strings).
 -- This will give translators an idea which strings are missing in their translation.
 --!param dir The directory where the file to write to should be.
@@ -972,8 +972,12 @@ end
 -- a specific savegame verion is from.
 function App:getVersion(version)
   local ver = version or self.savegame_version
-  if ver > 51 then
+  if ver > 54 then
     return "Trunk"
+  elseif ver > 53 then
+    return "0.11"
+  elseif ver > 51 then
+    return "0.10"
   elseif ver > 45 then
     return "0.01"
   else
@@ -1048,13 +1052,16 @@ function App:afterLoad()
     self.world.game_log = {}
     self.world:gameLog("Created Gamelog on load of old (pre-versioning) savegame.")
   end
-  
+  local first = self.world.original_savegame_version
   if new == old then
-    self.world:gameLog("Savegame version is " .. new .. " (" .. self:getVersion() .. ")")
+    self.world:gameLog("Savegame version is " .. new .. " (" .. self:getVersion() 
+      .. "), originally it was " .. first .. " (" .. self:getVersion(first) .. ")")
     return
   elseif new > old then
     self.world:gameLog("Savegame version changed from " .. old .. " (" .. self:getVersion(old) ..
-                       ") to " .. new .. " (" .. self:getVersion() .. ").")
+                       ") to " .. new .. " (" .. self:getVersion() .. 
+                       "). The save was created using " .. first .. 
+                       " (" .. self:getVersion(first) .. ")")
   else
     -- TODO: This should maybe be forbidden completely.
     self.world:gameLog("Warning: loaded savegame version " .. old .. " (" .. self:getVersion(old) ..

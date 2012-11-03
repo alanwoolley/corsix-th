@@ -123,13 +123,18 @@ function UICheats:updateCheatedStatus()
 end
 
 function UICheats:buttonClicked(num)
-  local announcements = self.ui.app.world.cheat_announcements
-  if announcements then
-    self.ui:playSound(announcements[math.random(1, #announcements)])
+  -- Only the cheats that may fail return false in that case. All others return nothing.
+  if self.cheats[num].func(self) ~= false then
+    local announcements = self.ui.app.world.cheat_announcements
+    if announcements then
+      self.ui:playSound(announcements[math.random(1, #announcements)])
+    end
+    self.ui.hospital.cheated = true
+    self:updateCheatedStatus()
+  else
+    -- It was not possible to use this cheat.
+    self.ui:addWindow(UIInformation(self.ui, {_S.information.cheat_not_possible}))
   end
-  self.ui.hospital.cheated = true
-  self:updateCheatedStatus()
-  self.cheats[num].func(self)
 end
 
 function UICheats:cheatMoney()
@@ -156,7 +161,7 @@ function UICheats:cheatVip()
 end
 
 function UICheats:cheatEarthquake()
-  self.ui.app.world:createEarthquake()
+  return self.ui.app.world:createEarthquake()
 end
 
 function UICheats:cheatPatient()
