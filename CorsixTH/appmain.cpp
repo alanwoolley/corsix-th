@@ -121,6 +121,17 @@ extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthRestartGame(
 	LOG_INFO("Done");
 }
 
+extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthTryAutoSave(
+		JNIEnv* env, jclass cls, jstring filename) {
+	const char *nativeString = env->GetStringUTFChars(filename, 0);
+	LOG_INFO("Attempting AutoSave");
+	SDL_Event e;
+	e.type = SDL_USEREVENT_AUTOSAVE;
+	e.user.data1 = (void*) nativeString;
+	SDL_PushEvent(&e);
+	LOG_INFO("Done");
+}
+
 extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthSaveGame(
 		JNIEnv* env, jclass jcls, jstring path) {
 
@@ -185,7 +196,6 @@ int SDL_main(int argc, char** argv, JavaVM* vm) {
 	bool bRun = true;
 
 	while (bRun) {
-		LOG_INFO("2");
 		L = NULL;
 
 		L = luaL_newstate();

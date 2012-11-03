@@ -53,6 +53,7 @@ function App:App()
     restart = self.restart,
     save = self.save,
     gamespeed = self.gamespeed,
+    tryautosave = self.tryAutoSave
   }
   self.strings = {}
   self.savegame_version = SAVEGAME_VERSION
@@ -997,7 +998,20 @@ end
 
 function App:gamespeed(speed)
   print "Changing speed"
-  return self.world:setSpeed(speed)
+  if self.map then
+    return self.world:setSpeed(speed)
+  else
+    print "Trying to change gamespeed, but no map is loaded"
+  end
+end
+
+function App:tryAutoSave(filename)
+  print "Trying to Auto Save"
+  if self.map then
+    return SaveGameFile(self.savegame_dir .. filename)
+  else
+    print "Trying to save, but no map is loaded"
+  end
 end
 
 

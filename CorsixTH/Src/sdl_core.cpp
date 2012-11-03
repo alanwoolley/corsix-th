@@ -238,6 +238,13 @@ static int l_mainloop(lua_State *L)
             	lua_pushliteral(dispatcher, "restart");
             	nargs = 1;
             	break;
+            case SDL_USEREVENT_AUTOSAVE:
+            	lua_pushliteral(dispatcher, "tryautosave");
+            	strcpy(d, (const char*)e.user.data1);
+            	lua_pushstring(dispatcher, (const char*)d);
+            	nargs = 2;
+            	break;
+
             case SDL_USEREVENT_CPCALL:
                 if(luaT_cpcall(L, (lua_CFunction)e.user.data1, e.user.data2))
                 {
