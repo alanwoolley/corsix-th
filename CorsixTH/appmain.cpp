@@ -112,6 +112,18 @@ static int gamespeedupdated(lua_State *L) {
 	return sendCommandInt(COMMAND_GAME_SPEED_UPDATED, 4);
 }
 
+extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_onNativeLowMemory(JNIEnv* env, jclass cls) {
+	LOG_INFO("Calling Lua GC");
+	int previously = lua_gc(L, LUA_GCCOUNT, NULL);
+	lua_gc(L,LUA_GCCOLLECT, NULL);
+	int now = lua_gc(L, LUA_GCCOUNT, NULL);
+	int diff = now-previously;
+	char* logmsg = new char[512];
+	sprintf(logmsg, "Freed up %i KB", previously-now);
+
+	LOG_INFO(logmsg);
+}
+
 extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthRestartGame(
 		JNIEnv* env, jclass cls) {
 	LOG_INFO("Restarting game");
