@@ -18,7 +18,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. --]]
 
-Language("Castellano", "Spanish", "es", "spa", "esp")
+Language("Castellano", "Spanish", "es", "spa", "esp", "sp")
 Inherit("english")
 Inherit("original_strings", 4)
 
@@ -52,6 +52,7 @@ tooltip.jukebox.fast_forward = utf8 "Avance rápido del reproductor de música"
 tooltip.patient_window.close = "Cerrar ventana"
 tooltip.staff_window.close = "Cerrar ventana"
 tooltip.build_room_window.close = "Salir de esta ventana y volver al juego"
+menu_options.jukebox = utf8 "  REPRODUCTOR DE MúSICA  "
 
 -- Improve tooltips in staff window to mention hidden features
 tooltip.staff_window.face = "Rostro de la persona - pulsa para abrir pantalla de recursos."
@@ -61,6 +62,32 @@ tooltip.staff_window.center_view = utf8 "Botón izquierdo para fijarse en la per
 confirmation.restart_level = utf8 "¿Seguro que quieres reiniciar el nivel?"
 -- TODO adviser.multiplayer.objective_completed
 -- TODO adviser.multiplayer.objective_failed
+
+-- Some overrides as original texts were too long see issue 1355 MarkL
+high_score = {
+  categories = {
+    deaths = "FALLECIMIENTOS",
+    total_value = "VALOR TOTAL",
+    money = "RIQUEZA",
+    cures = "CURACIONES",
+    visitors = "VISITANTES",
+    staff_number = "PLANTILLA",
+    cure_death_ratio = "PROPORCION",
+    patient_happiness = "CLIENTES CONTENTOS",
+    staff_happiness = "PERSONAL CONTENTO",
+    salary = "SUELDO MAS ALTO",
+    clean = "LIMPIEZA",
+  },
+  player = "JUGADOR",
+  score = "PUNTOS",
+  pos = "POS",
+  best_scores = "TABLA DEL HONOR",
+  worst_scores = "TABLA DE LA VERGUENZA",
+  killed = "Muerto"
+}
+
+--String text gets outside of window
+confirmation.quit = utf8 "¿Seguro que quieres salir del juego?                       "
 
 -------------------------------  NEW STRINGS  -------------------------------
 date_format = {
@@ -90,7 +117,7 @@ menu_options_game_speed = {
   slowest             = "  (1) MUY LENTA  ",
   slower              = "  (2) LENTA  ",
   normal              = "  (3) NORMAL  ",
-  max_speed           = "  (4) VELOCIDAD MAXIMA  ",
+  max_speed           = utf8 "  (4) VELOCIDAD MáXIMA  ",
   and_then_some_more  = "  (5) VELOCIDAD ABSURDA  ",
 }
 
@@ -100,10 +127,10 @@ menu_file.restart = "  REINICIAR  "
 menu_debug = {
   jump_to_level               = "  CAMBIAR DE NIVEL  ",
   transparent_walls           = "  (X) PAREDES TRANSPARENTES  ",
-  limit_camera                = "  LIMITAR CAMARA  ",
+  limit_camera                = utf8 "  LIMITAR CáMARA  ",
   disable_salary_raise        = "  DESACTIVAR SUBIDA DE SUELDO  ",
-  make_debug_fax              = "  (F8) CREAR FAX DE DEPURACION  ",
-  make_debug_patient          = "  (F9) CREAR PACIENTE DE DEPURACION  ",
+  make_debug_fax              = utf8 "  (F8) CREAR FAX DE DEPURACIóN  ",
+  make_debug_patient          = utf8 "  (F9) CREAR PACIENTE DE DEPURACIóN  ",
   cheats                      = "  (F11) TRUCOS  ",
   lua_console                 = "  (F12) CONSOLA LUA  ",
   calls_dispatcher            = "  LLAMAR A CONTROLADOR  ",
@@ -140,6 +167,8 @@ adviser = {
     falling_4 = utf8 "¡Esto es un hospital, no un parque de atracciones!",
     falling_5 = utf8 "¡Este no es el lugar para tumbar a personas, que están enfermas!",
     falling_6 = utf8 "¡Esto no es una bolera, no deberías tratar así a los enfermos!",
+    research_screen_open_1 = utf8 "Tienes que construir un Departamento de Investigación para poder acceder a la pantalla de investigación.",
+    research_screen_open_2 = "No se pueden realizar investigaciones en este nivel.",
   },
   cheats = {
     th_cheat = utf8 "¡Felicidades, has desbloqueado los trucos!",
@@ -201,7 +230,7 @@ main_menu = {
   custom_level = "Nivel personalizado",
   load_game = "Cargar partida",
   options = "Opciones",
-  savegame_version = utf8 "Versión de la partida guardada: ",
+  savegame_version = utf8 "Versión del guardado: ",
   version = utf8 "Versión: ",
   exit = "Salir",
 }
