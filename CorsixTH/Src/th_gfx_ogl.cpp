@@ -39,6 +39,10 @@ struct RECT
 #endif
 #endif
 
+#if SDL_VERSION_ATLEAST(2,0,0)
+SDL_Window *window;
+#endif
+
 THRenderTarget::THRenderTarget()
 {
     m_pSurface = NULL;
@@ -87,10 +91,14 @@ THRenderTarget::~THRenderTarget()
 
 bool THRenderTarget::create(const THRenderTargetCreationParams* pParams)
 {
+
     int iBPP = pParams->iBPP;
-    if(!pParams->bReuseContext)
+   
+	if(!pParams->bReuseContext)
     {
-        if(iBPP == 0)
+      /*
+		if(iBPP == 0)
+		
             iBPP = SDL_GetVideoInfo()->vfmt->BitsPerPixel;
         switch(iBPP)
         {
@@ -111,11 +119,25 @@ bool THRenderTarget::create(const THRenderTargetCreationParams* pParams)
             SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE,  8);
             break;
         }
+		*/
         SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 0);
         SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, pParams->bDoubleBuffered   ? 1:0);
-        SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, pParams->bPresentImmediate ? 0:1);
-        m_pSurface = SDL_SetVideoMode(pParams->iWidth, pParams->iHeight, iBPP,
+
+#if SDL_VERSION_ATLEAST(2,0,0)
+		SDL_GL_SetSwapInterval(pParams->bPresentImmediate ? 0:1);
+		window = SDL_CreateWindow("CorsixTH",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,pParams->iWidth,pParams->iHeight,pParams->iSDLFlags | SDL_WINDOW_OPENGL);
+		
+		m_pSurface = SDL_GetWindowSurface(window);
+		SDL_GLContext glcontext = SDL_GL_CreateContext(window);
+
+#else
+		SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, pParams->bPresentImmediate ? 0:1);
+		 m_pSurface = SDL_SetVideoMode(pParams->iWidth, pParams->iHeight, iBPP,
             pParams->iSDLFlags | SDL_OPENGL);
+#endif
+
+
+
         if(m_pSurface == NULL)
             return false;
     }
@@ -336,8 +358,13 @@ bool THRenderTarget::endFrame()
         return false;
     _flushZoomBuffer();
 
-    if(m_pSurface)
+    if(m_pSurface) {
+#if SDL_VERSION_ATLEAST(2,0,0)
+		SDL_GL_SwapWindow(window);
+#else
         SDL_GL_SwapBuffers();
+#endif
+	}
     return true;
 }
 

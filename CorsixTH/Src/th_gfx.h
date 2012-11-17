@@ -43,6 +43,7 @@ enum THScaledItems
 #error No rendering engine enabled in config file
 #endif
 
+
 void IntersectTHClipRect(THClipRect& rcClip,const THClipRect& rcIntersect);
 
 //! Bitflags for drawing operations
