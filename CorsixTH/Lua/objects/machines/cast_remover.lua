@@ -29,6 +29,7 @@ object.ticks = false
 object.build_preview_animation = 5072
 object.default_strength = 10
 object.crashed_animation = 3388
+object.show_in_town_map = true
 local function copy_north_to_south(t)
   t.south = t.north
   return t
@@ -72,8 +73,9 @@ object.orientations = {
     walk_in_tile = {0, -1},
     use_position_secondary = {0, -1},
     finish_use_position_secondary = {1, -1},
-    footprint = { {-1, -1}, {0, -1, only_passable = true}, {1, -1, only_passable = true},
-                  {-1, 0}, {0, 0, only_passable = true}, {-1, 1, only_passable = true}, 
+    footprint = { {-1, -1, complete_cell = true}, {0, -1, only_passable = true}, {1, -1, only_passable = true},
+                  {-1, 0, complete_cell = true}, {0, 0, only_passable = true, complete_cell = true}, 
+                  {-1, 1, only_passable = true, need_west_side = true}, 
                   {-1, -2, only_passable = true, invisible = true, optional = true}, 
                   {-2, -1, only_passable = true, invisible = true, optional = true} },
     list_bottom = true,
@@ -85,8 +87,8 @@ object.orientations = {
     walk_in_tile = {-1, 0},
     use_position_secondary = {-1, 0},
     finish_use_position_secondary = {-1, 1},
-    footprint = { {-1, -1}, {0, -1}, {1, -1, only_passable = true},
-                  {-1, 0, only_passable = true}, {0, 0, only_passable = true},
+    footprint = { {-1, -1}, {0, -1, complete_cell = true}, {1, -1, only_passable = true, need_north_side = true},
+                  {-1, 0, only_passable = true}, {0, 0, only_passable = true, complete_cell = true},
                   {-1, 1, only_passable = true},
                   {-2, -1, only_passable = true, invisible = true, optional = true}, 
                   {-1, -2, only_passable = true, invisible = true, optional = true} },

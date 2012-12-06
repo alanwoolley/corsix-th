@@ -193,6 +193,47 @@ function UI:UI(app, minimal)
   
   self:setCursor(self.default_cursor)
   
+  -- to avoid a bug which causes open fullscreen windows to display incorrectly, load
+  -- the sprite sheet associated with all fullscreen windows so they are correctly cached.
+  -- Darrell: Only do this if we have a valid data directory otherwise we won't be able to 
+  -- display the directory browser to even find the data directory.
+  -- Edvin: Also, the demo does not contain any of the dialogs.
+  if self.app.good_install_folder and not self.app.using_demo_files then
+    local gfx = self.app.gfx
+    local palette
+    -- load drug casebook sprite table
+    palette = gfx:loadPalette("QData", "DrugN01V.pal")
+    palette:setEntry(255, 0xFF, 0x00, 0xFF) -- Make index 255 transparent
+    gfx:loadSpriteTable("QData", "DrugN02V", true, palette)
+    -- load fax sprite table
+    palette = gfx:loadPalette("QData", "Fax01V.pal")
+    palette:setEntry(255, 0xFF, 0x00, 0xFF) -- Make index 255 transparent
+    gfx:loadSpriteTable("QData", "Fax02V", true, palette)
+    -- load town map sprite table
+    palette = gfx:loadPalette("QData", "Town01V.pal")
+    palette:setEntry(255, 0xFF, 0x00, 0xFF) -- Make index 255 transparent
+    gfx:loadSpriteTable("QData", "Town02V", true, palette)
+    -- load hospital policy sprite table
+    palette = gfx:loadPalette("QData", "Pol01V.pal")
+    palette:setEntry(255, 0xFF, 0x00, 0xFF) -- Make index 255 transparent
+    gfx:loadSpriteTable("QData", "Pol02V", true, palette)
+    -- load bank manager sprite table
+    palette = gfx:loadPalette("QData", "Bank01V.pal")
+    palette:setEntry(255, 0xFF, 0x00, 0xFF) -- Make index 255 transparent
+    gfx:loadSpriteTable("QData", "Bank02V", true, palette)
+    -- load research screen sprite table
+    palette = gfx:loadPalette("QData", "Res01V.pal")
+    palette:setEntry(255, 0xFF, 0x00, 0xFF) -- Make index 255 transparent
+    gfx:loadSpriteTable("QData", "Res02V", true, palette)
+    -- load progress report sprite table
+    palette = gfx:loadPalette("QData", "Rep01V.pal")
+    palette:setEntry(255, 0xFF, 0x00, 0xFF) -- Make index 255 transparent
+    gfx:loadSpriteTable("QData", "Rep02V", true, palette)
+    -- load annual report sprite table
+    palette = gfx:loadPalette("QData", "Award02V.pal")
+    palette:setEntry(255, 0xFF, 0x00, 0xFF) -- Make index 255 transparent
+    gfx:loadSpriteTable("QData", "Award03V", true, palette)
+  end
 end
 
 -- Used for everything except music and announcements
@@ -377,12 +418,14 @@ end
 function UI:changeResolution(width, height)
   local old_width, old_height = self.app.config.width, self.app.config.height
   self.app.video:endFrame()
-  local video = TH.surface(width, height, unpack(self.app.modes))
+  local video, error_message = TH.surface(width, height, unpack(self.app.modes))
   if video then
     self.app.config.width = width
     self.app.config.height = height
   else
     print("Warning: Could not change resolution to " .. width .. "x" .. height .. ". Reverting to previous resolution.")
+    print("The error was: ")
+    print(error_message)
     video = TH.surface(old_width, old_height, unpack(self.app.modes))
     return false
   end

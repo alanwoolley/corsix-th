@@ -25,6 +25,7 @@ object.name = _S.object.console
 object.tooltip = _S.tooltip.objects.console
 object.ticks = true
 object.build_preview_animation = 922
+object.show_in_town_map = true
 local function copy_north_to_south(t)
   t.south = t.north
   return t
@@ -46,12 +47,20 @@ object.usage_animations = copy_north_to_south {
 
 object.orientations = {
   north = {
-    footprint = { {-1, -1}, {-1, 0}, {0, -1}, {0, 0, only_passable = true} },
+    footprint = 
+      { {-1, -1, complete_cell = true}, 
+      {-1, 0, complete_cell = true}, 
+      {0, -1, complete_cell = true}, 
+      {0, 0, complete_cell = true, only_passable = true} },
     render_attach_position = {0, -1},
     use_position = "passable"
   },
   east = {
-    footprint = { {-1, -1}, {-1, 0}, {0, -1}, {0, 0, only_passable = true} },
+    footprint = 
+      { {-1, -1, complete_cell = true}, 
+      {-1, 0, complete_cell = true}, 
+      {0, -1, complete_cell = true}, 
+      {0, 0, complete_cell = true, only_passable = true} },
     render_attach_position = {-1, 0},
     use_position = "passable"
   },

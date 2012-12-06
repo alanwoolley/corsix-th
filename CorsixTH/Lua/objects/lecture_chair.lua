@@ -25,6 +25,7 @@ object.name = _S.object.lecture_chair
 object.tooltip = _S.tooltip.objects.lecture_chair
 object.ticks = false
 object.build_preview_animation = 5084
+object.show_in_town_map = true
 local function copy_north_to_south(t)
   t.south = t.north
   return t
@@ -48,13 +49,13 @@ anim_mgr:setMarker(object.usage_animations.north.finish_use, 0, kf2, 11, kf2, 18
 
 object.orientations = {
   north = {
-    footprint = { {0, 0}, {1, 0, only_passable = true} },
+    footprint = { {0, 0, complete_cell = true}, {1, 0, only_passable = true} },
     use_position = "passable",
     use_animate_from_use_position = true,
     early_list = true,
   },
   east = {
-    footprint = { {0, 0}, {0, 1, only_passable = true} },
+    footprint = { {0, 0, complete_cell = true}, {0, 1, only_passable = true} },
     use_position = "passable",
     use_animate_from_use_position = true,
   },

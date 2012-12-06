@@ -25,6 +25,7 @@ object.name = _S.object.bookcase
 object.tooltip = _S.tooltip.objects.bookcase
 object.ticks = false
 object.build_preview_animation = 5104
+object.show_in_town_map = true
 local function copy_north_to_south(t)
   t.south = t.north
   return t
@@ -39,13 +40,12 @@ object.usage_animations = copy_north_to_south {
 }
 object.orientations = {
   north = {
-    footprint = { {0, 0}, {1, 0, only_passable = true} },
+    footprint = { {0, 0, complete_cell = true}, {1, 0, only_passable = true} },
     use_position = "passable",
     use_animate_from_use_position = true,
-    early_list_while_in_use = true,
   },
   east = {
-    footprint = { {0, 0}, {0, 1, only_passable = true} },
+    footprint = { {0, 0, complete_cell = true}, {0, 1, only_passable = true} },
     use_position = "passable",
     use_animate_from_use_position = true,
   },

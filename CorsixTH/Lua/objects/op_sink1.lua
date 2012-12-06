@@ -27,6 +27,7 @@ object.name = _S.object.op_sink1
 object.tooltip = _S.tooltip.objects.op_sink1
 object.ticks = false
 object.walk_in_to_use = true
+object.show_in_town_map = true
 object.locked_to_wall = {
   -- permittable wall -> orientation
   north = "east",
@@ -46,7 +47,7 @@ object.usage_animations = copy_north_to_south {
 object.orientations = {
   north = {
     footprint = {
-      {0, 0}, {0, -1},
+      {0, 0, complete_cell = true}, {0, -1, complete_cell = true},
       {1, 0, only_passable = true, invisible = true},
     },
     use_position = {1, 0},
@@ -54,7 +55,7 @@ object.orientations = {
   },
   east = {
     footprint = {
-      {0, 0}, {-1, 0},
+      {0, 0, complete_cell = true}, {-1, 0, complete_cell = true},
       {0, 1, only_passable = true, invisible = true},
     },
     use_position = {0, 1},

@@ -118,6 +118,11 @@ struct THDrawable : public THLinkList
 
     //! Drawing flags (zero or more list flags from THDrawFlags)
     unsigned long m_iFlags;
+
+    /** Returns true if instance is a multiple frame animation.
+        Should be overloaded in derived class.
+    */
+    bool (*m_fnIsMultipleFrameAnimation)(THDrawable *pSelf);
 };
 
 /*!
@@ -358,13 +363,13 @@ protected:
 };
 
 struct THMapNode;
-class THAnimationBase : protected THDrawable
+class THAnimationBase : public THDrawable
 {
 public:
     THAnimationBase();
 
     void removeFromTile();
-    void attachToTile(THMapNode *pMapNode);
+    void attachToTile(THMapNode *pMapNode, int layer);
 
     unsigned long getFlags() const {return m_iFlags;}
     int getX() const {return m_iX;}
@@ -375,6 +380,7 @@ public:
     void setLayer(int iLayer, int iId);
     void setLayersFrom(const THAnimationBase *pSrc) {m_oLayers = pSrc->m_oLayers;}
 
+   // bool isMultipleFrameAnimation() { return false;}
 protected:
     void _clear();
 
@@ -384,6 +390,7 @@ protected:
     int m_iY;
 
     THLayers_t m_oLayers;
+
 };
 
 class THAnimation : public THAnimationBase
@@ -418,6 +425,7 @@ public:
     void persist(LuaPersistWriter *pWriter) const;
     void depersist(LuaPersistReader *pReader);
 
+    THAnimationManager* getAnimationManager(){ return m_pManager;}
 protected:
     THAnimationManager *m_pManager;
     THAnimation* m_pMorphTarget;

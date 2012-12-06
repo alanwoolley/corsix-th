@@ -35,7 +35,6 @@ function Staff:tickDay()
   local fair_wage = self.profile:getFairWage(self.world)
   local wage = self.profile.wage
   self:changeAttribute("happiness", 0.05 * (wage - fair_wage) / (fair_wage ~= 0 and fair_wage or 1))
-
   -- if you overwork your Dr's then there is a chance that they can go crazy
   -- when this happens, find him and get him to rest straight away
   if self.attributes["fatigue"] then
@@ -423,6 +422,7 @@ function Staff:dump()
           "Watering: " .. self.attributes["watering"], 
           "Repairing: " .. self.attributes["repairing"])
   end
+
   Humanoid.dump(self)
 end
 
@@ -711,6 +711,9 @@ function Staff:isIdle()
     return false
   end
 
+  if self.waiting_on_other_staff then
+    return false
+  end
   -- if they are using a door they are not idle, this stops doctors being considered for staff selection
   -- for rooms they have not completely left yet, fixes issue 810
   if self.user_of and self.user_of.object_type.id == "door" then
@@ -911,5 +914,17 @@ function Staff:assignHandymanTask(taskIndex, taskType)
       task.call.dropped = nil
     end
     task.call.dispatcher:executeCall(task.call, self)
+  end
+end
+
+function Staff:getDrawingLayer()
+  if self.humanoid_class == "Receptionist" then
+    local direction = self.last_move_direction
+    if direction == "west" or direction == "north" then
+      return 5
+    end
+    return 3
+  else
+    return 4
   end
 end

@@ -29,6 +29,7 @@ object.ticks = false
 object.build_preview_animation = 5094
 object.default_strength = 12
 object.crashed_animation = 3372
+object.show_in_town_map = true
 local function copy_north_to_south(t)
   t.south = t.north
   return t
@@ -94,17 +95,20 @@ object.orientations = {
     handyman_position = {0, -1},
     use_position_secondary = {1, 0},
     use_position = {0, -1},
-    footprint = { {-1, -1, only_passable = true}, {0, -1, only_passable = true},
-                  {-2, 0}, {-1, 0}, {0, 0}, {1, 0, only_passable = true},
-                  {-1, 1} }
+    footprint = { {-1, -1, only_passable = true, need_east_side = true, need_west_side = true}, 
+                  {0, -1, only_passable = true, need_north_side = true},
+                  {-2, 0, need_south_side = true, need_north_side = true}, 
+                  {-1, 0}, {0, 0, complete_cell = true}, {1, 0, only_passable = true},
+                  {-1, 1, need_east_side = true, need_west_side = true} }
   },
   east = {
     handyman_position = {-1, 0},
     use_position_secondary = {0, 1},
     use_position = {-1, 0},
-    footprint = { {0, -2},
-                  {-1, -1, only_passable = true}, {0, -1}, {1, -1},
-                  {-1, 0, only_passable = true}, {0, 0},
+    footprint = { {0, -2, need_east_side = true, need_west_side = true},
+                  {-1, -1, only_passable = true, complete_cell = true}, {0, -1}, 
+                  {1, -1, need_south_side = true, need_north_side = true},
+                  {-1, 0, only_passable = true, need_west_side = true}, {0, 0, complete_cell = true},
                   {0, 1, only_passable = true} }
   },
 }

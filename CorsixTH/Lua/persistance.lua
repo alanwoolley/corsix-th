@@ -242,7 +242,9 @@ function LoadGame(data)
   TheApp.ui.menu_bar.ui = TheApp.ui
   TheApp.ui.menu_bar:onChangeLanguage()
   --end, persist.errcatch)
+  TheApp.world.map:registerTemperatureDisplayMethod()
   TheApp:afterLoad()
+  TheApp.world:resetAnimations()
   TheApp.ui:onChangeResolution()
 end
 

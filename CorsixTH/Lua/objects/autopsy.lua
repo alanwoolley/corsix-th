@@ -27,6 +27,7 @@ object.tooltip = _S.tooltip.objects.auto_autopsy
 object.ticks = true
 object.build_preview_animation = 5102
 object.crashed_animation = 3304
+object.show_in_town_map = true
 
 local function copy_north_to_south(t)
   t.south = t.north
@@ -86,9 +87,9 @@ object.orientations = {
     use_position = {0, 1},
     handyman_position = {0, 1},
     footprint = {
-      {-2, -1}, {-2, 0}, {-2, 1, only_passable = true},
-      {-1, -1},  {-1, 0}, {-1, 1, only_passable = true},
-      {0, -1}, {0, 0}, {0, 1, only_passable = true},
+      {-2, -1, complete_cell = true}, {-2, 0, complete_cell = true}, {-2, 1, only_passable = true},
+      {-1, -1, complete_cell = true},  {-1, 0, complete_cell = true}, {-1, 1, only_passable = true},
+      {0, -1, complete_cell = true}, {0, 0, complete_cell = true}, {0, 1, only_passable = true},
     },
     early_list = true,
   },
@@ -98,8 +99,8 @@ object.orientations = {
     use_position = {1, 0},
     handyman_position = {1, 0},
     footprint = {
-      {-1, -2}, {-1, -1}, {-1, 0},
-      {0, -2}, {0, -1}, {0, 0},
+      {-1, -2, complete_cell = true}, {-1, -1, complete_cell = true}, {-1, 0, complete_cell = true},
+      {0, -2, complete_cell = true}, {0, -1, complete_cell = true}, {0, 0, complete_cell = true},
       {1, -2, only_passable = true}, {1, -1, only_passable = true},
         {1, -0, only_passable = true},
     },

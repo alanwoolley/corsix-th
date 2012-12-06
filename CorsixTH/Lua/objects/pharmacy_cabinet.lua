@@ -27,6 +27,7 @@ object.name = _S.object.pharmacy_cabinet
 object.tooltip = _S.tooltip.objects.pharmacy_cabinet
 object.ticks = false
 object.build_preview_animation = 5088
+object.show_in_town_map = true
 local function copy_north_to_south(t)
   t.south = t.north
   return t
@@ -69,17 +70,16 @@ object.multi_usage_animations = {
 }
 object.orientations = {
   north = {
-    footprint = { {0, 0}, {0, 1, only_passable = true}, {0, 2, only_passable = true}, {-1, 1, only_passable = true} },
+    footprint = { {0, 0, complete_cell = true}, {0, 1, only_passable = true}, {0, 2, only_passable = true}, {-1, 1, only_passable = true} },
     use_position = {0, 1},
     use_position_secondary = {-1, 1},
     use_animate_from_use_position = true,
   },
   east = {
-    footprint = { {0, 0}, {1, 0, only_passable = true}, {2, 0, only_passable = true}, {1, -1, only_passable = true} },
+    footprint = { {0, 0, complete_cell = true}, {1, 0, only_passable = true}, {2, 0, only_passable = true}, {1, -1, only_passable = true} },
     use_position = {1, 0},
     use_position_secondary = {1, -1},
     use_animate_from_use_position = true,
-    early_list_while_in_use = true,
   },
 }
 

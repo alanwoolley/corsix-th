@@ -28,7 +28,7 @@ local assert, io, type, dofile, loadfile, pcall, tonumber, print, setmetatable
 
 -- Increment each time a savegame break would occur
 -- and add compatibility code in afterLoad functions
-local SAVEGAME_VERSION = 56
+local SAVEGAME_VERSION = 57
 
 class "App"
 
@@ -72,6 +72,18 @@ end
 function App:init()
   -- App initialisation 1st goal: Get the loading screen up
   
+  print("")
+  print("")
+  print("---------------------------------------------------------------")
+  print("")
+  print("Welcome to CorsixTH " .. self:getVersion() .. "!")
+  print("")
+  print("---------------------------------------------------------------")
+  print("")
+  print("This window will display useful information if an error occurs.")
+  print("")
+  print("---------------------------------------------------------------")
+  print("")
   -- Prereq 1: Config file (for screen width / height / TH folder)
   -- Note: These errors cannot be translated, as the config file specifies the language
   local conf_path = self.command_line["config-file"] or "config.txt"

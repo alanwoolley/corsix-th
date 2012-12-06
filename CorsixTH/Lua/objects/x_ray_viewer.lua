@@ -25,6 +25,7 @@ object.name = _S.object.x_ray_viewer
 object.tooltip = _S.tooltip.objects.x_ray_viewer
 object.ticks = false
 object.build_preview_animation = 5078
+object.show_in_town_map = true
 object.locked_to_wall = {
   -- permittable wall -> orientation
   north = "east",
@@ -41,13 +42,13 @@ object.idle_animations = copy_north_to_south {
 object.orientations = {
   north = {
     footprint = {
-      {0, 0},
+      {0, 0, need_west_side = true },
     },
     list_bottom = true,
   },
   east = {
     footprint = {
-      {0, 0},
+      {0, 0, need_north_side = true},
     },
     list_bottom = true,
     early_list = true,
