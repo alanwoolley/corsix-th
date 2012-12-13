@@ -19,18 +19,15 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SDL_PATH)/include \
 					$(LOCAL_PATH)/$(AGG_PATH)/include \
 					$(LOCAL_PATH)/$(FREETYPE_PATH)/include \
 					$(LOCAL_PATH)/$(FREETYPE_PATH)/include/freetype \
-					$(LOCAL_PATH)/$(FREETYPE_PATH)/include/config \
-					$(LOCAL_PATH)/$(FREETYPE_PATH)/include/internal \
-					$(LOCAL_PATH)/$(FREETYPE_PATH)/include/internal/services \
 					$(LOCAL_PATH)/$(LUA_PATH) \
 					$(LOCAL_PATH)/$(SDL_MIXER_PATH) \
-					$(CORSIX_TH_SRC) \
+					$(LOCAL_PATH)/$(CORSIX_TH_SRC) \
 					$(LOCAL_PATH)/$(CTH_ASSETS) \
-					$(LFS_SRC) \
-					$(LPEG) \
+					$(LOCAL_PATH)/$(LFS_SRC) \
+					$(LOCAL_PATH)/$(LPEG) \
 					$(LOCAL_PATH)/$(SDL_GFX_PATH)
 					
-LOCAL_CFLAGS := -DPLAY_MOD				
+LOCAL_CFLAGS := -DPLAY_MOD
 
 # Add your application source files here...
 LOCAL_SRC_FILES := $(SDL_PATH)/src/main/android/SDL_android_main.cpp \
