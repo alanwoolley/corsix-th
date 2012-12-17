@@ -56,7 +56,7 @@ const char *speeds[] = { "Pause", "Slowest", "Slower", "Normal", "Max speed",
 static int sendCommandInt(jint cmd, jint data) {
 	JNIEnv* jEnv;
 	jvm->AttachCurrentThread(&jEnv, NULL);
-	jclass cls = jEnv->FindClass("uk/co/armedpineapple/corsixth/SDLActivity");
+	jclass cls = jEnv->FindClass("uk/co/armedpineapple/cth/SDLActivity");
 	jmethodID method = jEnv->GetStaticMethodID(cls, "sendCommand", "(II)V");
 	jEnv->CallStaticVoidMethod(cls, method, cmd, data);
 	return 0;
@@ -65,7 +65,7 @@ static int sendCommandInt(jint cmd, jint data) {
 static int sendCommand(jint cmd) {
 	JNIEnv* jEnv;
 	jvm->AttachCurrentThread(&jEnv, NULL);
-	jclass cls = jEnv->FindClass("uk/co/armedpineapple/corsixth/SDLActivity");
+	jclass cls = jEnv->FindClass("uk/co/armedpineapple/cth/SDLActivity");
 	jmethodID method = jEnv->GetStaticMethodID(cls, "sendCommand", "(I)V");
 	jEnv->CallStaticVoidMethod(cls, method, cmd);
 	return 0;
@@ -112,7 +112,7 @@ static int gamespeedupdated(lua_State *L) {
 	return sendCommandInt(COMMAND_GAME_SPEED_UPDATED, 4);
 }
 
-extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_onNativeLowMemory(JNIEnv* env, jclass cls) {
+extern "C" void Java_uk_co_armedpineapple_cth_SDLActivity_onNativeLowMemory(JNIEnv* env, jclass cls) {
 	LOG_INFO("Calling Lua GC");
 	int previously = lua_gc(L, LUA_GCCOUNT, NULL);
 	lua_gc(L,LUA_GCCOLLECT, NULL);
@@ -124,7 +124,7 @@ extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_onNativeLowMemory
 	LOG_INFO(logmsg);
 }
 
-extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthRestartGame(
+extern "C" void Java_uk_co_armedpineapple_cth_SDLActivity_cthRestartGame(
 		JNIEnv* env, jclass cls) {
 	LOG_INFO("Restarting game");
 	SDL_Event e;
@@ -133,7 +133,7 @@ extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthRestartGame(
 	LOG_INFO("Done");
 }
 
-extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthTryAutoSave(
+extern "C" void Java_uk_co_armedpineapple_cth_SDLActivity_cthTryAutoSave(
 		JNIEnv* env, jclass cls, jstring filename) {
 	const char *nativeString = env->GetStringUTFChars(filename, 0);
 	LOG_INFO("Attempting AutoSave");
@@ -144,7 +144,7 @@ extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthTryAutoSave(
 	LOG_INFO("Done");
 }
 
-extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthSaveGame(
+extern "C" void Java_uk_co_armedpineapple_cth_SDLActivity_cthSaveGame(
 		JNIEnv* env, jclass jcls, jstring path) {
 
 	const char *nativeString = env->GetStringUTFChars(path, 0);
@@ -158,7 +158,7 @@ extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthSaveGame(
 
 }
 
-extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthLoadGame(
+extern "C" void Java_uk_co_armedpineapple_cth_SDLActivity_cthLoadGame(
 		JNIEnv* env, jclass jcls, jstring path) {
 
 	const char *nativeString = env->GetStringUTFChars(path, 0);
@@ -171,7 +171,7 @@ extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthLoadGame(
 	LOG_INFO("Done");
 }
 
-extern "C" void Java_uk_co_armedpineapple_corsixth_SDLActivity_cthGameSpeed(
+extern "C" void Java_uk_co_armedpineapple_cth_SDLActivity_cthGameSpeed(
 		JNIEnv* env, jclass jcls, jint speed) {
 	LOG_INFO("Setting game speed");
 	SDL_Event e;

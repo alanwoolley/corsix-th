@@ -181,7 +181,7 @@ int CorsixTH_lua_main_no_eval(lua_State *L) {
 
 	jvm->AttachCurrentThread(&jEnv, NULL);
 
-	jclass cls = jEnv->FindClass("uk/co/armedpineapple/corsixth/SDLActivity");
+	jclass cls = jEnv->FindClass("uk/co/armedpineapple/cth/SDLActivity");
 	jmethodID method = jEnv->GetStaticMethodID(cls, "nativeGetGamePath",
 			"()Ljava/lang/String;");
 
