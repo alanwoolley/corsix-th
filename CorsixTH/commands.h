@@ -1,3 +1,12 @@
+#ifndef COMMANDS_H_
+#define COMMANDS_H_
+
+#ifndef NULL
+#define NULL 0
+#endif
+
+#include <jni.h>
+
 #define COMMAND_SHOW_MENU 0
 #define COMMAND_SHOW_LOAD_DIALOG 1
 #define COMMAND_SHOW_SAVE_DIALOG 2
@@ -10,3 +19,9 @@
 #define COMMAND_PAUSE_GAME 9
 #define COMMAND_SHOW_SETTINGS_DIALOG 10
 #define COMMAND_GAME_SPEED_UPDATED 11
+#define COMMAND_GAME_LOAD_ERROR 12
+
+int sendCommandInt(JavaVM* jvm, jint cmd, jint data);
+int sendCommand(JavaVM* jvm, jint cmd);
+
+#endif

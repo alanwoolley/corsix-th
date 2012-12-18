@@ -53,47 +53,36 @@ lua_State* L;
 const char *speeds[] = { "Pause", "Slowest", "Slower", "Normal", "Max speed",
 		"And then some more" };
 
-static int sendCommandInt(jint cmd, jint data) {
-	JNIEnv* jEnv;
-	jvm->AttachCurrentThread(&jEnv, NULL);
-	jclass cls = jEnv->FindClass("uk/co/armedpineapple/cth/SDLActivity");
-	jmethodID method = jEnv->GetStaticMethodID(cls, "sendCommand", "(II)V");
-	jEnv->CallStaticVoidMethod(cls, method, cmd, data);
-	return 0;
-}
 
-static int sendCommand(jint cmd) {
-	JNIEnv* jEnv;
-	jvm->AttachCurrentThread(&jEnv, NULL);
-	jclass cls = jEnv->FindClass("uk/co/armedpineapple/cth/SDLActivity");
-	jmethodID method = jEnv->GetStaticMethodID(cls, "sendCommand", "(I)V");
-	jEnv->CallStaticVoidMethod(cls, method, cmd);
-	return 0;
-}
 
 static int showkeyboard(lua_State *L) {
 	LOG_INFO("Showing keyboard");
-	return sendCommand(COMMAND_SHOW_KEYBOARD);
+	return sendCommand(jvm, COMMAND_SHOW_KEYBOARD);
 }
 
 static int hidekeyboard(lua_State *L) {
 	LOG_INFO("Hiding keyboard");
-	return sendCommand(COMMAND_HIDE_KEYBOARD);
+	return sendCommand(jvm, COMMAND_HIDE_KEYBOARD);
 }
 
 static int showmenu(lua_State *L) {
 	LOG_INFO("Showing Menu");
-	return sendCommand(COMMAND_SHOW_MENU);
+	return sendCommand(jvm, COMMAND_SHOW_MENU);
 }
 
 static int quickload(lua_State *L) {
 	LOG_INFO("Quick Load");
-	return sendCommand(COMMAND_QUICK_LOAD);
+	return sendCommand(jvm, COMMAND_QUICK_LOAD);
 }
 
 static int showloaddialog(lua_State *L) {
 	LOG_INFO("Showing Load Dialog");
-	return sendCommand(COMMAND_SHOW_LOAD_DIALOG);
+	return sendCommand(jvm, COMMAND_SHOW_LOAD_DIALOG);
+}
+
+static int showerrordialog(lua_State *L) {
+	LOG_INFO("Showing Error Dialog");
+	return sendCommand(jvm, COMMAND_GAME_LOAD_ERROR);
 }
 
 static int gamespeedupdated(lua_State *L) {
@@ -105,11 +94,11 @@ static int gamespeedupdated(lua_State *L) {
 
 	for (int n = 0; n < 6; n++) {
 		if (strcmp(gamespeed, speeds[n]) == 0) {
-			return sendCommandInt(COMMAND_GAME_SPEED_UPDATED, n);
+			return sendCommandInt(jvm, COMMAND_GAME_SPEED_UPDATED, n);
 		}
 	}
 	LOG_INFO("Couldn't find game speed. Going with Normal.");
-	return sendCommandInt(COMMAND_GAME_SPEED_UPDATED, 4);
+	return sendCommandInt(jvm, COMMAND_GAME_SPEED_UPDATED, 4);
 }
 
 extern "C" void Java_uk_co_armedpineapple_cth_SDLActivity_onNativeLowMemory(JNIEnv* env, jclass cls) {
@@ -226,6 +215,7 @@ int SDL_main(int argc, char** argv, JavaVM* vm, const char* logpath) {
 		lua_register(L, "showloaddialog", showloaddialog);
 		lua_register(L, "quickload", quickload);
 		lua_register(L, "gamespeedupdated", gamespeedupdated);
+		lua_register(L, "showerrordialog", showerrordialog);
 
 		lua_settop(L, 0);
 		lua_pushcfunction(L, CorsixTH_lua_stacktrace);
@@ -250,6 +240,7 @@ int SDL_main(int argc, char** argv, JavaVM* vm, const char* logpath) {
 			if (lua_pcall(L, 1, 0, 0) != 0) {
 				fprintf(stderr, "%s\n", lua_tostring(L, -1));
 			}
+			sendCommand(jvm,COMMAND_GAME_LOAD_ERROR);
 		}
 
 		lua_getfield(L, LUA_REGISTRYINDEX, "_RESTART");

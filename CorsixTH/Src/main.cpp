@@ -23,6 +23,7 @@
 #include "config.h"
 #include "lua.hpp"
 #include "../logging.h"
+#include "../commands.h"
 #include "main.h"
 
 extern "C" {
@@ -55,6 +56,7 @@ int CorsixTH_lua_main_no_eval(lua_State *L) {
 				"Linked against a version of Lua different to the "
 						"one used when compiling.\nPlease recompile CorsixTH against the "
 						"same Lua version it is linked against.");
+		sendCommand(jvm,COMMAND_GAME_LOAD_ERROR);
 		return lua_error(L);
 	}
 	lua_pop(L, 1);
@@ -248,6 +250,8 @@ int CorsixTH_lua_panic(lua_State *L) {
 	fflush(stderr);
 
 	// A stack trace would be nice, but they cannot be done in a panic.
+
+	sendCommand(jvm,COMMAND_GAME_LOAD_ERROR);
 
 			return 0;
 		}
