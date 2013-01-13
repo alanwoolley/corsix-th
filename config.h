@@ -65,6 +65,9 @@ SOFTWARE.
 // Chinese are desired.
 #define CORSIX_TH_USE_FREETYPE2
 
+/** MOVIES! **/
+#undef CORSIX_TH_USE_FFMPEG
+
 /** Environment detection **/
 #if defined(__amd64__) || defined(__IA64__) || defined(__x86_64__) || \
     defined(__x86_64) || defined(_M_IA64) ||  defined(_IA64) || \
