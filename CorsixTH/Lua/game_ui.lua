@@ -211,7 +211,13 @@ function GameUI:onKeyDown(code, rawchar)
   end
   rawchar = self.key_code_to_rawchar[code] -- UI may have translated rawchar
   local key = self:_translateKeyCode(code, rawchar)
-  
+  --abort movies
+  if self.app.moviePlayer.playing then
+    if key == "esc" or key == " " then
+      self.app.moviePlayer:stop()
+    end
+    return true
+  end
   --Maybe the player wants to abort an "about to edit room" action
   if key == "esc" and self.edit_room then
     self:setEditRoom(false)
@@ -316,8 +322,11 @@ function GameUI:onCursorWorldPositionChange()
 
     self.cursor_entity = entity
     if self.cursor ~= self.edit_room_cursor and self.cursor ~= self.waiting_cursor then
-      local cursor = entity and entity.hover_cursor or
+      local cursor = self.default_cursor
+      if self.app.world.user_actions_allowed then
+        cursor = entity and entity.hover_cursor or
         (self.down_count ~= 0 and self.down_cursor or self.default_cursor)
+      end
       self:setCursor(cursor)
     end
     if self.bottom_panel then
@@ -387,6 +396,10 @@ end
 function GameUI:onMouseMove(x, y, dx, dy)
   local repaint = UpdateCursorPosition(self.app.video, x, y)
   scrolling = false
+  if self.app.moviePlayer.playing then
+    return false
+  end
+  
   self.cursor_x = x
   self.cursor_y = y
   if self:onCursorWorldPositionChange() or self.simulated_cursor then
@@ -469,6 +482,10 @@ end
 
 function GameUI:onMouseUp(code, x, y)
   scrolling = false
+  if self.app.moviePlayer.playing then
+    return UI.onMouseUp(self, code, x, y)
+  end
+
   if code == 4 or code == 5 then
     -- Mouse wheel
     local window = self:getWindow(UIFullscreen)

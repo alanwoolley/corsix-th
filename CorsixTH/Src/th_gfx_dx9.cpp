@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2009 Peter "Corsix" Cawley
+Copyright (c) 2009-2013 Peter "Corsix" Cawley and Edvin "Lego3" Linge
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -33,6 +33,7 @@ SOFTWARE.
 #include <math.h>
 #ifdef _MSC_VER
 #pragma comment(lib, "D3D9")
+#pragma comment(lib, "D3DX9.lib")
 #pragma warning(disable: 4996) // Deprecated fopen
 #endif
 #if SDL_VERSION_ATLEAST(2,0,0)
@@ -51,6 +52,7 @@ THRenderTarget::THRenderTarget()
     fnOnDeviceChange = THDX9_OnDeviceChangeThunk<THRenderTarget>;
     m_pD3D = NULL;
     m_pDevice = NULL;
+    m_pPixelShader = NULL;
     m_pVerticies = NULL;
     m_pWhiteTexture = NULL;
     m_pZoomRenderTexture = NULL;
@@ -72,6 +74,10 @@ THRenderTarget::THRenderTarget()
 
 THRenderTarget::~THRenderTarget()
 {
+    if(m_pPixelShader != NULL) {
+        m_pPixelShader->Release();
+        m_pPixelShader = NULL;
+    }
     if(m_pOriginalBackBuffer != NULL)
     {
         if(m_pDevice != NULL)
@@ -288,6 +294,25 @@ bool THRenderTarget::create(const THRenderTargetCreationParams* pParams)
     {
         m_sLastError = "Could not create reference texture";
         return false;
+    }
+
+    // Create the pixel shader used for making a blue filter effect
+    // when the game is paused.
+    m_bBlueFilterActive = false;
+    if (m_pPixelShader == NULL) {
+        LPD3DXBUFFER m_pCode;
+        m_pResult = D3DXCompileShaderFromFile("Src/shaders/blue_filter.psh",
+                                   NULL,          //macro's            
+                                   NULL,          //includes           
+                                   "ps_main",     //main function      
+                                   "ps_2_0",      //shader profile     
+                                   0,             //flags              
+                                   &m_pCode,      //compiled operations
+                                   NULL,          //errors
+                                   NULL);         //constants
+
+        m_pDevice->CreatePixelShader((DWORD*)m_pCode->GetBufferPointer(),
+                                   &m_pPixelShader);
     }
 
     SetWindowLongPtr(hWindow, GWLP_USERDATA, (LONG_PTR)this);
@@ -635,6 +660,19 @@ bool THRenderTarget::fillBlack()
     }
     m_pDevice->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
     return true;
+}
+
+void THRenderTarget::setBlueFilterActive(bool bActivate)
+{
+    m_bBlueFilterActive = bActivate;
+    if (m_bBlueFilterActive)
+    {
+        m_pDevice->SetPixelShader(m_pPixelShader);
+    }
+    else
+    {
+        m_pDevice->SetPixelShader(NULL);
+    }
 }
 
 uint32_t THRenderTarget::mapColour(uint8_t iR, uint8_t iG, uint8_t iB)

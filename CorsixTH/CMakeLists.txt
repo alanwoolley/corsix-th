@@ -49,6 +49,7 @@ FILE(GLOB_RECURSE corsixth_source_files
   ${CMAKE_SOURCE_DIR}/CorsixTH/Src/*.c
   ${CMAKE_SOURCE_DIR}/CorsixTH/Src/*.hpp
   ${CMAKE_SOURCE_DIR}/CorsixTH/Src/*.h
+  ${CMAKE_SOURCE_DIR}/CorsixTH/Src/shaders/*.psh
   ${CMAKE_BINARY_DIR}/CorsixTH/Src/config.h
   ${CMAKE_SOURCE_DIR}/CorsixTH/Lua/api_version.lua
   ${CMAKE_SOURCE_DIR}/CorsixTH/CorsixTH.rc
@@ -136,6 +137,20 @@ IF(CORSIX_TH_USE_SDL_MIXER)
   ENDIF(SDLMIXER_FOUND)
 ENDIF(CORSIX_TH_USE_SDL_MIXER)
 
+message( STATUS "CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}" )
+
+# Find FFMPEG
+IF(CORSIX_TH_USE_FFMPEG)
+	FIND_PACKAGE(FFmpeg COMPONENTS AVFORMAT AVCODEC AVUTIL SWSCALE SWRESAMPLE REQUIRED)
+  IF(FFMPEG_FOUND)
+    TARGET_LINK_LIBRARIES(CorsixTH ${FFMPEG_LIBRARIES})
+    INCLUDE_DIRECTORIES(${FFMPEG_INCLUDE_DIRS})
+    message("  FFmpeg found")
+  ELSE(FFMPEG_FOUND)
+    message("Error: FFmpeg library not found, even though it was selected to be included")
+  ENDIF(FFMPEG_FOUND)
+ENDIF(CORSIX_TH_USE_FFMPEG)
+
 # Find Freetype2
 IF(CORSIX_TH_USE_FREETYPE2)
   FIND_PACKAGE(Freetype REQUIRED)
@@ -159,6 +174,27 @@ IF(CORSIX_TH_USE_OGL_RENDERER)
     message(FATAL_ERROR "Error: OpenGL library not found, it is required to build (consider changing choice of renderer)")
   ENDIF(OPENGL_FOUND)
 ENDIF(CORSIX_TH_USE_OGL_RENDERER)
+
+# Find DirectX
+IF(CORSIX_TH_USE_DX9_RENDERER)
+  FIND_PACKAGE(DirectX REQUIRED)
+  IF(DirectX_FOUND)
+    TARGET_LINK_LIBRARIES(CorsixTH ${DirectX_LIBRARY})
+    TARGET_LINK_LIBRARIES(CorsixTH ${DirectX_D3DX9_LIBRARY})
+    INCLUDE_DIRECTORIES(${DirectX_INCLUDE_DIR})
+    message("  DirectX found")
+  ELSE(DirectX_FOUND)
+    message(FATAL_ERROR "Error: DirectX library not found, it is required to build (consider changing choice of renderer)")
+  ENDIF(DirectX_FOUND)
+ENDIF(CORSIX_TH_USE_DX9_RENDERER)
+
+# Find msinttypes for MSVC
+IF(MSVC)
+  FIND_PATH(MSINTTYPES_INCLUDE_DIRS "inttypes.h" NO_DEFAULT_PATH)
+  MARK_AS_ADVANCED(MSINTTYPES_INCLUDE_DIRS)
+  MESSAGE(STATUS "Adding include directory: ${MSINTTYPES_INCLUDE_DIRS}")
+  INCLUDE_DIRECTORIES(${MSINTTYPES_INCLUDE_DIRS})
+ENDIF(MSVC)
 
 # Declaration of the install process
 IF(APPLE)

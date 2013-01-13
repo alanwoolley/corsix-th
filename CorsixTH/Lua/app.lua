@@ -28,7 +28,7 @@ local assert, io, type, dofile, loadfile, pcall, tonumber, print, setmetatable
 
 -- Increment each time a savegame break would occur
 -- and add compatibility code in afterLoad functions
-local SAVEGAME_VERSION = 57
+local SAVEGAME_VERSION = 58
 
 class "App"
 
@@ -54,6 +54,8 @@ function App:App()
     save = self.save,
     gamespeed = self.gamespeed,
     tryautosave = self.tryAutoSave
+    movie_allocate_picture = self.onMovieAllocatePicture,
+    movie_over = self.onMovieOver
   }
   self.strings = {}
   self.savegame_version = SAVEGAME_VERSION
@@ -156,6 +158,7 @@ function App:init()
   modes[#modes + 1] = "opengl"
   self.modes = modes
   self.video = assert(TH.surface(self.config.width, self.config.height, unpack(modes)))
+  self.video:setBlueFilterActive(false)
   SDL.wm.setIconWin32()
   
   
@@ -208,6 +211,13 @@ function App:init()
   self.audio = Audio(self)
   self.audio:init()
   
+  -- Load movie player
+  dofile "movie_player"
+  self.moviePlayer = MoviePlayer(self, self.audio)
+  if good_install_folder then
+    self.moviePlayer:init()
+  end
+
   -- Load strings before UI and before additional Lua
   dofile "strings"
   dofile "string_extensions"
@@ -270,6 +280,9 @@ function App:init()
     self:loadLevel("")
   else
     self:loadMainMenu()
+    if self.config.play_intro then
+      self.moviePlayer:playIntro()
+    end
     -- If we couldn't properly load the language, show an information dialog
     if not language_load_success then
       -- At this point we know the language is english, so no use having
@@ -342,6 +355,9 @@ function App:initLanguage()
 end
 
 function App:loadMainMenu(message)
+  -- Make sure there is no blue filter active.
+  self.video:setBlueFilterActive(false)
+
   -- Unload ui, world and map
   self.ui = nil
   self.world = nil
@@ -377,10 +393,14 @@ function App:loadLevel(level, ...)
         player_salary = self.ui.hospital.player_salary,
         message_popup = self.ui.hospital.message_popup,
         hospital_littered = self.ui.hospital.hospital_littered,
+        has_seen_pay_rise = self.ui.hospital.has_seen_pay_rise,
       },
     }
   end
   
+  -- Make sure there is no blue filter active.
+  self.video:setBlueFilterActive(false)
+
   -- Unload ui, world and map
   self.ui = nil
   self.world = nil
@@ -398,7 +418,11 @@ function App:loadLevel(level, ...)
   -- Load UI
   self.ui = GameUI(self, self.world:getLocalPlayerHospital())
   self.world:setUI(self.ui) -- Function call allows world to set up its keyHandlers
-  
+ 
+  if tonumber(level) then
+    self.moviePlayer:playAdvanceMovie(level)
+  end
+ 
   -- Now restore progress from previous levels.
   if carry_to_next_level then
     self.world:initFromPreviousLevel(carry_to_next_level)
@@ -747,10 +771,12 @@ function App:dispatch(evt_type, ...)
 end
 
 function App:onTick(...)
-  if self.world then
-    self.world:onTick(...)
+  if(not self.moviePlayer.playing) then
+    if self.world then
+      self.world:onTick(...)
+    end
+    self.ui:onTick(...)
   end
-  self.ui:onTick(...)
   return true -- tick events always result in a repaint
 end
 
@@ -760,9 +786,13 @@ local fps_sum = 0 -- Sum of fps_history array
 local fps_next = 1 -- Used to loop through fps_history when [over]writing
 
 function App:drawFrame()
-  self.video:startFrame()
-  self.ui:draw(self.video)
-  self.video:endFrame()
+  if(self.moviePlayer.playing) then
+    self.moviePlayer:refresh()
+  else
+    self.video:startFrame()
+    self.ui:draw(self.video)
+    self.video:endFrame()
+  end
   
   if self.config.track_fps then
     fps_sum = fps_sum - fps_history[fps_next]
@@ -806,6 +836,14 @@ function App:onMusicOver(...)
   return self.audio:onMusicOver(...)
 end
 
+function App:onMovieAllocatePicture(...)
+  return self.moviePlayer:onMovieAllocatePicture(...)
+end
+
+function App:onMovieOver(...)
+  self.moviePlayer:onMovieOver(...)
+end
+
 function App:checkInstallFolder()
   self.fs = FileSystem()
   local status, err
@@ -834,9 +872,11 @@ function App:checkInstallFolder()
   check("QData".. pathsep .."SPointer.dat")
   if #missing ~= 0 then
     missing = table.concat(missing, ", ")
-    error("Invalid Theme Hospital install folder specified in config file, "..
+    print("Invalid Theme Hospital install folder specified in config file, "..
           "as at least the following files are missing: ".. missing ..".\n"..
           message)
+    print("Trying to let the user select a new one.")
+    return false
   end
     
   -- Check for demo version

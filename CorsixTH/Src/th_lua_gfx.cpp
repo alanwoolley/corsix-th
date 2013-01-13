@@ -1,24 +1,24 @@
 /*
- Copyright (c) 2010 Peter "Corsix" Cawley
+Copyright (c) 2010-2013 Peter "Corsix" Cawley and Edvin "Lego3" Linge
 
- Permission is hereby granted, free of charge, to any person obtaining a copy of
- this software and associated documentation files (the "Software"), to deal in
- the Software without restriction, including without limitation the rights to
- use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
- of the Software, and to permit persons to whom the Software is furnished to do
- so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
 
- The above copyright notice and this permission notice shall be included in all
- copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- SOFTWARE.
- */
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
 
 #include "th_lua_internal.h"
 #include "th_gfx.h"
@@ -568,7 +568,22 @@ static int l_surface_new(lua_State *L) {
 	lua_pushstring(L, pCanvas->getLastError());
 	return 2;
 }
+static int l_surface_set_blue_filter_active(lua_State *L)
+{
+    THRenderTarget* pCanvas = luaT_testuserdata<THRenderTarget>(L);
+    pCanvas->setBlueFilterActive(lua_isnoneornil(L, 2) ? false : lua_toboolean(L, 2));
+    return 1;
+}
 
+static int l_surface_map(lua_State *L)
+{
+    THRenderTarget* pCanvas = luaT_testuserdata<THRenderTarget>(L);
+    lua_pushnumber(L, (lua_Number)pCanvas->mapColour(
+        (Uint8)luaL_checkinteger(L, 2),
+        (Uint8)luaL_checkinteger(L, 3),
+        (Uint8)luaL_checkinteger(L, 4)));
+    return 1;
+}
 static int l_surface_fill_black(lua_State *L) {
 	THRenderTarget* pCanvas = luaT_testuserdata<THRenderTarget>(L);
 	lua_settop(L, 1);
@@ -753,38 +768,34 @@ void THLuaRegisterGfx(const THLuaRegisterState_t *pState) {
 	;
 #endif
 
-	// Layers
-	luaT_class(THLayers_t, l_layers_new, "layers", MT_Layers)
-	;
-	luaT_setmetamethod(l_layers_get, "index");
-	luaT_setmetamethod(l_layers_set, "newindex");
-	luaT_setmetamethod(l_layers_persist, "persist");
-	luaT_setmetamethod(l_layers_depersist, "depersist");
-	luaT_endclass()
-	;
 
-	// Cursor
-	luaT_class(THCursor, l_cursor_new, "cursor", MT_Cursor)
-	;
-	luaT_setfunction(l_cursor_load, "load", MT_Sheet);
-	luaT_setfunction(l_cursor_use, "use", MT_Surface);
-	luaT_setfunction(l_cursor_position, "setPosition", MT_Surface);
-	luaT_endclass()
-	;
+    // Layers
+    luaT_class(THLayers_t, l_layers_new, "layers", MT_Layers);
+    luaT_setmetamethod(l_layers_get, "index");
+    luaT_setmetamethod(l_layers_set, "newindex");
+    luaT_setmetamethod(l_layers_persist, "persist");
+    luaT_setmetamethod(l_layers_depersist, "depersist");
+    luaT_endclass();
 
-	// Surface
-	luaT_class(THRenderTarget, l_surface_new, "surface", MT_Surface)
-	;
-	luaT_setfunction(l_surface_fill_black, "fillBlack");
-	luaT_setfunction(l_surface_start_frame, "startFrame");
-	luaT_setfunction(l_surface_end_frame, "endFrame");
-	luaT_setfunction(l_surface_nonoverlapping, "nonOverlapping");
-	luaT_setfunction(l_surface_map, "mapRGB");
-	luaT_setfunction(l_surface_rect, "drawRect");
-	luaT_setfunction(l_surface_get_clip, "getClip");
-	luaT_setfunction(l_surface_set_clip, "setClip");
-	luaT_setfunction(l_surface_screenshot, "takeScreenshot");
-	luaT_setfunction(l_surface_scale, "scale");
-	luaT_endclass()
-	;
+    // Cursor
+    luaT_class(THCursor, l_cursor_new, "cursor", MT_Cursor);
+    luaT_setfunction(l_cursor_load, "load", MT_Sheet);
+    luaT_setfunction(l_cursor_use, "use", MT_Surface);
+    luaT_setfunction(l_cursor_position, "setPosition", MT_Surface);
+    luaT_endclass();
+
+    // Surface
+    luaT_class(THRenderTarget, l_surface_new, "surface", MT_Surface);
+    luaT_setfunction(l_surface_fill_black, "fillBlack");
+    luaT_setfunction(l_surface_start_frame, "startFrame");
+    luaT_setfunction(l_surface_end_frame, "endFrame");
+    luaT_setfunction(l_surface_nonoverlapping, "nonOverlapping");
+    luaT_setfunction(l_surface_map, "mapRGB");
+    luaT_setfunction(l_surface_set_blue_filter_active, "setBlueFilterActive");
+    luaT_setfunction(l_surface_rect, "drawRect");
+    luaT_setfunction(l_surface_get_clip, "getClip");
+    luaT_setfunction(l_surface_set_clip, "setClip");
+    luaT_setfunction(l_surface_screenshot, "takeScreenshot");
+    luaT_setfunction(l_surface_scale, "scale");
+    luaT_endclass();
 }
