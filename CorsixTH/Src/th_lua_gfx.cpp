@@ -624,14 +624,6 @@ static int l_surface_nonoverlapping(lua_State *L) {
 	return 1;
 }
 
-static int l_surface_map(lua_State *L) {
-	THRenderTarget* pCanvas = luaT_testuserdata<THRenderTarget>(L);
-	lua_pushnumber(L,
-			(lua_Number) pCanvas->mapColour((Uint8) luaL_checkinteger(L, 2),
-					(Uint8) luaL_checkinteger(L, 3),
-					(Uint8) luaL_checkinteger(L, 4)));
-	return 1;
-}
 
 static int l_surface_rect(lua_State *L) {
 	THRenderTarget* pCanvas = luaT_testuserdata<THRenderTarget>(L);

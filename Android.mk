@@ -58,6 +58,8 @@ LOCAL_SRC_FILES := $(SDL_PATH)/src/main/android/SDL_android_main.cpp \
 			$(CORSIX_TH_SRC)/sdl_audio.cpp \
 			$(CORSIX_TH_SRC)/sdl_wm.cpp \
 			$(CORSIX_TH_SRC)/xmi2mid.cpp \
+			$(CORSIX_TH_SRC)/th_lua_movie.cpp \
+			$(CORSIX_TH_SRC)/th_movie.cpp \
 			$(LFS_SRC)/lfs.c \
 			$(LFS_SRC)/lfs_ext.c \
 			$(LPEG_SRC)/lpeg.c
@@ -68,5 +70,7 @@ LOCAL_STATIC_LIBRARIES := libfreetype
 
 LOCAL_LDLIBS := -lGLESv1_CM -llog
 LOCAL_LDLIBS += -L$(LOCAL_PATH)/libs/
+
+LOCAL_CPP_FEATURES += exceptions
 
 include $(BUILD_SHARED_LIBRARY)

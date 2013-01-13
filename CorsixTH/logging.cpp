@@ -1,12 +1,11 @@
 #include "logging.h"
-#include <stdio.h>
-#include <time.h>
+
 
 FILE* fo;
 FILE* fe;
 
 void formatString(std::string *strtext) {
-
+/*
 	time_t current_time = time(NULL);
 	std::string timestring = ctime(&current_time);
 
@@ -19,7 +18,7 @@ void formatString(std::string *strtext) {
 			strtext->resize(strtext->length() + 1, '\n');
 		}
 	}
-
+*/
 }
 
 void LOG_ERROR(std::string strtext) {
