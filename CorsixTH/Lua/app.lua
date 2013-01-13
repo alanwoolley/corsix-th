@@ -102,6 +102,10 @@ function App:init()
   dofile "filesystem"
   local good_install_folder = self:checkInstallFolder()
   self.good_install_folder = good_install_folder
+  if not good_install_folder then
+  	showerrordialog()
+  end
+  
   -- self:checkLanguageFile()
   self.savegame_dir = self.config.savegames or conf_path:match("^(.-)[^".. pathsep .. "]*$") .. "Saves"
   if self.savegame_dir:sub(-1, -1) == pathsep then
@@ -272,6 +276,7 @@ function App:init()
     self.ui = UI(self, true)
     self.ui:setMenuBackground()
     self.ui:addWindow(UIInstallDirBrowser(self.ui))
+   
     return true
   end
   
