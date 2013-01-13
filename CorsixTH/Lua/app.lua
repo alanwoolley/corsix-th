@@ -53,7 +53,7 @@ function App:App()
     restart = self.restart,
     save = self.save,
     gamespeed = self.gamespeed,
-    tryautosave = self.tryAutoSave
+    tryautosave = self.tryAutoSave,
     movie_allocate_picture = self.onMovieAllocatePicture,
     movie_over = self.onMovieOver
   }
