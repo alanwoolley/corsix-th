@@ -86,6 +86,11 @@ end
 
 function MoviePlayer:playAdvanceMovie(level)
   local filename = self.advance_movies[level]
+
+  if(not self.moviePlayer:getEnabled() or not self.app.config.movies or filename == nil) then
+      return
+  end
+
   self.can_skip = false
   self.audio:stopBackgroundMusic()
   self.holding_bg_music = true
@@ -109,8 +114,8 @@ function MoviePlayer:playMovie(filename, wait_for_stop)
   local screen_w, screen_h = self.app.config.width, self.app.config.height
   local ar
 
-  if(not self.app.config.movies or filename == nil) then
-    return
+  if(not self.moviePlayer:getEnabled() or not self.app.config.movies or filename == nil) then
+      return
   end
 
   self.moviePlayer:load(filename)
@@ -171,28 +176,30 @@ function MoviePlayer:onMovieOver()
 end
 
 function MoviePlayer:stop()
-    if self.can_skip then
-        self.moviePlayer:stop()
-    end
-    self.wait_for_stop = false
-    if not self.wait_for_over then
-        self:_destroyMovie()
-    end
+  if self.can_skip then
+    self.moviePlayer:stop()
+  end
+  self.wait_for_stop = false
+  if not self.wait_for_over then
+    self:_destroyMovie()
+  end
 end
 
 function MoviePlayer:_destroyMovie()
-    self.moviePlayer:unload()
+  self.moviePlayer:unload()
+  if(self.moviePlayer:requiresVideoReset()) then
     self.app.ui:resetVideo()
-    if self.channel >= 0 then
-        self.audio:releaseChannel(self.channel)
-        self.channel = -1
-    end
-    if self.holding_bg_music then
-        self.audio:resumeBackgroundMusic()
-    end
-    -- restore defaults
-    self.playing = false
-    self.can_skip = true
+  end
+  if self.channel >= 0 then
+    self.audio:releaseChannel(self.channel)
+    self.channel = -1
+  end
+  if self.holding_bg_music then
+    self.audio:resumeBackgroundMusic()
+  end
+  -- restore defaults
+  self.playing = false
+  self.can_skip = true
 end
 
 function MoviePlayer:refresh()

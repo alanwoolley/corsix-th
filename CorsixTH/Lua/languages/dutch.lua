@@ -190,6 +190,7 @@ information = {
     reputation = "Je reputatie kwam onder %d",
     balance = "Je banksaldo was lager dan %d",
     percentage_killed = "Je hebt meer dan %d procent van je patiënten vermoord",
+    cheat = "Dit was jouw keuze of heb je op de verkeerde knop gedrukt? Dus je faalt zelfs om vals te spelen, niet zo grappig hè?",
   },
   cheat_not_possible = "Cheat kan niet toegepast worden op dit level. Je faalt zelfs om vals te spelen, niet zo grappig hè?",
 }
@@ -2573,9 +2574,9 @@ menu_options_game_speed = {
   and_then_some_more = "  EN NOG EEN BEETJE ",
 }
 menu_options_warmth_colors = { 
-  choice_1 = "   Rood ", 
-  choice_2 = "   Blauw, groen en rood ", 
-  choice_3 = "   Geel, oranje en rood ", 
+  choice_1 = "   ROOD ", 
+  choice_2 = "   BLAUW, GROEN EN ROOD ", 
+  choice_3 = "   GEEL, ORANJE EN ROOD ", 
 }
 menu = {
   debug = "  DEBUG  ",
