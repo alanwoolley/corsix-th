@@ -3,7 +3,6 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := appmain
-LOCAL_ARM_MODE := arm
 
 SDL_PATH := ../SDL
 LUA_PATH := ../LUA
@@ -12,7 +11,7 @@ AGG_PATH := ../AGG
 CORSIX_TH_SRC := CorsixTH/Src
 LFS_SRC := LFS
 LPEG_SRC := LPEG
-FREETYPE_PATH := ../freetype
+FREETYPE_PATH := ../freetype2
 SDL_GFX_PATH := ../SDL_gfx
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SDL_PATH)/include \
@@ -27,7 +26,7 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SDL_PATH)/include \
 					$(LOCAL_PATH)/$(LPEG) \
 					$(LOCAL_PATH)/$(SDL_GFX_PATH)
 					
-LOCAL_CFLAGS := -DPLAY_MOD
+LOCAL_CFLAGS := -DPLAY_MOD 
 
 # Add your application source files here...
 LOCAL_SRC_FILES := $(SDL_PATH)/src/main/android/SDL_android_main.cpp \
@@ -67,7 +66,7 @@ LOCAL_SRC_FILES := $(SDL_PATH)/src/main/android/SDL_android_main.cpp \
 			
 
 LOCAL_SHARED_LIBRARIES := libLUA libAGG libSDL libSDL_image libSDL_mixer libSDL_gfx
-LOCAL_STATIC_LIBRARIES := libfreetype
+LOCAL_STATIC_LIBRARIES := libfreetype2
 
 LOCAL_LDLIBS := -lGLESv1_CM -llog
 LOCAL_LDLIBS += -L$(LOCAL_PATH)/libs/
