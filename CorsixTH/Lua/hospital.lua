@@ -1000,7 +1000,7 @@ function Hospital:onEndMonth()
     money_out = self.money_out,
     wages = wages,
     balance = self.balance,
-    visitors = self.visitors,
+    visitors = self.num_visitors,
     cures = self.num_cured,
     deaths = self.num_deaths,
     reputation = self.reputation,
@@ -1370,7 +1370,7 @@ function Hospital:hasRoomOfType(type)
   -- Check how many rooms there are.
   local result = false
   for _, room in pairs(self.world.rooms) do
-    if room.hospital == self and room.room_info.id == type and not room.crashed then
+    if room.hospital == self and room.room_info.id == type and room.is_active then
       result = (result or 0) + 1
     end
   end

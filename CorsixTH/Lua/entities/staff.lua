@@ -551,11 +551,10 @@ function Staff:checkIfNeedRest()
         callback = --[[persistable:staff_build_staff_room_callback]] function(room)
           if room.room_info.id == "staff_room" then
             self.waiting_for_staffroom = nil
-            self.world:unregisterRoomBuildCallback(callback)
-            self.build_callback = nil
+            self:unregisterRoomBuildCallback(callback)
           end
         end
-        self:registerNewRoomBuildCallback(callback)
+        self:registerRoomBuildCallback(callback)
         return
       end
       local room = self:getRoom()
@@ -838,6 +837,7 @@ function Staff:afterLoad(old, new)
       self.staffroom_needed = nil
     end
   end
+  Humanoid.afterLoad(self, old, new)
 end
 
 function Staff:intreruptHandymanTask()

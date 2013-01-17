@@ -634,11 +634,10 @@ function Patient:tickDay()
             callback = --[[persistable:patient_toilet_build_callback]] function(room)
               if room.room_info.id == "toilets" then
                 self.going_to_toilet = false
-                self.world:unregisterRoomBuildCallback(callback)
+                self:unregisterRoomBuildCallback(callback)
               end
             end
-            self.toilet_callback = callback
-            self.world:registerRoomBuildCallback(callback)
+            self:registerRoomBuildCallback(callback)
           -- Otherwise we can queue the action, but only if not in any rooms right now.
           elseif not self:getRoom() and not self.action_queue[1].is_leaving then
             self:setNextAction{
@@ -869,4 +868,40 @@ function Patient:updateDynamicInfo(action_string)
     end
   end
   self:setDynamicInfo('text', {action_string, "", info})
+end
+
+--[[ Update availability of a choice in message owned by this patient, if any
+!param choice (string) The choice that needs updating (currently "research" or "guess_cure").
+]]
+function Patient:updateMessage(choice)
+  if self.message and self.message.choices then
+    local enabled = false
+    if choice == "research" then
+      -- enable only if research department is built and a room in the treatment chain is undiscovered
+      if self.hospital:hasRoomOfType("research") then
+        local req = self.hospital:checkDiseaseRequirements(self.disease.id)
+        for _, room_id in ipairs(req.rooms) do
+          local room = self.world.available_rooms[room_id]
+          if room and self.hospital.undiscovered_rooms[room] then
+            enabled = true
+          end
+        end
+      end
+    else -- if choice == "guess_cure" then
+      -- TODO: implement
+    end
+    
+    for _, c in ipairs(self.message.choices) do
+      if c.choice == choice then
+        c.enabled = enabled
+      end
+    end
+    
+    -- Update the fax window if it is open.
+    local window = self.world.ui:getWindow(UIFax)
+    if window then
+      window:updateChoices()
+    end
+    
+  end
 end

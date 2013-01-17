@@ -100,24 +100,20 @@ local function action_seek_room_no_treatment_room_found(room_type, humanoid)
   -- Can this room be built right now? What is then missing?
   -- TODO: Change to make use of Hospital:checkDiseaseRequirements
   local output_text = strings.can_not_cure
-  local room_needed
-  for _, room in ipairs(TheApp.rooms) do
-    if room_type == room.id then
-      room_needed = room
-      break
-    end
-  end
-  if not room_needed or humanoid.hospital.discovered_rooms[room_needed] then
+  -- TODO: can we really assert this? Or should we just make the patient go home?
+  local room = assert(humanoid.world.available_rooms[room_type], "room " .. room_type .. " not available")
+  
+  local room_discovered = false
+  if humanoid.hospital.discovered_rooms[room] then
+    room_discovered = true
     local room_name, required_staff, staff_name = humanoid.world:getRoomNameAndRequiredStaffName(room_type)
-    output_text = strings.need_to_build:format(room_name)
-    if not humanoid.hospital:hasStaffOfCategory(required_staff) then
+    if humanoid.hospital:hasStaffOfCategory(required_staff) then
+      output_text = strings.need_to_build:format(room_name)
+    else
       output_text = strings.need_to_build_and_employ:format(room_name, staff_name)
     end
   end
-  local research_btn = "disabled"
-  if humanoid.world:findRoomNear(humanoid, "research") then
-    research_btn = "research"
-  end
+  local research_enabled = not room_discovered and humanoid.hospital:hasRoomOfType("research")
   local message = {
     {text = strings.disease_name:format(humanoid.disease.name)},
     {text = " "},
@@ -126,7 +122,7 @@ local function action_seek_room_no_treatment_room_found(room_type, humanoid)
     choices = {
       {text = strings.choices.send_home, choice = "send_home"},
       {text = strings.choices.wait,      choice = "wait"},
-      {text = strings.choices.research,  choice = research_btn},
+      {text = strings.choices.research,  choice = "research", enabled = research_enabled},
     },
   }
   -- Ok, send the message in all channels.
@@ -155,25 +151,20 @@ local function action_seek_room_no_diagnosis_room_found(action, humanoid)
     -- Wait two months before going home anyway.
     humanoid:setMood("patient_wait", "activate")
     humanoid.waiting = 60
-    local middle_choice = "disabled"
-    local more_text = ""
-    if humanoid.hospital.disease_casebook[humanoid.disease.id].discovered then
-      middle_choice = "guess_cure"
-      more_text = _S.fax.diagnosis_failed.partial_diagnosis_percentage_name
-        :format(math.round(humanoid.diagnosis_progress*100), humanoid.disease.name)
-    end
+    local guess_enabled = humanoid.hospital.disease_casebook[humanoid.disease.id].discovered
     local message = {
       {text = _S.fax.diagnosis_failed.situation},
       {text = " "},
       {text = _S.fax.diagnosis_failed.what_to_do_question},
       choices = {
         {text = _S.fax.diagnosis_failed.choices.send_home,   choice = "send_home"},
-        {text = _S.fax.diagnosis_failed.choices.take_chance, choice = middle_choice},
+        {text = _S.fax.diagnosis_failed.choices.take_chance, choice = "guess_cure", enabled = guess_enabled},
         {text = _S.fax.diagnosis_failed.choices.wait,        choice = "wait"},
       },
     }
-    if more_text ~= "" then
-      table.insert(message, 3, {text = more_text})
+    if guess_enabled then
+      table.insert(message, 3, {text = _S.fax.diagnosis_failed.partial_diagnosis_percentage_name
+        :format(math.round(humanoid.diagnosis_progress*100), humanoid.disease.name)})
     end
     TheApp.ui.bottom_panel:queueMessage("information", message, humanoid)
     humanoid:updateDynamicInfo(_S.dynamic_info.patient.actions.awaiting_decision)
@@ -195,10 +186,14 @@ end
 
 local action_seek_room_interrupt = permanent"action_seek_room_interrupt"( function(action, humanoid)
   humanoid:setMood("patient_wait", "deactivate")
-  humanoid.world:unregisterRoomBuildCallback(action.build_callback)
-  humanoid.build_callback = nil
   -- Just in case we are somehow started again:
+  -- FIXME: This seems to be used for intermediate actions like peeing while the patient is waiting
+  --        Unfortunately this means that if you finish the required room while the patient is peeing
+  --        the callback does not happen, meaning that the message does not disappear.
+  humanoid:unregisterRoomBuildCallback(action.build_callback)
+  humanoid:unregisterRoomRemoveCallback(action.remove_callback)
   action.build_callback = nil
+  action.remove_callback = nil
   action.done_init = false
   humanoid:finishAction()
 end)
@@ -223,8 +218,22 @@ local function action_seek_room_start(action, humanoid)
     if not action.done_init then
       action.done_init = true
       action.must_happen = true
+      
+      local remove_callback = --[[persistable:action_seek_room_remove_callback]] function(room)
+        if room.room_info.id == "research" then
+          humanoid:updateMessage("research")
+        end
+      end -- End of remove_callback function
+      action.remove_callback = remove_callback
+      humanoid:registerRoomRemoveCallback(remove_callback)
+      
       local build_callback
       build_callback = --[[persistable:action_seek_room_build_callback]] function(room)
+        -- if research room was built, message may need to be updated
+        if room.room_info.id == "research" then
+          humanoid:updateMessage("research")
+        end
+        
         local found = false
         if room.room_info.id == action.room_type then
           found = true
@@ -233,8 +242,8 @@ local function action_seek_room_start(action, humanoid)
           -- Example: Will go to ward, but is waiting for the operating theatre.
           -- Clean up and start over to find the room we actually want to go to.
           TheApp.ui.bottom_panel:removeMessage(humanoid)
-          humanoid.world:unregisterRoomBuildCallback(build_callback)
-          humanoid.build_callback = nil
+          humanoid:unregisterRoomBuildCallback(build_callback)
+          humanoid:unregisterRoomRemoveCallback(remove_callback)
           action.room_type_needed = nil
           action_seek_room_start(action, humanoid)
         elseif not humanoid.diagnosed then
@@ -250,12 +259,13 @@ local function action_seek_room_start(action, humanoid)
         if found then 
           action_seek_room_goto_room(room, humanoid, action.diagnosis_room)
           TheApp.ui.bottom_panel:removeMessage(humanoid)
-          humanoid.world:unregisterRoomBuildCallback(build_callback)
-          humanoid.build_callback = nil
+          humanoid:unregisterRoomBuildCallback(build_callback)
+          humanoid:unregisterRoomRemoveCallback(remove_callback)
         end
       end -- End of build_callback function
       action.build_callback = build_callback
-      humanoid:registerNewRoomBuildCallback(build_callback)
+      humanoid:registerRoomBuildCallback(build_callback)
+      
       action.on_interrupt = action_seek_room_interrupt
     end
     

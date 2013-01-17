@@ -93,6 +93,7 @@ function World:World(app)
   -- List of which goal criterion means what, and what number the corresponding icon has.
   self.level_criteria = local_criteria_variable
   self.room_build_callbacks = {--[[a set rather than a list]]}
+  self.room_remove_callbacks = {--[[a set rather than a list]]}
   self.room_built = {} -- List of room types that have been built
   self.hospitals = {}
   self.floating_dollars = {}
@@ -734,6 +735,19 @@ function World:unregisterRoomBuildCallback(callback)
   self.room_build_callbacks[callback] = nil
 end
 
+-- Register a function to be called whenever a room has been deactivated (crashed or edited).
+--!param callback (function) A function taking one argument: a `Room`.
+function World:registerRoomRemoveCallback(callback)
+  self.room_remove_callbacks[callback] = true
+end
+
+-- Unregister a function from being called whenever a room has been deactivated (crashed or edited).
+--!param callback (function) A function previously passed to
+-- `registerRoomRemoveCallback`.
+function World:unregisterRoomRemoveCallback(callback)
+  self.room_remove_callbacks[callback] = nil
+end
+
 function World:newRoom(x, y, w, h, room_info, ...)
   local id = #self.rooms + 1
   -- Note: Room IDs will be unique, but they may not form continuous values
@@ -748,6 +762,7 @@ function World:newRoom(x, y, w, h, room_info, ...)
   return room
 end
 
+--! Called when a room has been completely built and is ready to use
 function World:markRoomAsBuilt(room)
   room:roomFinished()
   local diag_disease = self.hospitals[1].disease_casebook["diag_" .. room.room_info.id]
@@ -755,6 +770,14 @@ function World:markRoomAsBuilt(room)
     self.hospitals[1].disease_casebook["diag_" .. room.room_info.id].discovered = true
   end
   for callback in pairs(self.room_build_callbacks) do
+    callback(room)
+  end
+end
+
+--! Called when a room has been deactivated (crashed or edited)
+function World:notifyRoomRemoved(room)
+  self.dispatcher:dropFromQueue(room)
+  for callback in pairs(self.room_remove_callbacks) do
     callback(room)
   end
 end
@@ -851,31 +874,25 @@ function World:setSpeed(speed)
     if self.active_earthquake then
       self.ui.tick_scroll_amount = {x = 0, y = 0}
     end
-    -- If the config does not allow actions when the game is paused, add a blueish tone.
-    if not TheApp.world.user_actions_allowed then
-      TheApp.video:setBlueFilterActive(true)
-    end
+    -- By default actions are not allowed when the game is paused.
+    self.user_actions_allowed = TheApp.config.allow_user_actions_while_paused
   elseif self:getCurrentSpeed() == "Pause" then
-    -- Possibly remove the blueish tone.
-    if not TheApp.config.allow_user_actions_while_paused then
-      TheApp.video:setBlueFilterActive(false)
-    end
+    self.user_actions_allowed = true
   end
   self.prev_speed = self:getCurrentSpeed()
   local numerator, denominator = unpack(tick_rates[speed])
   self.hours_per_tick = numerator
   self.tick_rate = denominator
+  -- Set the blue filter according to whether the user can build or not.
+  TheApp.video:setBlueFilterActive(not self.user_actions_allowed)
 end
 
 -- Dedicated function to allow unpausing by pressing 'p' again
 function World:pauseOrUnpause()
   if not self:isCurrentSpeed("Pause") then
-    -- By default actions are not allowed when the game is paused.
-    self.user_actions_allowed = TheApp.config.allow_user_actions_while_paused
     self:setSpeed("Pause")
   elseif self.prev_speed then
     self:setSpeed(self.prev_speed)
-    self.user_actions_allowed = true
   end
 end
 
@@ -2144,7 +2161,11 @@ function World:afterLoad(old, new)
   if old < 57 then
     self.user_actions_allowed = true
   end
-
+  if old < 61 then
+    -- room remove callbacks added
+    self.room_remove_callbacks = {}
+  end
+  
   -- Now let things inside the world react.
   for _, cat in pairs({self.hospitals, self.entities, self.rooms}) do
     for _, obj in pairs(cat) do
