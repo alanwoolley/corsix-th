@@ -28,7 +28,7 @@ local assert, io, type, dofile, loadfile, pcall, tonumber, print, setmetatable
 
 -- Increment each time a savegame break would occur
 -- and add compatibility code in afterLoad functions
-local SAVEGAME_VERSION = 61
+local SAVEGAME_VERSION = 62
 
 class "App"
 
@@ -118,6 +118,18 @@ function App:init()
   end
   if self.savegame_dir:sub(-1, -1) ~= pathsep then
     self.savegame_dir = self.savegame_dir .. pathsep
+  end
+  self.screenshot_dir = self.config.screenshots or conf_path:match("^(.-)[^".. pathsep .. "]*$") .. "Screenshots"
+  if self.screenshot_dir:sub(-1, -1) == pathsep then
+    self.screenshot_dir = self.screenshot_dir:sub(1, -2)
+  end
+  if lfs.attributes(self.screenshot_dir, "mode") ~= "directory" then
+    if not lfs.mkdir(self.screenshot_dir) then
+       print "Notice: Savegame directory does not exist and could not be created."
+    end
+  end
+  if self.screenshot_dir:sub(-1, -1) ~= pathsep then
+    self.screenshot_dir = self.screenshot_dir .. pathsep
   end
   
   -- Create the window

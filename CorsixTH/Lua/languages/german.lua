@@ -160,6 +160,18 @@ menu_options_warmth_colors = {
   choice_3 = "  GELB-ORANGE-ROT  ",
 }
 
+menu_charts = {
+  bank_manager  = "  (F1) BANK-MANAGER  ",
+  statement     = "  (F2) BILANZ  ",
+  staff_listing = "  (F3) PERSONALLISTE  ",
+  town_map      = "  (F4) ÜBERSICHTSKARTE  ",
+  casebook      = "  (F5) BEHANDLUNGSMAPPE  ",
+  research      = "  (F6) FORSCHUNG  ",
+  status        = "  (F7) STATUS  ",
+  graphs        = "  (F8) DIAGRAMME  ",
+  policy        = "  (F9) EINSTELLUNGEN  ",
+}
+
 -- The demo does not contain this string
 menu_file.restart = "  NEUSTART  "
 
@@ -168,8 +180,8 @@ menu_debug = {
   transparent_walls    = "  (X) DURCHSICHTIGE WÄNDE  ",
   limit_camera              = "  KAMERA BEGRENZEN  ",
   disable_salary_raise = "  KEINE GEHALTSERHÖHUNGEN  ",
-  make_debug_fax            = "  (F8) DEBUG-FAX ERSTELLEN  ",
-  make_debug_patient        = "  (F9) DEBUG-PATIENTEN ERSTELLEN  ",
+  make_debug_fax            = "  DEBUG-FAX ERSTELLEN  ",
+  make_debug_patient        = "  DEBUG-PATIENTEN ERSTELLEN  ",
   cheats                    = "  (F11) CHEATS  ",
   lua_console               = "  (F12) LUA-KONSOLE  ",
   calls_dispatcher          = "  AUFRUF-VERTEILER  ",
