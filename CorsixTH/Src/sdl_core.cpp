@@ -32,7 +32,7 @@ SOFTWARE.
 #pragma warning (disable: 4996) // CRT deprecation
 #endif
 
-#define MAX_FPS 18
+#define MAX_FPS 30
 
 static int l_init(lua_State *L)
 {
@@ -88,7 +88,7 @@ struct fps_ctrl
 
     void init()
     {
-        limit_fps = true;
+        limit_fps = false;
         track_fps = true;
         q_front = 0;
         q_back = 0;
