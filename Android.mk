@@ -16,6 +16,7 @@ SDL_GFX_PATH := ../SDL_gfx
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SDL_PATH)/include \
 					$(LOCAL_PATH)/$(AGG_PATH)/include \
+					$(LOCAL_PATH)/$(AGG_PATH)/src \
 					$(LOCAL_PATH)/$(FREETYPE_PATH)/include \
 					$(LOCAL_PATH)/$(FREETYPE_PATH)/include/freetype \
 					$(LOCAL_PATH)/$(LUA_PATH) \
