@@ -47,6 +47,13 @@ struct types_equal<T1, T1> {
 	};
 };
 
+typedef struct {
+  int musicVol, sfxVol, announcementsVol, fpsLimit;
+  unsigned char playSoundFx, playMusic, playAnnouncements, globalAudio;
+  char* originalFilesPath, cthPath, language;
+} Configuration;
+
+
 JavaVM* jvm;
 lua_State* L;
 
@@ -170,6 +177,21 @@ extern "C" void Java_uk_co_armedpineapple_cth_SDLActivity_cthGameSpeed(
 	LOG_INFO("Done");
 }
 
+extern "C" void Java_uk_co_armedpineapple_cth_SDLActivity_CthUpdateConfiguration( JNIEnv* env, jclass jcls, jobject configuration) {
+	LOG_INFO("Configuration Updated");
+
+	jclass configclass = jEnv->GetObjectClass(configuration);
+	jmethodID getCthPath = jEnv->GetMethodID(configclass, "getCthPath", "()Ljava/lang/String;");
+	jstring cthpath = (jstring) jEnv->CallObjectMethod(configuration, getCthPath);
+
+
+	SDL_Event e;
+	e.type = SDL_USEREVENT_CONFIGURATION;
+
+	SDL_PushEvent(&e);
+	LOG_INFO("Done");
+}
+
 //! Program entry point
 /*!
  Prepares a Lua state for, and catches errors from, CorsixTH_lua_main(). By
@@ -177,7 +199,16 @@ extern "C" void Java_uk_co_armedpineapple_cth_SDLActivity_cthGameSpeed(
  sooner, hence this function does as little as possible and leaves the rest
  for CorsixTH_lua_main().
  */
-int SDL_main(int argc, char** argv, JavaVM* vm, const char* logpath) {
+int SDL_main(int argc, char** argv, JavaVM* vm, jobject configuration) {
+
+	JNIEnv* jEnv;
+
+	vm->AttachCurrentThread(&jEnv, NULL);
+	jclass configclass = jEnv->GetObjectClass(configuration);
+	jmethodID getCthPath = jEnv->GetMethodID(configclass, "getCthPath", "()Ljava/lang/String;");
+	jstring cthpath = (jstring) jEnv->CallObjectMethod(configuration, getCthPath);
+	const char* logpath = jEnv->GetStringUTFChars(cthpath, 0);
+
 
 	START_LOGGING(logpath);
 
