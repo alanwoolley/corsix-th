@@ -540,7 +540,6 @@ function GameUI:onTick()
       auto_dy = 0
       auto_dx = 0
     else
-      print("we're on the move" .. auto_dx .. " - " .. auto_dy)
       auto_dy = auto_dy * auto_multiplier
       auto_dx = auto_dx * auto_multiplier
       self:scrollMap(auto_dx, auto_dy)
