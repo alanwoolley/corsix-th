@@ -45,10 +45,16 @@ SOFTWARE.
 #define SDL_USEREVENT_RESTART (SDL_USEREVENT + 7)
 #define SDL_USEREVENT_GAMESPEED (SDL_USEREVENT + 8)
 #define SDL_USEREVENT_AUTOSAVE (SDL_USEREVENT + 9)
-#define SDL_USEREVENT_CONFIGURATION (SDL_USEREVENT + 10);
+#define SDL_USEREVENT_CONFIGURATION (SDL_USEREVENT + 10)
 
 int luaopen_sdl(lua_State *L);
 
 void set_fps_limit(int fps);
+
+typedef struct {
+	int musicVol, sfxVol, announcementsVol, fpsLimit;
+	unsigned char playSoundFx, playMusic, playAnnouncements, globalAudio;
+	char* originalFilesPath, *cthPath, *language;
+} Configuration;
 
 #endif // CORSIX_TH_LUA_SDL_H_

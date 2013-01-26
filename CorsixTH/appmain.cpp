@@ -47,20 +47,13 @@ struct types_equal<T1, T1> {
 	};
 };
 
-typedef struct {
-  int musicVol, sfxVol, announcementsVol, fpsLimit;
-  unsigned char playSoundFx, playMusic, playAnnouncements, globalAudio;
-  char* originalFilesPath, cthPath, language;
-} Configuration;
-
+Configuration masterConfig;
 
 JavaVM* jvm;
 lua_State* L;
 
 const char *speeds[] = { "Pause", "Slowest", "Slower", "Normal", "Max speed",
 		"And then some more" };
-
-
 
 static int showkeyboard(lua_State *L) {
 	LOG_INFO("Showing keyboard");
@@ -108,14 +101,15 @@ static int gamespeedupdated(lua_State *L) {
 	return sendCommandInt(jvm, COMMAND_GAME_SPEED_UPDATED, 4);
 }
 
-extern "C" void Java_uk_co_armedpineapple_cth_SDLActivity_onNativeLowMemory(JNIEnv* env, jclass cls) {
+extern "C" void Java_uk_co_armedpineapple_cth_SDLActivity_onNativeLowMemory(
+		JNIEnv* env, jclass cls) {
 	LOG_INFO("Calling Lua GC");
 	int previously = lua_gc(L, LUA_GCCOUNT, NULL);
-	lua_gc(L,LUA_GCCOLLECT, NULL);
+	lua_gc(L, LUA_GCCOLLECT, NULL);
 	int now = lua_gc(L, LUA_GCCOUNT, NULL);
-	int diff = now-previously;
+	int diff = now - previously;
 	char* logmsg = new char[512];
-	sprintf(logmsg, "Freed up %i KB", previously-now);
+	sprintf(logmsg, "Freed up %i KB", previously - now);
 
 	LOG_INFO(logmsg);
 }
@@ -177,17 +171,53 @@ extern "C" void Java_uk_co_armedpineapple_cth_SDLActivity_cthGameSpeed(
 	LOG_INFO("Done");
 }
 
-extern "C" void Java_uk_co_armedpineapple_cth_SDLActivity_CthUpdateConfiguration( JNIEnv* env, jclass jcls, jobject configuration) {
+extern "C" void Java_uk_co_armedpineapple_cth_SDLActivity_cthUpdateConfiguration(
+		JNIEnv* env, jclass jcls, jobject configuration) {
 	LOG_INFO("Configuration Updated");
 
-	jclass configclass = jEnv->GetObjectClass(configuration);
-	jmethodID getCthPath = jEnv->GetMethodID(configclass, "getCthPath", "()Ljava/lang/String;");
-	jstring cthpath = (jstring) jEnv->CallObjectMethod(configuration, getCthPath);
+	jclass configclass = env->GetObjectClass(configuration);
+	jstring cthpath = (jstring) env->CallObjectMethod(configuration,
+			env->GetMethodID(configclass, "getCthPath",
+					"()Ljava/lang/String;"));
+	jstring originalfiles = (jstring) env->CallObjectMethod(configuration,
+			env->GetMethodID(configclass, "getOriginalFilesPath",
+					"()Ljava/lang/String;"));
+	jstring language = (jstring) env->CallObjectMethod(configuration,
+			env->GetMethodID(configclass, "getLanguage",
+					"()Ljava/lang/String;"));
+	jint musicVol = env->CallIntMethod(configuration,
+			env->GetMethodID(configclass, "getMusicVol", "()I"));
+	jint sfxVol = env->CallIntMethod(configuration,
+			env->GetMethodID(configclass, "getSfxVol", "()I"));
+	jint announcementsVol = env->CallIntMethod(configuration,
+			env->GetMethodID(configclass, "getAnnouncementsVol", "()I"));
+	jint fpsLimit = env->CallIntMethod(configuration,
+			env->GetMethodID(configclass, "getFpsLimit", "()I"));
+	jboolean playSoundFx = env->CallBooleanMethod(configuration,
+			env->GetMethodID(configclass, "getPlaySoundFx", "()Z"));
+	jboolean playMusic = env->CallBooleanMethod(configuration,
+			env->GetMethodID(configclass, "getPlayMusic", "()Z"));
+	jboolean playAnnouncements = env->CallBooleanMethod(configuration,
+			env->GetMethodID(configclass, "getPlayAnnouncements", "()Z"));
+	jboolean globalAudio = env->CallBooleanMethod(configuration,
+			env->GetMethodID(configclass, "getGlobalAudio", "()Z"));
 
+	masterConfig.cthPath = (char*) env->GetStringUTFChars(cthpath, 0);
+	masterConfig.originalFilesPath = (char*) env->GetStringUTFChars(
+			originalfiles, 0);
+	masterConfig.language = (char*) env->GetStringUTFChars(language, 0);
+	masterConfig.musicVol = (int) musicVol;
+	masterConfig.sfxVol = (int) sfxVol;
+	masterConfig.announcementsVol = (int) announcementsVol;
+	masterConfig.fpsLimit = (int) fpsLimit;
+	masterConfig.playSoundFx = (unsigned char) playSoundFx;
+	masterConfig.playMusic = (unsigned char) playMusic;
+	masterConfig.playAnnouncements = (unsigned char) playAnnouncements;
+	masterConfig.globalAudio = (unsigned char) globalAudio;
 
 	SDL_Event e;
 	e.type = SDL_USEREVENT_CONFIGURATION;
-
+	e.user.data1 = &masterConfig;
 	SDL_PushEvent(&e);
 	LOG_INFO("Done");
 }
@@ -205,10 +235,11 @@ int SDL_main(int argc, char** argv, JavaVM* vm, jobject configuration) {
 
 	vm->AttachCurrentThread(&jEnv, NULL);
 	jclass configclass = jEnv->GetObjectClass(configuration);
-	jmethodID getCthPath = jEnv->GetMethodID(configclass, "getCthPath", "()Ljava/lang/String;");
-	jstring cthpath = (jstring) jEnv->CallObjectMethod(configuration, getCthPath);
+	jmethodID getCthPath = jEnv->GetMethodID(configclass, "getCthPath",
+			"()Ljava/lang/String;");
+	jstring cthpath = (jstring) jEnv->CallObjectMethod(configuration,
+			getCthPath);
 	const char* logpath = jEnv->GetStringUTFChars(cthpath, 0);
-
 
 	START_LOGGING(logpath);
 
@@ -233,7 +264,7 @@ int SDL_main(int argc, char** argv, JavaVM* vm, jobject configuration) {
 
 		if (L == NULL) {
 			fprintf(stderr, "Fatal error starting CorsixTH: "
-					"Cannot open Lua state.\n");
+			"Cannot open Lua state.\n");
 			return 0;
 		}
 		lua_atpanic(L, CorsixTH_lua_panic);
@@ -271,7 +302,7 @@ int SDL_main(int argc, char** argv, JavaVM* vm, jobject configuration) {
 			if (lua_pcall(L, 1, 0, 0) != 0) {
 				fprintf(stderr, "%s\n", lua_tostring(L, -1));
 			}
-			sendCommand(jvm,COMMAND_GAME_LOAD_ERROR);
+			sendCommand(jvm, COMMAND_GAME_LOAD_ERROR);
 		}
 
 		lua_getfield(L, LUA_REGISTRYINDEX, "_RESTART");

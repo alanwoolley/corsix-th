@@ -54,6 +54,7 @@ function App:App()
     save = self.save,
     gamespeed = self.gamespeed,
     tryautosave = self.tryAutoSave,
+    configupdate = self.updateConfig,
     movie_allocate_picture = self.onMovieAllocatePicture,
     movie_over = self.onMovieOver
   }
@@ -1081,6 +1082,12 @@ function App:tryAutoSave(filename)
     print "Trying to save, but no map is loaded"
   end
 end
+
+function App:updateConfig(newconfig)
+  print "New configuration!"
+  for k,v in pairs(newconfig) do print(k,v) end
+end
+
 
 
 --! Restarts the current level (offers confirmation window first)
