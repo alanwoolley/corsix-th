@@ -171,10 +171,7 @@ extern "C" void Java_uk_co_armedpineapple_cth_SDLActivity_cthGameSpeed(
 	LOG_INFO("Done");
 }
 
-extern "C" void Java_uk_co_armedpineapple_cth_SDLActivity_cthUpdateConfiguration(
-		JNIEnv* env, jclass jcls, jobject configuration) {
-	LOG_INFO("Configuration Updated");
-
+void populateConfiguration(JNIEnv* env, jobject configuration) {
 	jclass configclass = env->GetObjectClass(configuration);
 	jstring cthpath = (jstring) env->CallObjectMethod(configuration,
 			env->GetMethodID(configclass, "getCthPath",
@@ -214,6 +211,13 @@ extern "C" void Java_uk_co_armedpineapple_cth_SDLActivity_cthUpdateConfiguration
 	masterConfig.playMusic = (unsigned char) playMusic;
 	masterConfig.playAnnouncements = (unsigned char) playAnnouncements;
 	masterConfig.globalAudio = (unsigned char) globalAudio;
+}
+
+extern "C" void Java_uk_co_armedpineapple_cth_SDLActivity_cthUpdateConfiguration(
+		JNIEnv* env, jclass jcls, jobject configuration) {
+	LOG_INFO("Configuration Updated");
+
+	populateConfiguration(env, configuration);
 
 	SDL_Event e;
 	e.type = SDL_USEREVENT_CONFIGURATION;
@@ -232,16 +236,10 @@ extern "C" void Java_uk_co_armedpineapple_cth_SDLActivity_cthUpdateConfiguration
 int SDL_main(int argc, char** argv, JavaVM* vm, jobject configuration) {
 
 	JNIEnv* jEnv;
-
 	vm->AttachCurrentThread(&jEnv, NULL);
-	jclass configclass = jEnv->GetObjectClass(configuration);
-	jmethodID getCthPath = jEnv->GetMethodID(configclass, "getCthPath",
-			"()Ljava/lang/String;");
-	jstring cthpath = (jstring) jEnv->CallObjectMethod(configuration,
-			getCthPath);
-	const char* logpath = jEnv->GetStringUTFChars(cthpath, 0);
+	populateConfiguration(jEnv, configuration);
 
-	START_LOGGING(logpath);
+	START_LOGGING(masterConfig.cthPath);
 
 	LOG_INFO("Starting CTH Android");
 	jvm = vm;
