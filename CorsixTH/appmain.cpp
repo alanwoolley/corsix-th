@@ -219,6 +219,9 @@ extern "C" void Java_uk_co_armedpineapple_cth_SDLActivity_cthUpdateConfiguration
 
 	populateConfiguration(env, configuration);
 
+	// Update FPS Limit
+	set_fps_limit(masterConfig.fpsLimit);
+
 	SDL_Event e;
 	e.type = SDL_USEREVENT_CONFIGURATION;
 	e.user.data1 = &masterConfig;
@@ -235,11 +238,18 @@ extern "C" void Java_uk_co_armedpineapple_cth_SDLActivity_cthUpdateConfiguration
  */
 int SDL_main(int argc, char** argv, JavaVM* vm, jobject configuration) {
 
+	// Initialise the environment and set initial configuration
 	JNIEnv* jEnv;
 	vm->AttachCurrentThread(&jEnv, NULL);
 	populateConfiguration(jEnv, configuration);
 
+	// Enable Logging
 	START_LOGGING(masterConfig.cthPath);
+
+	// Set FPS Limit
+	set_fps_limit(masterConfig.fpsLimit);
+
+
 
 	LOG_INFO("Starting CTH Android");
 	jvm = vm;

@@ -32,7 +32,9 @@
 #pragma warning (disable: 4996) // CRT deprecation
 #endif
 
-#define MAX_FPS 30
+// Frame Limiter
+int fps = 0;
+FPSmanager fps_manager;
 
 static int l_init(lua_State *L) {
 	Uint32 flags = 0;
@@ -150,15 +152,27 @@ static void l_pushtableint(lua_State *L, const char* k, int v) {
 	lua_settable(L, -3);
 }
 
+void set_fps_limit(int newfps) {
+
+	fps = newfps;
+	if (fps != 0) {
+		SDL_initFramerate(&fps_manager);
+		SDL_setFramerate(&fps_manager, newfps);
+	}
+	printf("New framerate limit is %i \n", newfps);
+}
+
 static int l_mainloop(lua_State *L) {
 	luaL_checktype(L, 1, LUA_TTHREAD);
 	lua_State *dispatcher = lua_tothread(L, 1);
 
 	fps_ctrl *fps_control = (fps_ctrl*) lua_touserdata(L, lua_upvalueindex(1));
 	SDL_TimerID timer = SDL_AddTimer(30, timer_frame_callback, NULL);
-	FPSmanager fps_manager;
+
 	SDL_initFramerate(&fps_manager);
-	SDL_setFramerate(&fps_manager, MAX_FPS);
+	if (fps != 0) {
+		SDL_setFramerate(&fps_manager, fps);
+	}
 
 	SDL_Event e;
 	char buf[255];
@@ -346,9 +360,20 @@ static int l_mainloop(lua_State *L) {
 					goto leave_loop;
 				}
 				lua_settop(dispatcher, 0);
+
+				// Perform delay
+				if (fps != 0) {
+					SDL_framerateDelay(&fps_manager);
+				}
+
 			} while (fps_control->limit_fps == false && SDL_PollEvent(NULL) == 0);
+		} else {
+			// Perform delay
+			if (fps != 0) {
+				SDL_framerateDelay(&fps_manager);
+			}
 		}
-		SDL_framerateDelay(&fps_manager);
+
 		// No events pending - a good time to do a bit of garbage collection
 		lua_gc(L, LUA_GCSTEP, 2);
 	}
