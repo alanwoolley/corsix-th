@@ -171,6 +171,7 @@ extern "C" void Java_uk_co_armedpineapple_cth_SDLActivity_cthGameSpeed(
 }
 
 void populateConfiguration(JNIEnv* env, jobject configuration) {
+	LOG_INFO("Populating Configuration Object");
 	jclass configclass = env->GetObjectClass(configuration);
 	jstring cthpath = (jstring) env->CallObjectMethod(configuration,
 			env->GetMethodID(configclass, "getCthPath",
@@ -210,6 +211,7 @@ void populateConfiguration(JNIEnv* env, jobject configuration) {
 	masterConfig.playMusic = (unsigned char) playMusic;
 	masterConfig.playAnnouncements = (unsigned char) playAnnouncements;
 	masterConfig.globalAudio = (unsigned char) globalAudio;
+	LOG_INFO("Done");
 }
 
 extern "C" void Java_uk_co_armedpineapple_cth_SDLActivity_cthUpdateConfiguration(
