@@ -19,13 +19,13 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SDL_PATH)/include \
 					$(LOCAL_PATH)/$(AGG_PATH)/src \
 					$(LOCAL_PATH)/$(FREETYPE_PATH)/include \
 					$(LOCAL_PATH)/$(FREETYPE_PATH)/include/freetype \
-					$(LOCAL_PATH)/$(LUA_PATH) \
 					$(LOCAL_PATH)/$(SDL_MIXER_PATH) \
 					$(LOCAL_PATH)/$(CORSIX_TH_SRC) \
 					$(LOCAL_PATH)/$(CTH_ASSETS) \
 					$(LOCAL_PATH)/$(LFS_SRC) \
 					$(LOCAL_PATH)/$(LPEG) \
-					$(LOCAL_PATH)/$(SDL_GFX_PATH)
+					$(LOCAL_PATH)/$(SDL_GFX_PATH) \
+					$(LOCAL_PATH)/$(LUA_PATH)
 					
 LOCAL_CFLAGS := -DPLAY_MOD 
 
@@ -66,11 +66,10 @@ LOCAL_SRC_FILES := $(SDL_PATH)/src/main/android/SDL_android_main.cpp \
 			$(LPEG_SRC)/lpeg.c
 			
 
-LOCAL_SHARED_LIBRARIES := libLUA libAGG libSDL libSDL_image libSDL_mixer libSDL_gfx
-LOCAL_STATIC_LIBRARIES := libfreetype2
+LOCAL_SHARED_LIBRARIES := libLUA libSDL libSDL_mixer 
+LOCAL_STATIC_LIBRARIES := libfreetype2 libSDL_gfx libAGG
 
-LOCAL_LDLIBS := -lGLESv1_CM -llog
-LOCAL_LDLIBS += -L$(LOCAL_PATH)/libs/
+LOCAL_LDLIBS := -llog
 
 LOCAL_CPP_FEATURES += exceptions
 
