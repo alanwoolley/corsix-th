@@ -167,14 +167,33 @@ function Panel:makeTextbox(...)
   return self.window:makeTextboxOnPanel(self, ...)
 end
 
+local function sanitize(colour)
+  if colour > 255 then
+    colour = 255
+  elseif colour < 0 then
+    colour = 0
+  end
+  return colour
+end
+
 --[[ Set the colour of a panel
 ! Note: This works only with ColourPanel and BevelPanel, not normal (sprite) panels.
 !param col (table) Colour given as a table with three fields red, green and blue, each an integer value in [0, 255].
 ]]
 function Panel:setColour(col)
-  if self.colour then
-    self.colour = TheApp.video:mapRGB(col.red, col.green, col.blue)
-  end
+  self.colour = self.colour and TheApp.video:mapRGB(col.red, col.green, col.blue)
+  self.highlight_colour = self.highlight_colour and TheApp.video:mapRGB(
+    sanitize(col.red + 40),
+    sanitize(col.green + 40),
+    sanitize(col.blue + 40))
+  self.shadow_colour = self.shadow_colour and TheApp.video:mapRGB(
+    sanitize(col.red - 40),
+    sanitize(col.green - 40),
+    sanitize(col.blue - 40))
+  self.disabled_colour = self.disabled_colour and TheApp.video:mapRGB(
+    sanitize(math.floor((col.red + 100) / 2)),
+    sanitize(math.floor((col.green + 100) / 2)),
+    sanitize(math.floor((col.blue + 100) / 2)))
   return self
 end
 
@@ -212,6 +231,31 @@ function Panel:setLabel(label, font, align)
   return self
 end
 
+--! Specifies whether auto clip (clipping text at the end so it fits) is enabled for this panel
+--!param mode (boolean) true to activate, false to deactivate.
+function Panel:setAutoClip(mode)
+  self.auto_clip = mode
+  return self
+end
+
+--! Checks if a given line drawn with the panel's label font would be longer than the given limit
+--! and if so, shortens it enough to fit including "..." at the end
+--!param line (string) the line to modify
+--!param limit (int) the maximum length in pixels the line should have
+--!return the possibly modified line
+function Panel:clipLine(line, limit)
+  local last_x = self.label_font:draw(nil, line, 0, 0)
+  if last_x > limit then
+    limit = limit - self.label_font:sizeOf("..._")
+    while last_x > limit do
+      line = line:sub(1, -2)
+      last_x = self.label_font:draw(nil, line, 0, 0)
+    end
+    line = line .. "..."
+  end
+  return line
+end
+
 --! Draw function for the label on a panel
 --!param canvas The canvas to draw on (can be nil for test)
 --!param x x position to start drawing on
@@ -222,29 +266,51 @@ function Panel:drawLabel(canvas, x, y, limit)
   if type(self.label) == "table" then -- multiline label
     local width
     local next_y = y + self.y + 1
+    local last_x = x + self.x + 2
     for i, line in ipairs(self.label) do
       if limit and limit[1] == i then
-        line = string.sub(line, 1, limit[2])
+        line = line:sub(1, limit[2])
       end
-      local last_y = next_y
-      next_y, width = self.label_font:drawWrapped(canvas, line, x + self.x + 2, next_y, self.w - 4)
-      if next_y == last_y then
-        -- Special handling for empty lines
+      if self.auto_clip then
+        line = self:clipLine(line, self.w - 4)
+        last_x = self.label_font:draw(canvas, line, x + self.x + 2, next_y, self.w - 4)
         local _, h = self.label_font:sizeOf("A")
         next_y = next_y + h
+      else
+        local last_y = next_y
+        next_y, width = self.label_font:drawWrapped(canvas, line, x + self.x + 2, next_y, self.w - 4)
+        last_x = x + self.x + 2 + width
+        if not line:find("%S") then
+          -- Special handling for empty lines or lines with only space
+          local _, h = self.label_font:sizeOf("A")
+          next_y = last_y + h
+        end
       end
       if limit and limit[1] == i then
         break
       end
     end
-    return x + self.x + 2 + width, next_y
+    return last_x, next_y
   else
     local line = self.label
     if limit then
-      line = string.sub(line, 1, limit[2])
+      line = line:sub(1, limit[2])
     end
+      if self.auto_clip then
+        line = self:clipLine(line, self.w - 4)
+      end
     return self.label_font:draw(canvas, line, x + self.x + 2, y + self.y, self.w - 4, self.h, self.align)
   end
+end
+
+function Panel:setPosition(x, y)
+  self.x = x
+  self.y = y
+end
+
+function Panel:setSize(width, height)
+  self.w = width
+  self.h = height
 end
 
 --[[ Add a `Panel` to the window.
@@ -327,15 +393,6 @@ local --[[persistable: window_panel_bevel_draw]] function panel_bevel_draw(panel
   if panel.label then
     panel:drawLabel(canvas, x, y)
   end
-end
-
-local function sanitize(colour)
-  if colour > 255 then
-    colour = 255
-  elseif colour < 0 then
-    colour = 0
-  end
-  return colour
 end
 
 --[[ Add a beveled `Panel` to the window.
@@ -594,6 +651,35 @@ function Button:handleClick(mouse_button)
       self.on_click = --[[persistable:button_on_click_handler_stub]] function() end
     end
   end
+end
+
+function Button:setPosition(x, y)
+  self.panel_for_sprite:setPosition(x, y)
+  self.r = self.r - self.x + x
+  self.b = self.b - self.y + y
+  self.x = x
+  self.y = y
+  if self.tooltip then
+    self.tooltip.tooltip_x = math.round((self.x + self.r) / 2, 1)
+    self.tooltip.tooltip_y = self.y
+  end
+end
+
+function Button:setSize(width, height)
+  self.panel_for_sprite:setSize(width, height)
+  self.r = self.x + width
+  self.b = self.y + height
+  if self.tooltip then
+    self.tooltip.tooltip_x = math.round((self.x + self.r) / 2, 1)
+    self.tooltip.tooltip_y = self.y
+  end
+end
+
+--! Convenience function to allow setLabel to be called on a button, not only its panel.
+--! see Panel:setLabel
+function Button:setLabel(label, font, align)
+  self.panel_for_sprite:setLabel(label, font, align)
+  return self
 end
 
 --[[ Convert a static panel into a clickable button.
@@ -868,6 +954,7 @@ function Textbox:input(char, rawchar, code)
   end
   local ui = self.panel.window.ui
   local line = type(self.text) == "table" and self.text[self.cursor_pos[1]] or self.text
+  local pat = "%a%d_" -- which characters form "words" for ctrl+[left/right/backspace/delete]
   local new_line
   local handled = false
   if not self.char_limit or string.len(line) < self.char_limit then
@@ -899,22 +986,26 @@ function Textbox:input(char, rawchar, code)
       self.cursor_pos[2] = self.cursor_pos[2] + 1
     end
   end
-  -- Backspace (delete last char)
+  -- Backspace (delete last char, or last word if ctrl is pressed)
   if not handled and char == "backspace" then
     if self.cursor_pos[2] == 0 then
-      if type(self.text) == "table" and #self.text > 1 then
+      if type(self.text) == "table" and self.cursor_pos[1] > 1 then
         table.remove(self.text, self.cursor_pos[1])
         self.cursor_pos[1] = self.cursor_pos[1] - 1
         self.cursor_pos[2] = string.len(self.text[self.cursor_pos[1]])
         new_line = self.text[self.cursor_pos[1]] .. line
       end
     else
-      new_line = line:sub(1, self.cursor_pos[2] - 1) .. line:sub(self.cursor_pos[2] + 1, -1)
-      self.cursor_pos[2] = self.cursor_pos[2] - 1
+      local pos = self.cursor_pos[2] - 1
+      if ui.buttons_down.ctrl then
+        pos = string.find(string.sub(line, 1, self.cursor_pos[2]), "[^"..pat.."]["..pat.."]+[^"..pat.."]*$") or 0
+      end
+      new_line = line:sub(1, pos) .. line:sub(self.cursor_pos[2] + 1, -1)
+      self.cursor_pos[2] = pos
     end
     handled = true
   end
-  -- Delete (delete next char)
+  -- Delete (delete next char, or next word if ctrl is pressed)
   if not handled and char == "delete" then
     if self.cursor_pos[2] == string.len(line) then
       if type(self.text) == "table" and self.cursor_pos[1] < #self.text then
@@ -922,7 +1013,11 @@ function Textbox:input(char, rawchar, code)
         table.remove(self.text, self.cursor_pos[1] + 1)
       end
     else
-      new_line = line:sub(1, self.cursor_pos[2]) .. line:sub(self.cursor_pos[2] + 2, -1)
+      local pos = self.cursor_pos[2] + 2
+      if ui.buttons_down.ctrl then
+        pos = (string.find(line, "[^"..pat.."]["..pat.."]", self.cursor_pos[2] + 1) or string.len(line)) + 1
+      end
+      new_line = line:sub(1, self.cursor_pos[2]) .. line:sub(pos, -1)
     end
     handled = true
   end
@@ -973,8 +1068,13 @@ function Textbox:input(char, rawchar, code)
           self.cursor_pos[2] = 0
         end
       else
-        -- one to the right
-        self.cursor_pos[2] = self.cursor_pos[2] + 1
+        if ui.buttons_down.ctrl then
+          -- to the right until next word or end of line
+          self.cursor_pos[2] = string.find(line, "[^"..pat.."]["..pat.."]", self.cursor_pos[2] + 1) or string.len(line)
+        else
+          -- one to the right
+          self.cursor_pos[2] = self.cursor_pos[2] + 1
+        end
       end
     elseif code == 276 then -- left
       if self.cursor_pos[2] == 0 then
@@ -984,18 +1084,30 @@ function Textbox:input(char, rawchar, code)
           self.cursor_pos[2] = string.len(self.text[self.cursor_pos[1]])
         end
       else
-        -- one to the left
-        self.cursor_pos[2] = self.cursor_pos[2] - 1
+        if ui.buttons_down.ctrl then
+          -- to the left until beginning of word or beginning of line
+          self.cursor_pos[2] = string.find(string.sub(line, 1, self.cursor_pos[2]), "[^"..pat.."]["..pat.."]+[^"..pat.."]*$") or 0
+        else
+          -- one to the left
+          self.cursor_pos[2] = self.cursor_pos[2] - 1
+        end
       end
     end
-    -- make cursor visible
-    self.cursor_counter = 0
-    self.cursor_state = true
-    return true
+    handled = true
   end
   -- Tab (reserved)
   if not handled and code == 9 then
     return true
+  end
+  -- Home (beginning of line)
+  if not handled and char == "home" then
+    self.cursor_pos[2] = 0
+    handled = true
+  end
+  -- End (end of line)
+  if not handled and char == "end_key" then
+    self.cursor_pos[2] = string.len(line)
+    handled = true
   end
   if not self.char_limit or string.len(self.text) < self.char_limit then
     -- Experimental "all" category
@@ -1054,7 +1166,16 @@ end
 ]]
 function Textbox:setText(text)
   self.text = text
+  self.panel:setLabel(self.text)
   return self
+end
+
+function Textbox:setPosition(x, y)
+  self.button:setPosition(x, y)
+end
+
+function Textbox:setSize(width, height)
+  self.button:setSize(width, height)
 end
 
 --[[ Convert a static panel into a textbox.
@@ -1168,7 +1289,7 @@ top-left corner of the window.
 ]]
 function Window:hitTest(x, y)
   if x < 0 or y < 0 or (self.width and x >= self.width) or (self.height and y >= self.height) then
-    return false
+--    return false
   end
   if self.panels[1] then
     for _, panel in ipairs(self.panels) do

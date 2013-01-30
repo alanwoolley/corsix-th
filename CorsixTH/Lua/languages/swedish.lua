@@ -87,6 +87,19 @@ menu_options_warmth_colors = {
   choice_3 = "  GUL ORANGE RÖD  ",
 }
 
+-- Add F-keys to entries in charts menu (except briefing), also town_map was added.
+menu_charts = {
+  bank_manager  = "  (F1) BANKKAMRER  ",
+  statement     = "  (F2) KONTOUTDRAG  ",
+  staff_listing = "  (F3) PERSONALLEDNING  ",
+  town_map      = "  (F4) STADSKARTA  ",
+  casebook      = "  (F5) MEDICINJOURNAL  ",
+  research      = "  (F6) FORSKNING  ",
+  status        = "  (F7) STATUS  ",
+  graphs        = "  (F8) GRAFER  ",
+  policy        = "  (F9) POLICY  ",
+}
+
 menu_file.restart = "  STARTA OM  "
 
 menu_debug = {
@@ -252,11 +265,18 @@ tooltip.menu_list_window = {
 }
 
 options_window = {
+  caption = "Alternativ",
   fullscreen = "Helskärm",
+  option_on = "På",
+  option_off = "Av",
+  data_location = "Speldatakälla",
   width = "Bredd",
   height = "Höjd",
-  change_resolution = "Ändra upplösning",
+  resolution = "Upplösning",
+  language = "Spelspråk",
+  apply = "Tillämpa",
   browse = "Bläddra...",
+  custom_resolution = "Anpassad...",
   new_th_directory = "Här kan du välja en ny plats här Theme Hospital installerats. Så fort du väljer den nya mappen kommer spelet att startas om.",
   back = "Tillbaka",
   cancel = "Avbryt",
@@ -266,18 +286,30 @@ tooltip.options_window = {
   fullscreen_button = "Klicka för att gå mellan fönster och helskärm",
   width = "Fyll i önskad skärmbredd",
   height = "Fyll i önskad skärmhöjd",
-  change_resolution = "Ändra upplösning till de dimensioner ifyllda till vänster",
-  language = "Ändra till %s som språk",
+  data_location = "Mapp som en installation av Theme Hospital finns i, krävs för att köra CorsixTH",
+  fullscreen = "Om spelet ska köras i fullskärmsläge eller fönsterläge",
+  language = "Text i spelet kommer att visas på det här språket",
+  apply = "Tillämpa den valda upplösningen",
+  resolution = "Upplösning spelet ska köras i",
+  select_language = "Väljs spelspråk",
+  language_dropdown_item = "Ändra till %s som språk",
+  select_resolution = "Välj en ny upplösning",
+  cancel = "Återvänd utan att ändra upplösning",
   original_path = "Den just nu valda mappen där Theme Hospital installerats",
   browse = "Bläddra efter en annan Theme Hospital installation",
   back = "Stäng alternativmenyn",
 }
 
 new_game_window = {
+  caption = "Kampanj",
+  option_on = "På",
+  option_off = "Av",
+  difficulty = "Svårighetsgrad",
   easy = "Junior (Lätt)",
   medium = "Läkare (Medel)",
   hard = "Konsult (Svår)",
   tutorial = "Starthjälp",
+  start = "Börja",
   cancel = "Avbryt",
 }
 
@@ -285,6 +317,8 @@ tooltip.new_game_window = {
   easy = "Om du känner dig ny på denna typ av spel är detta läget för dig",
   medium = "Detta är den gyllene medelvägen om du är osäker på vad du ska välja",
   hard = "Känner du för en utmaning och är van vid den här typen av spel är det här rätt val",
+  difficulty = "Välj vilken svårighetsgrad spelet ska ha",
+  start = "Börja spela med dessa inställningar",
   tutorial = "Vill du ha lite hjälp på traven i början, tryck ner den här rutan",
   cancel = "Oj, det var ju egentligen inte meningen att starta ett nytt spel!",
 }
@@ -497,3 +531,11 @@ original_credits[358] = " "
 original_credits[359] = " "
 original_credits[360] = " "
 original_credits[361] = "."
+
+
+
+--------------------------------  UNUSED  -----------------------------------
+------------------- (kept for backwards compatibility) ----------------------
+
+options_window.change_resolution = "Ändra upplösning"
+tooltip.options_window.change_resolution = "Ändra upplösning till de dimensioner ifyllda till vänster"

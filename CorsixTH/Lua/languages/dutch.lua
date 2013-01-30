@@ -286,6 +286,14 @@ rooms_long = {
   blood_machine = "Bloedmachinekamer",
 }
 options_window = {
+  custom_resolution = "Aangepast...",
+  caption = "Opties",
+  option_on = "Aan",
+  option_off = "Uit",
+  resolution = "Resolutie",
+  data_location = "Data locatie",
+  apply = "Toepassen",
+  language = "Taal",
   fullscreen = "Volledig scherm",
   height = "Hoogte",
   width = "Breedte",
@@ -773,11 +781,16 @@ tooltip = {
     },
   },
   new_game_window = {
-    hard = "Als je het spel kent en meer uitdaging zoekt, kies deze optie.",
+    caption = "Nieuwe carrière", 
+    option_on = "Aan", 
+    option_off = "Uit", 
+    difficulty = "Moeilijkheid", 
     cancel = "Oh, ik wilde eigenlijk helemaal geen nieuw spel starten!", 
     tutorial = "Als je wat hulp nodig hebt in het spel, klik dan hier",
+	start = "Begin het spel met de geselecteerde instellingen",
     easy = "Als je dit spel nog nooit gespeeld hebt, is deze optie voor jou",
     medium = "De gulden middenweg, als je geen idee hebt wat je wilt",
+	hard = "Als je het spel kent en meer uitdaging zoekt, kies deze optie.",
   },
   calls_dispatcher = {
     assigned = "Dit vakje is aangekruist als de taak is toegewezen.",
@@ -1209,6 +1222,15 @@ tooltip = {
     close = "Venster sluiten en terugkeren naar het spel",
   },
   options_window = {
+    fullscreen = "Wil je het spel in volledig scherm of in een venster spelen?", --Hoe kun je ''Windowed mode'' het beste verwoorden? Omni: wat vind je hiervan?--
+    resolution = "Verander de resolutie naar wat er rechts is ingevuld",
+    apply = "Pas de ingevoerde resolutie toe",
+    data_location = "De locatie van de orginele Theme Hospital installatie, welke nodig is om CorsixTH te kunnen spelen",
+    language_dropdown_item = "Kies %s als taal",
+    language = "De taal waarin het spel wordt weergeven",
+    select_language = "Selecteer de taal waarin je het spel wilt spelen",
+    cancel = "Annuleren",
+    select_resolution = "Een andere resolutie selecteren",
     fullscreen_button = "Volledig scherm",
     change_resolution = "Verander de resolutie naar wat er links is ingevuld",
     height = "Voer de gewenste verticale resolutie in",
@@ -1216,7 +1238,7 @@ tooltip = {
     language = "Kies %s als taal",
     back = "Sluit het instellingenvenster",
     original_path = "De gekozen locatie van de originele Theme Hospital installatie",
-    browse = "Zoek een andere locatie van een originele Theme Hospital installatie",
+    browse = "Zoek een andere locatie van een originele Theme Hospital installatie (locatie is op dit moment: %1%)",
   },
   research_policy = {
     research_progress = "Voortgang tot de volgende ontdekking in deze categorie: %1%/%2%",
@@ -2391,7 +2413,7 @@ main_menu = {
   savegame_version = "Savegame versie: ",
 }
 confirmation = {  --spaces on the end make the text fit properly in text windows
-  quit = "Je hebt gekozen voor afsluiten. Weet je zeker dat je het spel wilt verlaten?                ",
+  quit = "Weet je zeker dat je het spel wilt verlaten?                ",
   return_to_blueprint = "Weet je zeker dat je terug wil gaan naar de blauwdrukmodus?                   ",
   needs_restart = "Om deze instellingen toe te passen, moet CorsixTH opnieuw opstarten. Niet opgeslagen vooruitgang zal hierdoor verloren gaan. Weet je zeker dat je dit wil doen?                     ",
   overwrite_save = "Er is hier al een spel opgeslagen. Weet je zeker dat je het bestaande spel wilt overschrijven?                   ",
@@ -2746,9 +2768,11 @@ menu_file_save = {
   [8] = "  SPEL 8  ",
 }
 new_game_window = {
+  difficulty = "Selecteer moeilijkheid",
   hard = "Specialist (Moeilijk)",
   medium = "Arts (Gemiddeld)",
   easy = "Assistent (Makkelijk)",
+  start = "Begin",
   cancel = "Annuleren",
   tutorial = "Leermodus",
 }

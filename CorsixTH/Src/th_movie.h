@@ -23,6 +23,7 @@ SOFTWARE.
 #ifndef TH_VIDEO_H
 #define TH_VIDEO_H
 #define PICTURE_BUFFER_SIZE 4
+#define MOVIE_ERROR_BUFFER_SIZE 128
 
 #include <string>
 #include <queue>
@@ -49,6 +50,7 @@ public:
     bool m_fAllocated;
     bool m_fReallocate;
     PixelFormat m_pixelFormat;
+    SDL_Surface *m_pSurface;
 
     THMoviePicture();
     ~THMoviePicture();
@@ -81,7 +83,7 @@ public:
     ~THMovie();
 
     bool moviesEnabled();
-    void load(const char* szFilepath);
+    bool load(const char* szFilepath);
     void unload();
     void play(int iX, int iY, int iWidth, int iHeight, int iChannel);
     void stop();
@@ -89,6 +91,8 @@ public:
     int getNativeWidth();
     bool hasAudioTrack();
     bool requiresVideoReset();
+    const char* getLastError();
+    void clearLastError();
     void refresh();
     void copyAudioToStream(Uint8 *pbStream, int iStreamSize);
     void runVideo();
@@ -96,7 +100,10 @@ public:
     void readStreams();
 protected:
 #ifdef CORSIX_TH_USE_FFMPEG
-    int decodeAudioFrame();
+    std::string m_sLastError;
+    char m_szErrorBuffer[MOVIE_ERROR_BUFFER_SIZE];
+
+    int decodeAudioFrame(bool fFirst);
     int getVideoFrame(AVFrame *pFrame, int64_t *piPts);
     int queuePicture(AVFrame *pFrame, double dPts);
     void advancePictureQueue();
@@ -125,6 +132,8 @@ protected:
 
     //tick when video was started in ms
     int m_iStartTime;
+    int m_iCurSyncPtsSystemTime;
+    double m_iCurSyncPts;
 
     THAVPacketQueue *m_pAudioQueue;
 

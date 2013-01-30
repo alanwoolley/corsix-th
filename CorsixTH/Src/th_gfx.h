@@ -94,6 +94,7 @@ struct THRenderTargetCreationParams
     bool bFullscreen;
     bool bPresentImmediate;
     bool bReuseContext;
+    bool bOpenGL;
 };
 
 /*!

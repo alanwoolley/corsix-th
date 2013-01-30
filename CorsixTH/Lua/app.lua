@@ -28,7 +28,7 @@ local assert, io, type, dofile, loadfile, pcall, tonumber, print, setmetatable
 
 -- Increment each time a savegame break would occur
 -- and add compatibility code in afterLoad functions
-local SAVEGAME_VERSION = 62
+local SAVEGAME_VERSION = 65
 
 class "App"
 
@@ -159,6 +159,9 @@ function App:init()
   self.caption = "CorsixTH (" .. table.concat(caption_descs, ", ") .. ")"
   SDL.wm.setCaption(self.caption)
   local modes = {"hardware", "doublebuf"}
+  if compile_opts.renderer == "OpenGL" then
+    modes[#modes + 1] = "opengl"
+  end
   self.fullscreen = false
   if _MAP_EDITOR then
     MapEditorInitWithLuaApp(self)
@@ -524,6 +527,11 @@ function App:dumpStrings()
   -- for _, lang in ipairs(self.strings.languages_english) do
   --   self:checkMissingStringsInLanguage(dir, lang)
   -- end
+  print("")
+  print("------------------------------------------------------")
+  print("Dumped strings to default configuration file directory")
+  print("------------------------------------------------------")
+  print("")
 end
 
 --! Compares strings provided by language file of given language WITHOUT inheritance
@@ -1117,13 +1125,6 @@ function App:restart()
   end))
 end
 
---! Quits the running game and returns to main menu (offers confirmation window first)
-function App:quit()
-  self.ui:addWindow(UIConfirmDialog(self.ui, _S.confirmation.quit, --[[persistable:app_confirm_quit]] function()
-    self:loadMainMenu()
-  end))
-end
-
 --! Exits the game completely (no confirmation window)
 function App:exit()
   -- Save config before exiting
@@ -1164,4 +1165,9 @@ function App:afterLoad()
   self.map:afterLoad(old, new)
   self.world:afterLoad(old, new)
   self.ui:afterLoad(old, new)
+end
+
+
+-- Do not remove, for savegame compatibility < r1891
+local app_confirm_quit_stub = --[[persistable:app_confirm_quit]] function()
 end

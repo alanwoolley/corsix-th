@@ -268,18 +268,40 @@ tooltip.menu_list_window = {
 }
 
 options_window = {
+  caption = "Options",
+  option_on = "On",
+  option_off = "Off",
   fullscreen = "Fullscreen",
+  resolution = "Resolution",
+  custom_resolution = "Custom...",
   width = "Width",
   height = "Height",
-  change_resolution = "Change resolution",
+  apply = "Apply",
+  cancel = "Cancel",
+  data_location = "Data location",
   browse = "Browse...",
   new_th_directory = "Here you can specify a new Theme Hospital installation directory. As soon as you choose the new directory the game will be restarted.",
+  language = "Game language",
   cancel = "Cancel",
   back = "Back",
 }
 
-tooltip.handyman_window = {
-  parcel_select = "The parcel where the handyman accepts tasks, click to change setting"
+tooltip.options_window = {
+  fullscreen = "Whether the game should run in fullscreen or windowed mode",
+  fullscreen_button = "Click to toggle fullscreen mode",
+  resolution = "The resolution the game should run in",
+  select_resolution = "Select a new resolution",
+  width = "Enter desired screen width",
+  height = "Enter desired screen height",
+  apply = "Apply the entered resolution",
+  cancel = "Return without changing the resolution",
+  data_location = "The directory of the original Theme Hospital installation, which is required to run CorsixTH",
+  language = "The language texts in the game will appear in",
+  select_language = "Select the game language",
+  language_dropdown_item = "Choose %s as language",
+  original_path = "The currently chosen directory of the original Theme Hospital installation",
+  browse = "Browse for another location of a Theme Hospital installation (current location: %1%)",
+  back = "Close the options window",
 }
 
 handyman_window = {
@@ -287,31 +309,30 @@ handyman_window = {
   parcel = "Parcel"
 }
 
-tooltip.options_window = {
-  fullscreen_button = "Click to toggle fullscreen mode",
-  width = "Enter desired screen width",
-  height = "Enter desired screen height",
-  change_resolution = "Change the window resolution to the dimensions entered on the left",
-  language = "Select %s as language",
-  original_path = "The currently chosen directory of the original Theme Hospital installation",
-  browse = "Browse for another location of a Theme Hospital installation",
-  back = "Close the options window",
+tooltip.handyman_window = {
+  parcel_select = "The parcel where the handyman accepts tasks, click to change setting"
 }
 
 new_game_window = {
+  caption = "Campaign",
+  option_on = "On",
+  option_off = "Off",
+  difficulty = "Difficulty",
   easy = "Junior (Easy)",
   medium = "Doctor (Medium)",
   hard = "Consultant (Hard)",
   tutorial = "Tutorial",
+  start = "Start",
   cancel = "Cancel",
 }
 
 tooltip.new_game_window = {
+  difficulty = "Select the difficulty level you want to play the game in",
   easy = "If you are new to simulation games this is the option for you",
   medium = "This is the middle way to go if you are unsure what to choose",
   hard = "If you are used to this kind of game and want more of a challenge, pick this option",
   tutorial = "If you want some help to get started once in the game, tick this box",
-  tutorial = "Tutorial",
+  start = "Start the game with the chosen settings",
   cancel = "Oh, I didn't really mean to start a new game!",
 }
 
@@ -459,3 +480,10 @@ tooltip.calls_dispatcher = {
   assigned = "This box is marked if someone is assigned to the corresponding task.",
   close = "Close the calls dispatcher dialog",
 }
+
+
+--------------------------------  UNUSED  -----------------------------------
+------------------- (kept for backwards compatibility) ----------------------
+
+options_window.change_resolution = "Change resolution"
+tooltip.options_window.change_resolution = "Change the window resolution to the dimensions entered on the left"

@@ -115,7 +115,7 @@ menu_options = {
   edge_scrolling = "  DESPLAZAR POR BORDES  ",
   settings = "  CONFIGURACIóN  ",
   adviser_disabled = "  CONSEJERO  ",
-  warmth_colors = "  COLORES DE TEMPERATURA",
+  warmth_colors = "  COLORES DE TEMPERATURA  ",
 }
 
 menu_options_game_speed = {
@@ -132,6 +132,20 @@ menu_options_warmth_colors = {
   choice_2 = "   AZUL, VERDE, ROJO ",
   choice_3 = "   AMARILLO, NARANJA, ROJO ",
 }
+
+-- Add F-keys to entries in charts menu (except briefing), also town_map was added.
+menu_charts = {
+  bank_manager  = "  (F1) DIRECTOR DEL BANCO  ",
+  statement     = "  (F2) ESTADO DE CUENTAS  ",
+  staff_listing = "  (F3) LISTA DE PERSONAL  ",
+  town_map      = "  (F4) MAPA DE LA CIUDAD  ",
+  casebook      = "  (F5) HISTORIAL  ",
+  research      = "  (F6) INVESTIGACIóN  ",
+  status        = "  (F7) ESTADO  ",
+  graphs        = "  (F8) GRáFICAS  ",
+  policy        = "  (F9) NORMAS  ",
+}
+
 
 -- The demo does not contain this string
 menu_file.restart = "  REINICIAR  "
@@ -298,18 +312,40 @@ tooltip.menu_list_window = {
 }
 
 options_window = {
+  caption = "Opciones",
+  option_on = "Sí",
+  option_off = "No",
   fullscreen = "Pantalla completa",
+  resolution = "Resolución",
+  custom_resolution = "Personalizada...",
   width = "Ancho",
   height = "Alto",
-  change_resolution = "Cambiar resolución",
+  apply = "Apply",
+  cancel = "Cancel",
+  data_location = "Ubicación de datos",
   browse = "Buscar...",
   new_th_directory = "Aquí puedes especificar una nueva carpeta de instalación de Theme Hospital. En cuanto selecciones la nueva carpeta, el juego se reiniciará.",
+  language = "Idioma del juego",
   cancel = "Cancelar",
   back = "Volver",
 }
 
-tooltip.handyman_window = {
-  parcel_select = "La parcela donde el bedel acepta encargos, haz clic para cambiar el ajuste"
+tooltip.options_window = {
+  fullscreen = "Hace que el juego se ejecute en pantalla completa o en una ventana.",
+  fullscreen_button = "Pulsa aquí para activar el modo de pantalla completa.",
+  resolution = "Cambia la resolución en la que funcionará el juego.",
+  select_resolution = "Selecciona una nueva resolución.",
+  width = "Introduce el ancho de la pantalla.",
+  height = "Introduce la altura de la pantalla.",
+  apply = "Aplica la resolución seleccionada.",
+  cancel = "Vuelve sin cambiar la resolución.",
+  data_location = "Indica la carpeta donde está instalado el Theme Hospital original, necesario para ejecutar CorsixTH.",
+  language = "Selecciona el idioma de los textos.",
+  select_language = "Selecciona el idioma del juego.",
+  language_dropdown_item = "Utilizar el idioma %s.",
+  original_path = "La carpeta donde está instalado el Theme Hospital original.",
+  browse = "Busca otra ubicación de una instalación de Theme Hospital.",
+  back = "Cierra la ventana de opciones.",
 }
 
 handyman_window = {
@@ -317,31 +353,30 @@ handyman_window = {
   parcel = "Parcela"
 }
 
-tooltip.options_window = {
-  fullscreen_button = "Pulsa para activar el modo de pantalla completa",
-  width = "Introduce el ancho de pantalla deseado",
-  height = "Introduce el alto de pantalla deseado",
-  change_resolution = "Cambia la resolución de la ventana a las dimensiones indicadas a la izquierda",
-  language = "Seleccionar el idioma %s",
-  original_path = "La carpeta actualmente seleccionada con la instalación original de Theme Hospital",
-  browse = "Buscar otra ubicación de una instalación de Theme Hospital",
-  back = "Cerrar la ventana de opciones",
+tooltip.handyman_window = {
+  parcel_select = "La parcela donde el bedel acepta encargos, haz clic para cambiar el ajuste"
 }
 
 new_game_window = {
+  caption = "Campañapaign",
+  option_on = "Activada",
+  option_off = "Desactivada",
+  difficulty = "Dificultad",
   easy = "Novato (Fácil)",
   medium = "Médico (Normal)",
   hard = "Especialista (Difícil)",
   tutorial = "Tutorial",
+  start = "Comenzar",
   cancel = "Cancelar",
 }
 
 tooltip.new_game_window = {
+  difficulty = "Selecciona el nivel de dificultad con el que quieres jugar.",
   easy = "Si acabas de conocer los juegos de simulación, esta dificultad es para ti.",
   medium = "Esta es la dificultad intermedia, si no estás seguro de a dónde quieres ir.",
   hard = "Si ya estás acostumbrado a este tipo de juegos y quieres un buen desafío, aquí lo tendrás.",
   tutorial = "Selecciona esta casilla si necesitas ayuda para empezar a jugar.",
-  tutorial = "Tutorial",
+  start = "Empezar la partida con la configuración seleccionada.",
   cancel = "¡Perdón, yo no quería empezar una nueva partida!",
 }
 
@@ -489,3 +524,10 @@ tooltip.calls_dispatcher = {
   assigned = "Esta opción está activada si alguien ha sido asignado a la tarea correspondiente.",
   close = "Cerrar la ventana de llamadas de control.",
 }
+
+
+--------------------------------  UNUSED  -----------------------------------
+------------------- (kept for backwards compatibility) ----------------------
+
+options_window.change_resolution = "Cambiar resolución"
+tooltip.options_window.change_resolution = "Cambia la resolución de la ventana utilizando la dimensión indicada a la izquierda."

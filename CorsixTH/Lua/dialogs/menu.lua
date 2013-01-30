@@ -319,13 +319,6 @@ function UIMenuBar:disappear()
   end
 end
 
-function UIMenuBar:onKeyDown(key)
-  if key == "esc" then
-    self:appear()
-    return true
-  end
-end
-
 function UIMenuBar:onMouseDown(button, x, y)
   if button ~= "left" or not self.visible then
     return
@@ -517,7 +510,7 @@ function UIMenuBar:makeMenu(app)
   menu:appendItem(_S.menu_file.load, function() self.ui:addWindow(UILoadGame(self.ui, "game")) end)
     :appendItem(_S.menu_file.save, function() self.ui:addWindow(UISaveGame(self.ui)) end)
     :appendItem(_S.menu_file.restart, function() app:restart() end)
-    :appendItem(_S.menu_file.quit, function() app:quit() end)
+    :appendItem(_S.menu_file.quit, function() self.ui:quit() end)
   self:addMenu(_S.menu.file, menu)
   
   local options = UIMenu()
@@ -556,10 +549,13 @@ function UIMenuBar:makeMenu(app)
     end
     local function playMusic(item)
       if not app.audio.background_music then
+        app.config.play_music = true
         app.audio:playRandomBackgroundTrack() -- play
       else
+        app.config.play_music = false
         app.audio:stopBackgroundTrack() -- stop
       end
+      -- Also save this directly to the configuration file.
       app:saveConfig()
     end
     local function musicStatus(item)
@@ -647,7 +643,7 @@ function UIMenuBar:makeMenu(app)
   )
   local function _(s) return "  " .. s:upper() .. "  " end
   local function transparent_walls(item)
-    app.ui:makeWallsTransparent(item.checked)
+    app.ui:toggleWallsTransparent()
   end
   local function limit_camera(item)
     app.ui:limitCamera(item.checked)

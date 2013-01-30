@@ -336,40 +336,62 @@ tooltip.menu_list_window = {
 }
 
 options_window = {
+  caption = "Einstellungen",
+  option_on = "Ein",
+  option_off = "Aus",
   fullscreen = "Vollbild",
+  resolution = "Auflösung",
+  custom_resolution = "Benutzerdefiniert...",
   width = "Breite",
   height = "Höhe",
-  change_resolution = "Auflösung ändern",
+  apply = "Akzeptieren",
+  cancel = "Abbrechen",
+  data_location = "Datenverzeichnis",
   browse = "Durchsuchen...",
   new_th_directory = "Hier kann ein neues Theme Hospital-Installationsverzeichis ausgewählt werden. Sobald ein gültiges Verzeichnis ausgewählt wurde startet das Spiel neu.",
+  language = "Spielsprache",
   cancel = "Abbrechen",
   back = "Zurück",
 }
 
 tooltip.options_window = {
+  fullscreen = "Darstellung im Vollbild- oder Fenstermodus",
   fullscreen_button = "Klicken, um zwischen Vollbild- und Fenstermodus zu wechseln",
+  resolution = "Die Bildschirmauflösung in der das Spiel läuft",
+  select_resolution = "Eine neue Auflösung auswählen",
   width = "Gewünschte Bildschirmbreite eingeben",
   height = "Gewünschte Bildschirmhöhe eingeben",
-  change_resolution = "Die Fensterauflösung auf die links eingegebenen Werte ändern",
-  language = "%s als Sprache auswählen",
+  apply = "Die eingegebene Auflösung akzeptieren",
+  cancel = "Zurückkehren, ohne die Auflösung zu ändern",
+  data_location = "Das Installationsverzeichnis des Theme-Hospital-Originalspiels, welches zum Spielen von CorsixTH benötigt wird",
+  language = "Die Sprache, in der Texte im Spiel erscheinen",
+  select_language = "Die Spielsprache ändern",
+  language_dropdown_item = "%s als Sprache auswählen",
   original_path = "Das momentan gewählte Theme Hospital-Installationsverzeichnis",
-  browse = "Nach einer anderen Theme Hospital-Installation durchsuchen",
+  browse = "Nach einer anderen Theme Hospital-Installation durchsuchen (aktueller Pfad: %1%)",
   back = "Das Optionsfenster schließen",
 }
 
 new_game_window = {
+  caption = "Neues Spiel",
+  option_on = "Ein",
+  option_off = "Aus",
+  difficulty = "Schwierigkeit",
   easy = "AIP (Einfach)",
   medium = "Arzt (Mittel)",
   hard = "Berater (Schwer)",
   tutorial = "Einführung",
+  start = "Start",
   cancel = "Abbrechen",
 }
 
 tooltip.new_game_window = {
+  difficulty = "Hier kann der Schwierigkeitsgrad des Spiels eingestellt werden",
   easy = "Die richtige Option für Simulations-Neulinge",
   medium = "Der Mittelweg - für diejenigen, die sich nicht entscheiden können",
   hard = "Wer diese Art von Spielen schon gewöhnt ist und eine Herausforderung will, sollte hier klicken",
   tutorial = "Dieses Feld abhaken, um zu Beginn des Spieles eine Einführung zu erhalten",
+  start = "Das Spiel mit den gewählten Einstellungen starten",
   cancel = "Oh, eigentlich wollte ich gar kein neues Spiel starten!",
 }
 
@@ -596,3 +618,8 @@ original_credits[359] = " "
 original_credits[360] = " "
 original_credits[361] = " "
 
+--------------------------------  UNUSED  -----------------------------------
+------------------- (kept for backwards compatibility) ----------------------
+
+options_window.change_resolution = "Auflösung ändern"
+tooltip.options_window.change_resolution = "Die Fensterauflösung auf die links eingegebenen Werte ändern"

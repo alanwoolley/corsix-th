@@ -31,16 +31,16 @@ and only some basic rooms are available.
 
 
 ---------------------- General Information -------------------------
-%Name = "Example Town"
-%LevelFile = "Example.map"
+%Name = "Confined"
+%LevelFile = "confined_v5.map"
 
 Note that the below introduction text at the moment must reside on a single line within this file!
-%LevelBriefing = "This is an example map that shows aspiring map makers what can be done when making new fantastic creations!"
+%LevelBriefing = "You have been tasked to build a hospital in an area where only a few apartments are for sale. Land prices around here are astronomical, so you will have to live with a very confined space until you have earned enough money to expand."
 
 Town properties
 InterestRate is defined as centiprocent to allow for two decimals precision, i.e.
 300 means 3 %
-#town.StartCash.InterestRate 100000 300
+#town.StartCash.InterestRate 15000 1000
 
 -------------------- Disease Configuration -------------------------
 
@@ -174,6 +174,7 @@ Salary modifiers for different doctor attributes
 
 How much the skill of the doctor adds to the salary. skill * 1000 / divisor
 #gbv.SalaryAbilityDivisor 10
+#gbv.LandCostPerTile 150
 
 #gbv.TrainingRate         40
 #gbv.AbilityThreshold[0]  75 Surgeon
@@ -196,7 +197,6 @@ Divides research input to get the amount of research points. must be > 0
 #awards_trophies.TrophyReputationBonus  20000
 
 ------------------ Winning and Losing Conditions -------------------
-But we don't want any such conditions on the example level!
 1 Total reputation
 2 Balance total
 3 Percentage people your hospital has handled
@@ -204,19 +204,15 @@ But we don't want any such conditions on the example level!
 5 Percentage people have been killed
 6 Hospital value
 
-#win_criteria[0].Criteria.MaxMin.Value.Group.Bound 0 0 0 0 0
-#win_criteria[1].Criteria.MaxMin.Value.Group.Bound 0 0 0 0 0
-#win_criteria[2].Criteria.MaxMin.Value.Group.Bound 0 0 0 0 0
-#win_criteria[3].Criteria.MaxMin.Value.Group.Bound 0 0 0 0 0
-#win_criteria[4].Criteria.MaxMin.Value.Group.Bound 0 0 0 0 0
-#win_criteria[5].Criteria.MaxMin.Value.Group.Bound 0 0 0 0 0
+#win_criteria[0].Criteria.MaxMin.Value.Group.Bound 1 1 500    1 0
+#win_criteria[1].Criteria.MaxMin.Value.Group.Bound 2 1 50000  1 0
+#win_criteria[2].Criteria.MaxMin.Value.Group.Bound 3 1 50     1 0
+#win_criteria[3].Criteria.MaxMin.Value.Group.Bound 4 1 50     1 0
+#win_criteria[4].Criteria.MaxMin.Value.Group.Bound 6 1 100000 1 0
 
-#lose_criteria[0].Criteria.MaxMin.Value.Group.Bound 0 0 0 0 0
-#lose_criteria[1].Criteria.MaxMin.Value.Group.Bound 0 0 0 0 0
-#lose_criteria[2].Criteria.MaxMin.Value.Group.Bound 0 0 0 0 0
-#lose_criteria[3].Criteria.MaxMin.Value.Group.Bound 0 0 0 0 0
-#lose_criteria[4].Criteria.MaxMin.Value.Group.Bound 0 0 0 0 0
-#lose_criteria[5].Criteria.MaxMin.Value.Group.Bound 0 0 0 0 0
+#lose_criteria[0].Criteria.MaxMin.Value.Group.Bound 1 0 250    1 300
+#lose_criteria[1].Criteria.MaxMin.Value.Group.Bound 2 0 -20000 2 0
+#lose_criteria[2].Criteria.MaxMin.Value.Group.Bound 5 1 50     3 40
 
 --------------------- Competitor Information -----------------------
 

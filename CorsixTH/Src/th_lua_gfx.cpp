@@ -545,20 +545,21 @@ static int l_surface_new(lua_State *L)
 {
 	lua_remove(L, 1); // Value inserted by __call
 
-	THRenderTargetCreationParams oParams;
-	oParams.iWidth = luaL_checkint(L, 1);
-	oParams.iHeight = luaL_checkint(L, 2);
-	int iArg = 3;
-	if (lua_type(L, iArg) == LUA_TNUMBER)
-		oParams.iBPP = luaL_checkint(L, iArg++);
-	else
-		oParams.iBPP = 0;
-	oParams.iSDLFlags = 0;
-	oParams.bHardware = false;
-	oParams.bDoubleBuffered = false;
-	oParams.bFullscreen = false;
-	oParams.bPresentImmediate = false;
-	oParams.bReuseContext = false;
+   THRenderTargetCreationParams oParams;
+    oParams.iWidth = luaL_checkint(L, 1);
+    oParams.iHeight = luaL_checkint(L, 2);
+    int iArg = 3;
+    if(lua_type(L, iArg) == LUA_TNUMBER)
+        oParams.iBPP = luaL_checkint(L, iArg++);
+    else
+        oParams.iBPP = 0;
+    oParams.iSDLFlags = 0;
+    oParams.bHardware = false;
+    oParams.bDoubleBuffered = false;
+    oParams.bFullscreen = false;
+    oParams.bPresentImmediate = false;
+    oParams.bReuseContext = false;
+    oParams.bOpenGL = false;
 
 #define FLAG(name, field, flag) \
     else if(stricmp(sOption, name) == 0) \
@@ -581,7 +582,6 @@ static int l_surface_new(lua_State *L)
 		FLAG("present immediate", bPresentImmediate, 0 );
 		FLAG("reuse context", bReuseContext, 0);
 	}
-
 #undef FLAG
 
 #ifndef CORSIX_TH_USE_DX9_RENDERER
@@ -605,7 +605,6 @@ static int l_surface_new(lua_State *L)
 		SDL_SetWindowTitle(window,sTitle);
 #else
 		SDL_WM_SetCaption(sTitle, sIcon);
-
 #endif
 
 	}
@@ -817,6 +816,26 @@ static int l_line_draw(lua_State *L)
     return 1;
 }
 
+static int l_line_persist(lua_State *L)
+{
+    THLine* pLine = luaT_testuserdata<THLine>(L);
+    lua_settop(L, 2);
+    lua_insert(L, 1);
+    LuaPersistWriter* pWriter = (LuaPersistWriter*)lua_touserdata(L, 1);
+    pLine->persist(pWriter);
+    return 0;
+}
+
+static int l_line_depersist(lua_State *L)
+{
+    THLine* pLine = luaT_testuserdata<THLine>(L);
+    lua_settop(L, 2);
+    lua_insert(L, 1);
+    LuaPersistReader* pReader = (LuaPersistReader*)lua_touserdata(L, 1);
+    pLine->depersist(pReader);
+    return 0;
+}
+
 void THLuaRegisterGfx(const THLuaRegisterState_t *pState)
 {
     // Palette
@@ -906,5 +925,7 @@ void THLuaRegisterGfx(const THLuaRegisterState_t *pState)
     luaT_setfunction(l_set_width, "setWidth");
     luaT_setfunction(l_set_colour, "setColour");
     luaT_setfunction(l_line_draw, "draw", MT_Surface);
+    luaT_setmetamethod(l_line_persist, "persist");
+    luaT_setmetamethod(l_line_depersist, "depersist");
     luaT_endclass();
 }

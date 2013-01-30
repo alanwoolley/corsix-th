@@ -29,13 +29,13 @@ function MoviePlayer:MoviePlayer(app, audio)
   self.app = app
   self.audio = audio
   self.playing = false
-  self.can_skip = true
   self.holding_bg_music = false
   self.channel = -1
   self.lose_movies = {}
   self.advance_movies = {}
   self.intro_movie = nil
   self.win_movie = nil
+  self.can_skip = true
   self.wait_for_stop = false
   self.wait_for_over = false
 end
@@ -77,11 +77,11 @@ function MoviePlayer:init()
 end
 
 function MoviePlayer:playIntro()
-  self:playMovie(self.intro_movie, false)
+  self:playMovie(self.intro_movie, false, true)
 end
 
 function MoviePlayer:playWinMovie()
-  self:playMovie(self.win_movie, true)
+  self:playMovie(self.win_movie, true, true)
 end
 
 function MoviePlayer:playAdvanceMovie(level)
@@ -91,39 +91,56 @@ function MoviePlayer:playAdvanceMovie(level)
       return
   end
 
-  self.can_skip = false
-  self.audio:stopBackgroundMusic()
-  self.holding_bg_music = true
+  if self.audio.background_music then
+    self.holding_bg_music = self.audio:pauseBackgroundTrack()
+  else
+    
+  end
   if level == 12 then
     self.audio:playSound("DICE122M.WAV")
   else
     self.audio:playSound("DICEYFIN.WAV")
   end
-  self:playMovie(filename, true)
+  self:playMovie(filename, true, false)
 end
 
 function MoviePlayer:playLoseMovie()
   if #self.lose_movies > 0 then
     local filename = self.lose_movies[math.random(#self.lose_movies)]
-    self:playMovie(filename, true)
+    self:playMovie(filename, true, true)
   end
 end
 
-function MoviePlayer:playMovie(filename, wait_for_stop)
+function MoviePlayer:playMovie(filename, wait_for_stop, can_skip)
   local x, y, w, h = 0
   local screen_w, screen_h = self.app.config.width, self.app.config.height
   local ar
+  local success, warning
 
   if(not self.moviePlayer:getEnabled() or not self.app.config.movies or filename == nil) then
-      return
+    return
   end
 
-  self.moviePlayer:load(filename)
-
+  success, warning = self.moviePlayer:load(filename)
+  if warning ~= nil and warning ~= "" then
+    local message = "MoviePlayer:playMovie - Warning: " .. warning
+    if self.app.world then
+      self.app.world:gameLog(message)
+    elseif self.app.config.debug then
+      print(message)
+    end
+  end
+  if not success then
+    -- Indicates failure to load movie
+    return
+  end
+  -- Abort any loading of music
+  self.audio.load_music = false
   if self.moviePlayer:hasAudioTrack() then
     self.channel = self.audio:reserveChannel()
-    self.audio:stopBackgroundMusic()
-    self.holding_bg_music = true
+    if self.audio.background_music then
+      self.holding_bg_music = self.audio:pauseBackgroundTrack()
+    end
   end
 
   -- calculate target dimensions
@@ -156,11 +173,31 @@ function MoviePlayer:playMovie(filename, wait_for_stop)
   self.app.video:fillBlack()
   self.app.video:endFrame()
 
+  self.can_skip = can_skip
   self.wait_for_stop = wait_for_stop
   self.wait_for_over = true
-  
+
+  self.opengl_mode_index = nil
+  for i=1, #self.app.modes do
+    print(self.app.modes[i])
+    if self.app.modes[i] == "opengl" then
+      self.opengl_mode_index = i
+    end
+  end
+  if self.opengl_mode_index then
+    self.app.modes[self.opengl_mode_index] = ""
+  end
+
   --TODO: Add text e.g. for newspaper headlines
-  self.moviePlayer:play(x, y, w, h, self.channel)
+  warning = self.moviePlayer:play(x, y, w, h, self.channel)
+  if warning ~= nil and warning ~= "" then
+    local message = "MoviePlayer:playMovie - Warning: " .. warning
+    if self.app.world then
+      self.app.world:gameLog(message)
+    elseif self.app.config.debug then
+      print(message)
+    end
+  end
   self.playing = true
 end
 
@@ -169,6 +206,7 @@ function MoviePlayer:onMovieAllocatePicture()
 end
 
 function MoviePlayer:onMovieOver()
+  self.moviePlayer:unload()
   self.wait_for_over = false
   if not self.wait_for_stop then
     self:_destroyMovie()
@@ -186,7 +224,9 @@ function MoviePlayer:stop()
 end
 
 function MoviePlayer:_destroyMovie()
-  self.moviePlayer:unload()
+  if self.opengl_mode_index then
+    self.app.modes[self.opengl_mode_index] = "opengl"
+  end
   if(self.moviePlayer:requiresVideoReset()) then
     self.app.ui:resetVideo()
   end
@@ -195,11 +235,12 @@ function MoviePlayer:_destroyMovie()
     self.channel = -1
   end
   if self.holding_bg_music then
-    self.audio:resumeBackgroundMusic()
+    -- If possible we want to continue playing music where we were
+    self.audio:pauseBackgroundTrack()
+  else
+    self.audio:playRandomBackgroundTrack()
   end
-  -- restore defaults
   self.playing = false
-  self.can_skip = true
 end
 
 function MoviePlayer:refresh()

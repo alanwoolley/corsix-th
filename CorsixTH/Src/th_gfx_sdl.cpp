@@ -792,23 +792,33 @@ void THCursor::draw(THRenderTarget* pCanvas, int iX, int iY) {
 	SDL_BlitSurface(m_pBitmap, NULL, pCanvas->getRawSurface(), &rcDest);
 }
 
-THLine::THLine() {
-	m_fWidth = 1;
-	m_iR = 0;
-	m_iG = 0;
-	m_iB = 0;
-	m_iA = 255;
-	m_pBitmap = NULL;
-	m_fMaxX = 0;
-	m_fMaxY = 0;
+THLine::THLine()
+{
+    initialize();
 }
 
-THLine::~THLine() {
-	SDL_FreeSurface(m_pBitmap);
+void THLine::initialize()
+{
+    m_fWidth = 1;
+    m_iR = 0;
+    m_iG = 0;
+    m_iB = 0;
+    m_iA = 255;
+    m_pBitmap = NULL;
+    m_fMaxX = 0;
+    m_fMaxY = 0;
+    m_oPath = new agg::path_storage();
 }
 
-void THLine::moveTo(double fX, double fY) {
-	m_oPath.move_to(fX, fY);
+THLine::~THLine()
+{
+    SDL_FreeSurface(m_pBitmap);
+    delete(m_oPath);
+}
+
+void THLine::moveTo(double fX, double fY)
+{
+    m_oPath->move_to(fX, fY);
 
 	m_fMaxX = fX > m_fMaxX ? fX : m_fMaxX;
 	m_fMaxY = fY > m_fMaxY ? fY : m_fMaxY;
@@ -817,8 +827,9 @@ void THLine::moveTo(double fX, double fY) {
 	m_pBitmap = NULL;
 }
 
-void THLine::lineTo(double fX, double fY) {
-	m_oPath.line_to(fX, fY);
+void THLine::lineTo(double fX, double fY)
+{
+    m_oPath->line_to(fX, fY);
 
 	m_fMaxX = fX > m_fMaxX ? fX : m_fMaxX;
 	m_fMaxY = fY > m_fMaxY ? fY : m_fMaxY;
@@ -879,8 +890,8 @@ void THLine::draw(THRenderTarget* pCanvas, int iX, int iY) {
 			m_pBitmap->w, m_pBitmap->h, m_pBitmap->pitch);
 	agg::pixfmt_rgba32 pixf(rbuf);
 	agg::renderer_base<agg::pixfmt_rgba32> renb(pixf);
-
-	agg::conv_stroke<agg::path_storage> stroke(m_oPath);
+	
+	agg::conv_stroke<agg::path_storage> stroke(*m_oPath);
 	stroke.width(m_fWidth);
 
 	agg::rasterizer_scanline_aa<> ras;
@@ -891,6 +902,63 @@ void THLine::draw(THRenderTarget* pCanvas, int iX, int iY) {
 			agg::rgba8(m_iR, m_iG, m_iB, m_iA));
 
 	SDL_BlitSurface(m_pBitmap, NULL, pCanvas->getRawSurface(), &rcDest);
+}
+
+void THLine::persist(LuaPersistWriter *pWriter) const
+{
+    pWriter->writeVUInt((uint32_t)m_iR);
+    pWriter->writeVUInt((uint32_t)m_iG);
+    pWriter->writeVUInt((uint32_t)m_iB);
+    pWriter->writeVUInt((uint32_t)m_iA);
+    pWriter->writeVFloat(m_fWidth);
+
+    unsigned numOps = m_oPath->total_vertices();
+    pWriter->writeVUInt(numOps);
+
+    for (unsigned i = 0; i < numOps; i++) {
+        unsigned command = m_oPath->command(i);
+
+        double fX, fY;
+        m_oPath->vertex(i, &fX, &fY);
+
+        if (command == agg::path_cmd_move_to) {
+            command = (unsigned)THLOP_MOVE;
+        } else if (command == agg::path_cmd_line_to) {
+            command = (unsigned)THLOP_LINE;
+        }
+
+        pWriter->writeVUInt(command);
+        pWriter->writeVFloat(fX);
+        pWriter->writeVFloat(fY);
+    }
+}
+
+void THLine::depersist(LuaPersistReader *pReader)
+{
+    initialize();
+
+    pReader->readVUInt(m_iR);
+    pReader->readVUInt(m_iG);
+    pReader->readVUInt(m_iB);
+    pReader->readVUInt(m_iA);
+    pReader->readVFloat(m_fWidth);
+
+    uint32_t numOps = 0;
+    pReader->readVUInt(numOps);
+    for (uint32_t i = 0; i < numOps; i++) {
+        unsigned type;
+        double fX, fY;
+
+        pReader->readVUInt((uint32_t&)type);
+        pReader->readVFloat(fX);
+        pReader->readVFloat(fY);
+
+        if (type == THLOP_MOVE) {
+            moveTo(fX, fY);
+        } else if (type == THLOP_LINE) {
+            lineTo(fX, fY);
+        }
+    }
 }
 
 #ifdef CORSIX_TH_USE_FREETYPE2

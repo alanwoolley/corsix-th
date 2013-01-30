@@ -59,15 +59,21 @@ void th_movie_audio_callback(int iChannel, void *pStream, int iStreamSize, void 
     pMovie->copyAudioToStream((Uint8*)pStream, iStreamSize);
 }
 
+//NOTE: THMoviePicture will leak some memory if the surface changes before the
+//overlay is freed. We cannot free the overlay at this point because it crashes
+//on linux.
+//TODO: Attempt to free the overlay before any surface changes. The code
+//probably needs to be refactored to make that possible without deadlock.
 THMoviePicture::THMoviePicture():
     m_fAllocated(false),
     m_pOverlay(NULL),
     m_fReallocate(false),
-    m_pixelFormat(PIX_FMT_YUV420P) {}
+    m_pixelFormat(PIX_FMT_YUV420P),
+    m_pSurface(NULL) {}
 
 THMoviePicture::~THMoviePicture()
 {
-    if(m_pOverlay)
+    if(m_pOverlay && m_pSurface == SDL_GetVideoSurface())
     {
         SDL_FreeYUVOverlay(m_pOverlay);
         m_pOverlay = NULL;
@@ -77,12 +83,12 @@ THMoviePicture::~THMoviePicture()
 void THMoviePicture::allocate()
 {
     SDL_Surface* pSurface = SDL_GetVideoSurface();
-
-    if(m_pOverlay)
+    if(m_pOverlay && m_pSurface == pSurface)
     {
         SDL_FreeYUVOverlay(m_pOverlay);
     }
 
+    m_pSurface = pSurface;
     m_pOverlay = SDL_CreateYUVOverlay(m_iWidth, m_iHeight, SDL_YV12_OVERLAY, pSurface);
     if(m_pOverlay == NULL || m_pOverlay->pitches[0] < m_iWidth)
     {
@@ -93,7 +99,7 @@ void THMoviePicture::allocate()
 
 void THMoviePicture::deallocate()
 {
-    if(m_pOverlay)
+    if(m_pOverlay && m_pSurface == SDL_GetVideoSurface())
     {
         SDL_FreeYUVOverlay(m_pOverlay);
         m_pOverlay = NULL;
@@ -109,8 +115,7 @@ void THMoviePicture::draw()
     rcDest.y = m_iY;
     rcDest.w = m_iWidth;
     rcDest.h = m_iHeight;
-
-    if(m_pOverlay)
+    if(m_pOverlay && m_pSurface == SDL_GetVideoSurface())
     {
         iError = SDL_DisplayYUVOverlay(m_pOverlay, &rcDest);
         if(iError < 0)
@@ -222,7 +227,8 @@ THMovie::THMovie():
     m_pVideoThread(NULL),
     m_iAudioBufferMaxSize(0),
     m_iAudioBufferSize(0),
-    m_pAudioPacket(NULL)
+    m_pAudioPacket(NULL),
+    m_sLastError()
 {
     av_register_all();
 
@@ -255,7 +261,7 @@ bool THMovie::moviesEnabled()
     return true;
 }
 
-void THMovie::load(const char* szFilepath)
+bool THMovie::load(const char* szFilepath)
 {
     int iError = 0;
 
@@ -265,15 +271,17 @@ void THMovie::load(const char* szFilepath)
     iError = avformat_open_input(&m_pFormatContext, szFilepath, NULL, NULL);
     if(iError < 0)
     {
-        std::cerr << "Failed to open av input: " << iError;
-        return;
+        av_strerror(iError, m_szErrorBuffer, MOVIE_ERROR_BUFFER_SIZE);
+        m_sLastError = std::string(m_szErrorBuffer);
+        return false;
     }
 
     iError = avformat_find_stream_info(m_pFormatContext, NULL);
     if(iError < 0)
     {
-        std::cerr << "Failed to find stream info: " << iError;
-        return;
+        av_strerror(iError, m_szErrorBuffer, MOVIE_ERROR_BUFFER_SIZE);
+        m_sLastError = std::string(m_szErrorBuffer);
+        return false;
     }
 
     m_iVideoStream = av_find_best_stream(m_pFormatContext, AVMEDIA_TYPE_VIDEO, -1, -1, &m_pVideoCodec, 0);
@@ -286,6 +294,8 @@ void THMovie::load(const char* szFilepath)
         m_pAudioCodecContext = m_pFormatContext->streams[m_iAudioStream]->codec;
         avcodec_open2(m_pAudioCodecContext, m_pAudioCodec, NULL);
     }
+
+    return true;
 }
 
 int THMovie::getNativeHeight()
@@ -343,6 +353,8 @@ void THMovie::play(int iX, int iY, int iWidth, int iHeight, int iChannel)
 
     m_pAudioQueue = new THAVPacketQueue();
     m_iStartTime = SDL_GetTicks();
+    m_iCurSyncPts = 0;
+    m_iCurSyncPtsSystemTime = m_iStartTime;
 
     if(m_iAudioStream >= 0)
     {
@@ -365,7 +377,7 @@ void THMovie::play(int iX, int iY, int iWidth, int iHeight, int iChannel)
         if(m_iChannel < 0)
         {
             m_iChannel = -1;
-            std::cerr << "Error on Mix_PlayChannel for th_movie";
+            m_sLastError = std::string(Mix_GetError());
         }
         else
         {
@@ -537,7 +549,6 @@ void THMovie::readStreams()
     SDL_Event endEvent;
     endEvent.type = SDL_USEREVENT_MOVIE_OVER;
     SDL_PushEvent(&endEvent);
-
     m_fAborting = true;
 }
 
@@ -550,40 +561,47 @@ bool THMovie::requiresVideoReset()
 #endif
 }
 
+const char* THMovie::getLastError()
+{
+    return m_sLastError.c_str();
+}
+
+void THMovie::clearLastError()
+{
+    m_sLastError.clear();
+}
+
 void THMovie::refresh()
 {
     THMoviePicture* pMoviePicture;
 
-    if(m_pFormatContext->streams[m_iVideoStream])
+    if(m_iPictureQueueSize > 0)
     {
-        if(m_iPictureQueueSize > 0)
+        pMoviePicture = &(m_aPictureQueue[m_iPictureQueueReadIndex]);
+        double curTime = SDL_GetTicks() - m_iCurSyncPtsSystemTime + m_iCurSyncPts * 1000.0;
+
+        //don't play a frame too early
+        if(pMoviePicture->m_dPts > 0)
         {
-            pMoviePicture = &(m_aPictureQueue[m_iPictureQueueReadIndex]);
-            double curTime = SDL_GetTicks() - m_iStartTime;
-
-            //don't play a frame too early
-            if(pMoviePicture->m_dPts > 0)
+            if(pMoviePicture->m_dPts * 1000.0 > curTime)
             {
-                if(pMoviePicture->m_dPts * 1000.0 > curTime)
-                {
-                    return;
-                }
+                return;
             }
-
-            if(m_iPictureQueueSize > 1)
-            {
-                THMoviePicture* nextPicture = &(m_aPictureQueue[(m_iPictureQueueReadIndex + 1) % PICTURE_BUFFER_SIZE]);
-
-                //if we have another frame and it's time has already passed, drop the current frame
-                if(nextPicture->m_dPts > 0 && nextPicture->m_dPts * 1000.0 < curTime)
-                {
-                    advancePictureQueue();
-                }
-            }
-
-            pMoviePicture->draw();
-            advancePictureQueue();
         }
+
+        if(m_iPictureQueueSize > 1)
+        {
+            THMoviePicture* nextPicture = &(m_aPictureQueue[(m_iPictureQueueReadIndex + 1) % PICTURE_BUFFER_SIZE]);
+
+            //if we have another frame and it's time has already passed, drop the current frame
+            if(nextPicture->m_dPts > 0 && nextPicture->m_dPts * 1000.0 < curTime)
+            {
+                advancePictureQueue();
+            }
+        }
+
+        pMoviePicture->draw();
+        advancePictureQueue();
     }
 }
 
@@ -702,7 +720,8 @@ int THMovie::queuePicture(AVFrame *pFrame, double dPts)
         !pMoviePicture->m_fAllocated ||
         pMoviePicture->m_fReallocate ||
         pMoviePicture->m_iWidth != m_iWidth ||
-        pMoviePicture->m_iHeight != m_iHeight)
+        pMoviePicture->m_iHeight != m_iHeight ||
+        pMoviePicture->m_pSurface != SDL_GetVideoSurface())
     {
         SDL_Event reallocEvent;
 
@@ -749,7 +768,7 @@ int THMovie::queuePicture(AVFrame *pFrame, double dPts)
 
         if(m_pSwsContext == NULL)
         {
-            std::cerr << "Failed to initialize SwsContext";
+            m_sLastError = std::string("Failed to initialize SwsContext");
             return 1;
         }
 
@@ -787,12 +806,14 @@ void THMovie::copyAudioToStream(Uint8 *pbStream, int iStreamSize)
 {
     int iAudioSize;
     int iCopyLength;
+    bool fFirst = true;
 
     while(iStreamSize > 0)
     {
         if(m_iAudioBufferIndex >= m_iAudioBufferSize)
         {
-            iAudioSize = decodeAudioFrame();
+            iAudioSize = decodeAudioFrame(fFirst);
+            fFirst = false;
 
             if(iAudioSize <= 0)
             {
@@ -814,7 +835,7 @@ void THMovie::copyAudioToStream(Uint8 *pbStream, int iStreamSize)
     }
 }
 
-int THMovie::decodeAudioFrame()
+int THMovie::decodeAudioFrame(bool fFirst)
 {
     int iBytesConsumed = 0;
     int iSampleSize = 0;
@@ -822,6 +843,8 @@ int THMovie::decodeAudioFrame()
     int iGotFrame = 0;
     bool fNewPacket = false;
     bool fFlushComplete = false;
+    double dClockPts;
+    int iStreamPts;
 
     while(!iGotFrame && !m_fAborting)
     {
@@ -856,6 +879,19 @@ int THMovie::decodeAudioFrame()
                 avcodec_flush_buffers(m_pAudioCodecContext);
                 fFlushComplete = false;
             }
+        }
+
+        if(fFirst)
+        {
+            iStreamPts = m_pAudioPacket->pts;
+            if(iStreamPts != AV_NOPTS_VALUE)
+            {
+                //There is a time_base in m_pAudioCodecContext too, but that one is wrong.
+                dClockPts = iStreamPts * av_q2d(m_pFormatContext->streams[m_iAudioStream]->time_base);
+                m_iCurSyncPts = dClockPts;
+                m_iCurSyncPtsSystemTime = SDL_GetTicks();
+            }
+            fFirst = false;
         }
 
         while(m_pAudioPacket->size > 0 || (!m_pAudioPacket->data && fNewPacket))
@@ -896,8 +932,6 @@ int THMovie::decodeAudioFrame()
         }
     }
 
-    //TODO: Compensate for audio being out of sync
-
 #if LIBSWRESAMPLE_VERSION_INT < AV_VERSION_INT(0, 12, 100)
     //over-estimate output samples
     iOutSamples = (int)av_rescale_rnd(m_frame->nb_samples, m_iMixerFrequency, m_pAudioCodecContext->sample_rate, AV_ROUND_UP);
@@ -935,13 +969,14 @@ int THMovie::decodeAudioFrame()
 #endif
 
     swr_convert(m_pSwrContext, &m_pbAudioBuffer, iOutSamples, (const uint8_t**)&m_frame->data[0], m_frame->nb_samples);
+
     return iSampleSize;
 }
 #else //CORSIX_TH_USE_FFMPEG
 THMovie::THMovie() {}
 THMovie::~THMovie() {}
 bool THMovie::moviesEnabled() { return false; }
-void THMovie::load(const char* filepath) {}
+bool THMovie::load(const char* filepath) { return true; }
 void THMovie::unload() {}
 void THMovie::play(int iX, int iY, int iWidth, int iHeight, int iChannel)
 {
@@ -954,6 +989,8 @@ int THMovie::getNativeHeight() { return 0; }
 int THMovie::getNativeWidth() { return 0; }
 bool THMovie::hasAudioTrack() { return false; }
 bool THMovie::requiresVideoReset() { return false; }
+const char* THMovie::getLastError() { return NULL; }
+void THMovie::clearLastError() {}
 void THMovie::refresh() {}
 void THMovie::copyAudioToStream(Uint8 *stream, int length) {}
 void THMovie::runVideo() {}
