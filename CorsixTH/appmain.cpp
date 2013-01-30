@@ -87,7 +87,6 @@ static int showerrordialog(lua_State *L) {
 
 static int gamespeedupdated(lua_State *L) {
 	LOG_INFO("Game speed updated");
-	int speedvar;
 	int argc = lua_gettop(L);
 	const char* gamespeed = lua_tostring(L, 1);
 	LOG_INFO(gamespeed);
