@@ -88,10 +88,10 @@ menu_file_load = {
 }
 cheats_window = {
   warning = "Varování: Pokud budete podvádět, nedostanete na konci úrovně žádné bonusové body!",
-  caption = "Číty",
+  caption = "Cheaty",
   cheated = {
-    no = "Číty použity: Ne",
-    yes = "Číty použity: Ano",
+    no = "Cheaty použity: Ne",
+    yes = "Cheaty použity: Ano",
   },
   close = "Zavřít",
   cheats = {
@@ -1074,7 +1074,7 @@ tooltip = {
     back = "Zavřít okno možností",
     fullscreen_button = "Klikněte pro přepnutí režimu celé obrazovky",
     original_path = "Nyní zvolená složka instalace původní Theme Hospital",
-    browse = "Procházet pro jiné umístění instalace Theme Hospital",
+    browse = "Procházet pro jiné umístění instalace Theme Hospital. %1%",
     height = "Zadejte požadovanou výšku obrazovky",
     language = "Vybrat %s jako jazyk",
   },

@@ -549,11 +549,49 @@ void THRenderTarget::setCursorPosition(int iX, int iY)
     // TODO (low priority, as Lua will simulate a cursor)
 }
 
+SDL_Surface* flipSurface(SDL_Surface* pSurface)
+{
+    SDL_Surface *pSurfaceFlipped = SDL_CreateRGBSurface(pSurface->flags, pSurface->w, pSurface->h, pSurface->format->BitsPerPixel,
+        pSurface->format->Rmask, pSurface->format->Gmask, pSurface->format->Bmask, pSurface->format->Amask);
+    if (pSurfaceFlipped == NULL) return NULL;
+
+    uint8_t* src = reinterpret_cast<uint8_t*>(pSurface->pixels);
+    uint8_t* dest = reinterpret_cast<uint8_t*>(pSurfaceFlipped->pixels);
+
+    for(int iY = 0; iY < pSurface->h; ++iY)
+    {
+        memcpy(dest + pSurface->pitch * iY, src + pSurface->pitch * (pSurface->h - 1 - iY), pSurface->pitch);
+    }
+    return pSurfaceFlipped;
+}
+
 bool THRenderTarget::takeScreenshot(const char* sFile)
 {
-    // TODO
-    SDL_SetError("Not implemented in OpenGL mode");
-    return false;
+    SDL_Surface *pSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, this->m_iWidth, this->m_iHeight, 24, 0x000000FF, 0x0000FF00, 0x00FF0000, 0);
+    if(pSurface == NULL)
+    {
+        SDL_SetError("Could not create screenshot buffer");
+        return false;
+    }
+
+    // Read from buffer onto SDL surface
+    glReadBuffer(GL_FRONT);
+    glReadPixels(0, 0, this->m_iWidth, this->m_iHeight, GL_RGB, GL_UNSIGNED_BYTE, pSurface->pixels);
+
+    // Flip y
+    SDL_Surface *pSurfaceFlipped = flipSurface(pSurface);
+    if(pSurfaceFlipped == NULL)
+    {
+        SDL_SetError("Could not create inverted screenshot buffer");
+        return false;
+    }
+
+    // Save contents of SDL surface
+    bool bResult = SDL_SaveBMP(pSurfaceFlipped, sFile) == 0;
+    SDL_FreeSurface(pSurface);
+    SDL_FreeSurface(pSurfaceFlipped);
+    
+    return bResult;
 }
 
 int roundUp2(int x)
@@ -1138,8 +1176,14 @@ bool THSpriteSheet::getSpriteAverageColour(unsigned int iSprite, THColour* pColo
         uint32_t iColour = m_pPalette->getARGBData()[cPalIndex];
         if((iColour >> 24) == 0)
             continue;
-        iUsageCounts[cPalIndex]++;
-        iCountTotal++;
+        // Grant higher score to pixels with high or low intensity (helps avoid grey fonts)
+        unsigned char iR = static_cast<uint8_t> ((iColour >>  0) & 0xFF);
+        unsigned char iG = static_cast<uint8_t> ((iColour >>  8) & 0xFF);
+        unsigned char iB = static_cast<uint8_t> ((iColour >> 16) & 0xFF);
+        unsigned char cIntensity = (unsigned char)(((int)iR + (int)iG + (int)iB) / 3);
+        int iScore = 1 + max(0, 3 - ((255 - cIntensity) / 32)) + max(0, 3 - (cIntensity / 32));
+        iUsageCounts[cPalIndex] += iScore;
+        iCountTotal += iScore;
     }
     if(iCountTotal == 0)
         return false;

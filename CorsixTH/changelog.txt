@@ -6,19 +6,26 @@ In this version major new features include in-game movies, objects that
 occupy only the edge of a tile and the graph window.
 
   
--- Not Yet Implemented --
+-- Main features not yet implemented --
 
 * Epidemics
-* Rats
+* Rats (and the rat level)
 * Insurance company graphs, illness graph
 * Visual effects on patients with serious radiation and jellyitis.
 * Some fullscreen animations such as the winning letter.
+* Multiplayer support.
+
+For a (nearly) complete list, visit our Programming Ideas wiki page:
+http://code.google.com/p/corsix-th/wiki/ProgrammingIdeas
 
 
 -- Known Issues --
 
 * Emotion icons don't appear just above a humanoid's head at all times.
 * Main menu/in-game glitches when using the OpenGL version.
+
+For a complete list, visit the issue tracker: 
+http://code.google.com/p/corsix-th/issues/list
 
 
 -- Gameplay --
@@ -44,6 +51,7 @@ occupy only the edge of a tile and the graph window.
 
 * Change: Placing a member of staff inside a room that is already occupied
   will now replace that person.
+
 * Fix: Crashes in certain situations involving receptionists and reception 
   desks.
 * Fix: Patients being handled at a reception desk even if no receptionist 
@@ -68,9 +76,15 @@ occupy only the edge of a tile and the graph window.
   explodes or the player builds a research department.
 * Added: Keyboard shortcuts F1 - F9 for the fullscreen windows. They are NOT the
   same as in original TH but instead correspond to the order on the bottom panel.
-  
+* Added: Possibility to choose font file in the options dialog.
+* Added: Player name is now customizable in the new game dialog.
+ 
 * Removed: Keyboard shortcuts F8 and F9 for debug fax and debug patients.
+* Change: Don't require debug mode to be able to dump the gamelog.
+* Change: The shortcut for dumping strings is now Ctrl+T instead of Ctrl+Shift+D.
 
+* Change: Restructured options window to make it more consistent, less clutter-y
+  and smaller. 
 * Change: It is now possible to concentrate research on operating theatre
   diseases and redistribution of research is automatically done when
   a category has been completely researched.
@@ -80,9 +94,8 @@ occupy only the edge of a tile and the graph window.
   toggle buttons.
 * Change: Reordered entries of graphs menu to correspond with order in
   bottom panel.
-* Change: Restructured options window to make it more consistent, less clutter-y
-  and smaller.
- 
+* Fix: Colour selection algorithm for freetype fonts resulted in unreadable text
+  on faxes for some languages.
 * Fix: When an unanswered fax became meaningless (e.g. if you built the 
   required room), it was only removed if its message button was visible at the
   bottom panel (not if it was queued because of 5 buttons being there already).
@@ -97,23 +110,25 @@ occupy only the edge of a tile and the graph window.
 
 -- Graphics --
 
-* Added: The graph dialog now actually display graphs.
+* Added: The graph dialog now actually displays graphs.
 
 * Added: It is now possible to choose among three colour scales for warmth
   level. Look in the top menu for this choice.
 
 * Added: Print some info in the command prompt when the user wants to take
   a screenshot, so he can see if and why it failed.
+* Added: Screenshot functionality for OpenGL version.
 * Change: Screenshots get saved to a dedicated screenshot folder now, 
   which can be changed in the config.
 * Fix: Loading a game on startup where a fullscreen window was open would
   open with the font messed up.
-* Fix: Taking a screenshot (Ctrl+S) now possible under windows without
+* Fix: Taking a screenshot (Ctrl+S) is now possible under windows without
   fiddling in a lua file.
 
 
 -- Translations --
 
+* Added: Brazilian Portuguese language
 * Change: The "utf8" prefix has been obsolete for some time and has been
   removed from all language files.
 

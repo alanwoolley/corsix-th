@@ -239,7 +239,7 @@ tooltip.options_window = {
   language = "Velg %s som språk",
   back = "Lukk vinduet med innstillinger",
   original_path = "Valgt mappe for Theme Hospital installasjonen",
-  browse = "Bla gjennom mappene for å finne et annet sted for Theme Hospital-installasjonen",
+  browse = "Bla gjennom mappene for å finne et annet sted for Theme Hospital-installasjonen. %1%",
 }
 
 calls_dispatcher = {
@@ -2292,7 +2292,7 @@ progress_report = {
 -- Newspaper headlines
 newspaper = {
   -- Seven categories of funny headlines. I think each category is related
-  -- to one criterium you can lose to. TODO: categorize
+  -- to one criterion you can lose to. TODO: categorize
   { "DR SKREKK OG GRU", "SKUMMEL LEGE LEKER GUD", "DR ACULA SJOKKERER", "HVEM FALT FOR KNIVEN?", "FARLIG FORSKNING STOPPET ETTER RAZZIA" },
   { "DR ANKER", "KNUST KIRURG", "KONSULENT PÅ KJÖRET", "KIRURGISK SHOT", "KIRURG DRIKKER OPP", "KIRURGISK SPIRIT" },
   { "LEKENDE KIRURG", "DOKTOR PANTSDOWN", "DOKTOR LANGT NEDE", "GLUPSK KIRURG" },
