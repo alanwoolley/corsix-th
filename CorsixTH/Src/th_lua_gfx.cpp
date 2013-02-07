@@ -666,8 +666,13 @@ static int l_surface_nonoverlapping(lua_State *L)
 
 static int l_surface_set_blue_filter_active(lua_State *L)
 {
-    THRenderTarget* pCanvas = luaT_testuserdata<THRenderTarget>(L);
-    pCanvas->setBlueFilterActive(lua_isnoneornil(L, 2) ? false : lua_toboolean(L, 2));
+	THRenderTarget* pCanvas = luaT_testuserdata<THRenderTarget>(L);
+    //pCanvas->setBlueFilterActive(lua_isnoneornil(L, 2) ? false : lua_toboolean(L, 2));
+	// Keep blue filter off for now. TODO - make this work properly
+
+	pCanvas->setBlueFilterActive(false);
+
+
     return 1;
 }
 
