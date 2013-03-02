@@ -49,14 +49,13 @@ function App:App()
     motion = self.onMouseMove,
     active = self.onWindowActive,
     music_over = self.onMusicOver,
+	movie_over = self.onMovieOver,
     load = self.load,
     restart = self.restart,
     save = self.save,
     gamespeed = self.gamespeed,
     tryautosave = self.tryAutoSave,
     configupdate = self.updateConfig,
-    movie_allocate_picture = self.onMovieAllocatePicture,
-    movie_over = self.onMovieOver
   }
   self.strings = {}
   self.savegame_version = SAVEGAME_VERSION
@@ -860,10 +859,6 @@ end
 
 function App:onMusicOver(...)
   return self.audio:onMusicOver(...)
-end
-
-function App:onMovieAllocatePicture(...)
-  return self.moviePlayer:onMovieAllocatePicture(...)
 end
 
 function App:onMovieOver(...)

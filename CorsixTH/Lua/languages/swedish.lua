@@ -62,7 +62,10 @@ tooltip.research_policy.research_progress = "Framsteg inför nästa upptäckt i 
 
 handyman_window.all_parcels = "Alla tomter"
 handyman_window.parcel = "Tomt"
+
 tooltip.handyman_window.parcel_select = "Tomten där vaktmästaren accepterar uppdrag. Klicka för att ändra"
+tooltip.new_game_window.player_name = "Skriv in det namn du vill kallas i spelet"
+new_game_window.player_name = "Namn"
 
 menu_options = {
   lock_windows = "  LÅS FÖNSTER  ",
@@ -300,6 +303,7 @@ tooltip.options_window = {
   original_path = "Den just nu valda mappen där Theme Hospital installerats",
   browse = "Bläddra efter en annan Theme Hospital installation. (Nuvarande: %1%)",
   browse_font = "Bläddra efter en (annan) typsnittsfil. (Nuvarande: %1%)",
+  no_font_specified = "Ingen sökväg har valts ännu!",
   back = "Stäng alternativmenyn",
 }
 

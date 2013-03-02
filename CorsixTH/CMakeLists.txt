@@ -73,20 +73,12 @@ IF(APPLE)
   add_executable(CorsixTH MACOSX_BUNDLE ${corsixth_source_files} ${corsixth_icon_file})
 
   set_target_properties(CorsixTH PROPERTIES LINK_FLAGS_MINSIZEREL "-dead_strip")
+  set_target_properties(CorsixTH PROPERTIES XCODE_ATTRIBUTE_LD_RUNPATH_SEARCH_PATHS "@executable_path/../Frameworks")
 
-  #Add an extra step at the end of the build process to copy the resources into the
-  #bundle. I haven't yet found a way to keep the folder structure when adding resources
-  #into XCode. I would have thought we could use source_group but apparently not.
-  set(corsixth_bundle_resources 
-    ${CMAKE_SOURCE_DIR}/CorsixTH/CorsixTH.lua
-    ${CMAKE_SOURCE_DIR}/CorsixTH/Bitmap
-    ${CMAKE_SOURCE_DIR}/CorsixTH/Lua
-    ${CMAKE_SOURCE_DIR}/CorsixTH/Levels
-  )
-  add_custom_command(TARGET CorsixTH 
-					 POST_BUILD
-					 COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -exclude *.bmp -exclude *.png -resolve-src-symlinks ${corsixth_bundle_resources} \${TARGET_BUILD_DIR}/\${FULL_PRODUCT_NAME}/Contents/Resources
-  )
+  #Add an extra step at the end of the build process to copy the resources into the bundle.
+  add_custom_command(TARGET CorsixTH
+  					 POST_BUILD
+  					 COMMAND rsync -rv --include-from ${CMAKE_SOURCE_DIR}/CorsixTH/RequiredResources.txt ${CMAKE_SOURCE_DIR}/CorsixTH/ \${TARGET_BUILD_DIR}/\${FULL_PRODUCT_NAME}/Contents/Resources)
 
   target_link_libraries(CorsixTH SDLmain)
   INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR}/CorsixTH/SDLMain/)
@@ -145,6 +137,9 @@ IF(CORSIX_TH_USE_FFMPEG)
   IF(FFMPEG_FOUND)
     TARGET_LINK_LIBRARIES(CorsixTH ${FFMPEG_LIBRARIES})
     INCLUDE_DIRECTORIES(${FFMPEG_INCLUDE_DIRS})
+    IF(APPLE)
+      TARGET_LINK_LIBRARIES(CorsixTH libz.dylib)
+    ENDIF()
     message("  FFmpeg found")
   ELSE(FFMPEG_FOUND)
     message("Error: FFmpeg library not found, even though it was selected to be included")
@@ -157,6 +152,9 @@ IF(CORSIX_TH_USE_FREETYPE2)
   IF(FREETYPE_FOUND)
     TARGET_LINK_LIBRARIES(CorsixTH ${FREETYPE_LIBRARIES})
     INCLUDE_DIRECTORIES(${FREETYPE_INCLUDE_DIRS})
+	IF(APPLE)
+      TARGET_LINK_LIBRARIES(CorsixTH libbz2.dylib)
+    ENDIF()
     message("  FreeType2 found")
   ELSE(FREETYPE_FOUND)
     message("Error: FreeType2 library not found, even though it was selected to be used")
@@ -199,6 +197,7 @@ ENDIF(MSVC AND NOT CORSIX_TH_HAS_INTTYPES_H)
 
 # Declaration of the install process
 IF(APPLE)
+
   #Just use the prefix as it's sufficient to just set the prefix to /Applications on Mac.
   install(TARGETS CorsixTH BUNDLE DESTINATION .)
 
@@ -221,7 +220,7 @@ IF(APPLE)
   	  install(DIRECTORY ${LUA_LIBRARY} DESTINATION CorsixTH.app/Contents/Frameworks)
     ENDIF()
   ENDIF()
-
+  
 ELSE()
   install(TARGETS CorsixTH RUNTIME DESTINATION CorsixTH)
   install(DIRECTORY Lua Levels DESTINATION CorsixTH PATTERN "*.svn" EXCLUDE)
