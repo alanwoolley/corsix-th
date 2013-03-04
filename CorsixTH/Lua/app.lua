@@ -1094,7 +1094,10 @@ function App:updateConfig(newconfig)
  -- self.audio:setSoundVolume(newconfig["sfxVol"])
  -- self.audio:setAnnouncementVolume(newconfig["announcementsVol"])
   
+  -- This is really inconsistent!
+  
   self.audio:playSoundEffects(newconfig["playSoundFx"])
+  self.config.play_announcements = newconfig["playAnnouncements"]
   
   if newconfig["playMusic"] then
   		local oldstate = self.config.play_music
@@ -1109,7 +1112,8 @@ function App:updateConfig(newconfig)
         self.audio:stopBackgroundTrack() -- stop
       end
       
-  self.config.play_announcements = newconfig["playAnnouncements"]
+  
+  
   
   self:saveConfig()
 end

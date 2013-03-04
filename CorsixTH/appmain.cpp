@@ -182,12 +182,7 @@ void populateConfiguration(JNIEnv* env, jobject configuration) {
 	jstring language = (jstring) env->CallObjectMethod(configuration,
 			env->GetMethodID(configclass, "getLanguage",
 					"()Ljava/lang/String;"));
-	jint musicVol = env->CallIntMethod(configuration,
-			env->GetMethodID(configclass, "getMusicVol", "()I"));
-	jint sfxVol = env->CallIntMethod(configuration,
-			env->GetMethodID(configclass, "getSfxVol", "()I"));
-	jint announcementsVol = env->CallIntMethod(configuration,
-			env->GetMethodID(configclass, "getAnnouncementsVol", "()I"));
+
 	jint fpsLimit = env->CallIntMethod(configuration,
 			env->GetMethodID(configclass, "getFpsLimit", "()I"));
 	jboolean playSoundFx = env->CallBooleanMethod(configuration,
@@ -196,21 +191,18 @@ void populateConfiguration(JNIEnv* env, jobject configuration) {
 			env->GetMethodID(configclass, "getPlayMusic", "()Z"));
 	jboolean playAnnouncements = env->CallBooleanMethod(configuration,
 			env->GetMethodID(configclass, "getPlayAnnouncements", "()Z"));
-	jboolean globalAudio = env->CallBooleanMethod(configuration,
-			env->GetMethodID(configclass, "getGlobalAudio", "()Z"));
+
 
 	masterConfig.cthPath = (char*) env->GetStringUTFChars(cthpath, 0);
 	masterConfig.originalFilesPath = (char*) env->GetStringUTFChars(
 			originalfiles, 0);
 	masterConfig.language = (char*) env->GetStringUTFChars(language, 0);
-	masterConfig.musicVol = (int) musicVol;
-	masterConfig.sfxVol = (int) sfxVol;
-	masterConfig.announcementsVol = (int) announcementsVol;
+
 	masterConfig.fpsLimit = (int) fpsLimit;
 	masterConfig.playSoundFx = (unsigned char) playSoundFx;
 	masterConfig.playMusic = (unsigned char) playMusic;
 	masterConfig.playAnnouncements = (unsigned char) playAnnouncements;
-	masterConfig.globalAudio = (unsigned char) globalAudio;
+
 	LOG_INFO("Done");
 }
 

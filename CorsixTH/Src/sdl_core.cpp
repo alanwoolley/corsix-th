@@ -292,18 +292,14 @@ static int l_mainloop(lua_State *L) {
 						newConfig->originalFilesPath);
 				l_pushtablestring(dispatcher, "cthPath", newConfig->cthPath);
 				l_pushtablestring(dispatcher, "language", newConfig->language);
-				l_pushtableint(dispatcher, "musicVol", newConfig->musicVol);
-				l_pushtableint(dispatcher, "sfxVol", newConfig->sfxVol);
-				l_pushtableint(dispatcher, "announcementsVol",
-						newConfig->announcementsVol);
+
 				l_pushtableint(dispatcher, "fpsLimit", newConfig->fpsLimit);
 				l_pushtablebool(dispatcher, "playSoundFx",
 						newConfig->playSoundFx);
 				l_pushtablebool(dispatcher, "playMusic", newConfig->playMusic);
 				l_pushtablebool(dispatcher, "playAnnouncements",
 						newConfig->playAnnouncements);
-				l_pushtablebool(dispatcher, "globalAudio",
-						newConfig->globalAudio);
+
 
 				// Update FPS Limit
 				set_fps_limit(newConfig->fpsLimit);

@@ -50,8 +50,8 @@ int luaopen_sdl(lua_State *L);
 void set_fps_limit(int fps);
 
 typedef struct {
-	int musicVol, sfxVol, announcementsVol, fpsLimit;
-	unsigned char playSoundFx, playMusic, playAnnouncements, globalAudio;
+	int fpsLimit;
+	unsigned char playSoundFx, playMusic, playAnnouncements;
 	char* originalFilesPath, *cthPath, *language;
 } Configuration;
 
