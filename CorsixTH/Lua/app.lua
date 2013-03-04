@@ -1089,6 +1089,29 @@ end
 function App:updateConfig(newconfig)
   print "New configuration!"
   for k,v in pairs(newconfig) do print(k,v) end
+  
+ -- self.audio:setBackgroundVolume(newconfig["musicVol"])
+ -- self.audio:setSoundVolume(newconfig["sfxVol"])
+ -- self.audio:setAnnouncementVolume(newconfig["announcementsVol"])
+  
+  self.audio:playSoundEffects(newconfig["playSoundFx"])
+  
+  if newconfig["playMusic"] then
+  		local oldstate = self.config.play_music
+        self.config.play_music = true
+        
+        if not (oldstate == newconfig["playMusic"]) then
+        	self.audio:playRandomBackgroundTrack() -- play
+        end
+        
+      else
+        self.config.play_music = false
+        self.audio:stopBackgroundTrack() -- stop
+      end
+      
+  self.config.play_announcements = newconfig["playAnnouncements"]
+  
+  self:saveConfig()
 end
 
 

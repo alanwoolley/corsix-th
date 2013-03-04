@@ -305,6 +305,9 @@ static int l_mainloop(lua_State *L) {
 				l_pushtablebool(dispatcher, "globalAudio",
 						newConfig->globalAudio);
 
+				// Update FPS Limit
+				set_fps_limit(newConfig->fpsLimit);
+
 				nargs = 2;
 
 			}
