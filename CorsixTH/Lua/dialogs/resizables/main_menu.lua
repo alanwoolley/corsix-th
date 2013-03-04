@@ -28,13 +28,13 @@ local col_bg = {
 }
 
 function UIMainMenu:UIMainMenu(ui)
-  self:UIResizable(ui, 280, 390, col_bg)
+  self:UIResizable(ui, 280, 445, col_bg)
   
   local app = ui.app
   self.esc_closes = false
   self.modal_class = "main menu"
   self.on_top = true
-  self:setDefaultPosition(0.5, 0.1)
+  self:setDefaultPosition(0.5, 0.15)
 
   -- The main menu also shows the version number of the player's copy of the game.
   self.label_font = TheApp.gfx:loadFont("QData", "Font01V")
@@ -47,8 +47,9 @@ function UIMainMenu:UIMainMenu(ui)
   self:addBevelPanel(20, 150, 240, 60, col_bg):setLabel(_S.main_menu.load_game):makeButton(0, 0, 240, 60, nil, self.buttonLoadGame):setTooltip(_S.tooltip.main_menu.load_game)
   
   self:addBevelPanel(20, 215, 240, 60, col_bg):setLabel("Quick Load"):makeButton(0, 0, 240, 60, nil, self.buttonQuickLoad):setTooltip("Quick Load")
- 
-  self:addBevelPanel(20, 295, 240, 60, col_bg):setLabel(_S.main_menu.exit):makeButton(0, 0, 240, 60, nil, self.buttonExit):setTooltip(_S.tooltip.main_menu.exit)
+  self:addBevelPanel(20, 280, 240, 60, col_bg):setLabel("Settings"):makeButton(0, 0, 240, 60, nil, self.buttonSettings):setTooltip("Settings")
+  
+  self:addBevelPanel(20, 360, 240, 60, col_bg):setLabel(_S.main_menu.exit):makeButton(0, 0, 240, 60, nil, self.buttonExit):setTooltip(_S.tooltip.main_menu.exit)
 end
 
 function UIMainMenu:getSavedWindowPositionName()
@@ -62,7 +63,7 @@ function UIMainMenu:draw(canvas, x, y)
   x, y = self.x + x, self.y + y
 
   -- Move the version string up a bit if also showing the savegame version.
-  local ly = y + 375
+  local ly = y + 435
   if TheApp.config.debug then
     self.label_font:draw(canvas, _S.main_menu.savegame_version .. TheApp.savegame_version, x + 5, ly, 270, 0, "right")
     ly = ly - 15
@@ -86,6 +87,10 @@ end
 
 function UIMainMenu:buttonLoadGame()
   showloaddialog()
+end
+
+function UIMainMenu:buttonSettings()
+  showsettings()
 end
 
 function UIMainMenu:buttonQuickLoad()

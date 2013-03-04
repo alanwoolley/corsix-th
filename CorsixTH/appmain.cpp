@@ -85,6 +85,11 @@ static int showerrordialog(lua_State *L) {
 	return sendCommand(jvm, COMMAND_GAME_LOAD_ERROR);
 }
 
+static int showsettingsdialog(lua_State *L) {
+	LOG_INFO("Showing Settings Dialog");
+	return sendCommand(jvm, COMMAND_SHOW_SETTINGS_DIALOG);
+}
+
 static int gamespeedupdated(lua_State *L) {
 	LOG_INFO("Game speed updated");
 	int argc = lua_gettop(L);
@@ -279,6 +284,7 @@ int SDL_main(int argc, char** argv, JavaVM* vm, jobject configuration) {
 		lua_register(L, "quickload", quickload);
 		lua_register(L, "gamespeedupdated", gamespeedupdated);
 		lua_register(L, "showerrordialog", showerrordialog);
+		lua_register(L, "showsettings", showsettingsdialog);
 
 		lua_settop(L, 0);
 		lua_pushcfunction(L, CorsixTH_lua_stacktrace);
