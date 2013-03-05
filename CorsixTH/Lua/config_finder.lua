@@ -107,7 +107,8 @@ local config_defaults = {
   warmth_colors_display_default = 1,
   movies = true,
   play_intro = true,
-  scroll_region_size = 20
+  scroll_region_size = 20,
+  scroll_speed = 15
 }
 local fi = io.open(config_filename, "r")
 local config_values = {}

@@ -1114,6 +1114,8 @@ function App:updateConfig(newconfig)
       
   self.config.adviser_disabled = not newconfig["adviserEnabled"]
   self.config.scroll_region_size = newconfig["edgeScrollSize"]
+  self.config.scroll_speed = newconfig["edgeScrollSpeed"]
+  self.config.prevent_edge_scrolling = not newconfig["edgeScroll"]
    
   self:saveConfig()
 end

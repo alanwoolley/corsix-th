@@ -192,6 +192,8 @@ void populateConfiguration(JNIEnv* env, jobject configuration) {
 			env->GetMethodID(configclass, "getFpsLimit", "()I"));
 	jint edgeBordersSize = env->CallIntMethod(configuration,
 			env->GetMethodID(configclass, "getEdgeBordersSize", "()I"));
+	jint edgeScrollSpeed = env->CallIntMethod(configuration,
+			env->GetMethodID(configclass, "getEdgeScrollSpeed", "()I"));
 	jboolean playSoundFx = env->CallBooleanMethod(configuration,
 			env->GetMethodID(configclass, "getPlaySoundFx", "()Z"));
 	jboolean playMusic = env->CallBooleanMethod(configuration,
@@ -215,6 +217,7 @@ void populateConfiguration(JNIEnv* env, jobject configuration) {
 	masterConfig.adviserEnabled = (unsigned char) adviserEnabled;
 	masterConfig.edgeScroll = (unsigned char) edgeScrollEnabled;
 	masterConfig.edgeScrollSize = (int) edgeBordersSize;
+	masterConfig.edgeScrollSpeed = (int) edgeScrollSpeed;
 	LOG_INFO("Done");
 }
 

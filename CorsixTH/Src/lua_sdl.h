@@ -50,7 +50,7 @@ int luaopen_sdl(lua_State *L);
 void set_fps_limit(int fps);
 
 typedef struct {
-	int fpsLimit, edgeScrollSize;
+	int fpsLimit, edgeScrollSize, edgeScrollSpeed;
 	unsigned char playSoundFx, playMusic, playAnnouncements, adviserEnabled, edgeScroll;
 	char* originalFilesPath, *cthPath, *language;
 } Configuration;

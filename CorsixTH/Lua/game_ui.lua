@@ -405,6 +405,8 @@ function GameUI:onMouseMove(x, y, dx, dy)
   end
   
   local scroll_region_size = self.app.config.scroll_region_size
+  local scroll_power = self.app.config.scroll_speed
+  
   --if self.app.config.fullscreen then
     -- As the mouse is locked within the window, a 1px region feels a lot
     -- larger than it actually is.
@@ -413,12 +415,13 @@ function GameUI:onMouseMove(x, y, dx, dy)
     -- In windowed mode, a reasonable size is needed, though not too large.
   --  scroll_region_size = 8
   --end
+  
   if not self.app.config.prevent_edge_scrolling and (x < scroll_region_size
   or y < scroll_region_size or x >= self.app.config.width - scroll_region_size
   or y >= self.app.config.height - scroll_region_size) then
     local dx = 0
     local dy = 0
-    local scroll_power = 7
+    
     if x < scroll_region_size then
       dx = -scroll_power
     elseif x >= self.app.config.width - scroll_region_size then
