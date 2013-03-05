@@ -196,7 +196,8 @@ void populateConfiguration(JNIEnv* env, jobject configuration) {
 			env->GetMethodID(configclass, "getPlayMusic", "()Z"));
 	jboolean playAnnouncements = env->CallBooleanMethod(configuration,
 			env->GetMethodID(configclass, "getPlayAnnouncements", "()Z"));
-
+	jboolean adviserEnabled = env->CallBooleanMethod(configuration,
+				env->GetMethodID(configclass, "getAdviser", "()Z"));
 
 	masterConfig.cthPath = (char*) env->GetStringUTFChars(cthpath, 0);
 	masterConfig.originalFilesPath = (char*) env->GetStringUTFChars(
@@ -207,6 +208,7 @@ void populateConfiguration(JNIEnv* env, jobject configuration) {
 	masterConfig.playSoundFx = (unsigned char) playSoundFx;
 	masterConfig.playMusic = (unsigned char) playMusic;
 	masterConfig.playAnnouncements = (unsigned char) playAnnouncements;
+	masterConfig.adviserEnabled = (unsigned char) adviserEnabled;
 
 	LOG_INFO("Done");
 }

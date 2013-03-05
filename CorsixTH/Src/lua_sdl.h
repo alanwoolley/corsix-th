@@ -51,7 +51,7 @@ void set_fps_limit(int fps);
 
 typedef struct {
 	int fpsLimit;
-	unsigned char playSoundFx, playMusic, playAnnouncements;
+	unsigned char playSoundFx, playMusic, playAnnouncements, adviserEnabled;
 	char* originalFilesPath, *cthPath, *language;
 } Configuration;
 

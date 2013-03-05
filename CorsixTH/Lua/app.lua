@@ -1112,6 +1112,7 @@ function App:updateConfig(newconfig)
         self.audio:stopBackgroundTrack() -- stop
       end
       
+  self.config.adviser_disabled = not newconfig["adviserEnabled"]
   
   
   

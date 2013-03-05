@@ -299,7 +299,8 @@ static int l_mainloop(lua_State *L) {
 				l_pushtablebool(dispatcher, "playMusic", newConfig->playMusic);
 				l_pushtablebool(dispatcher, "playAnnouncements",
 						newConfig->playAnnouncements);
-
+				l_pushtablebool(dispatcher, "adviserEnabled",
+						newConfig->adviserEnabled);
 
 				// Update FPS Limit
 				set_fps_limit(newConfig->fpsLimit);
