@@ -13,6 +13,7 @@ LFS_SRC := LFS
 LPEG_SRC := LPEG
 FREETYPE_PATH := ../freetype2
 SDL_GFX_PATH := ../SDL_gfx
+FFMPEG_PATH := ../ffmpeg
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SDL_PATH)/include \
 					$(LOCAL_PATH)/$(AGG_PATH)/include \
@@ -25,7 +26,13 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SDL_PATH)/include \
 					$(LOCAL_PATH)/$(LFS_SRC) \
 					$(LOCAL_PATH)/$(LPEG) \
 					$(LOCAL_PATH)/$(SDL_GFX_PATH) \
-					$(LOCAL_PATH)/$(LUA_PATH)
+					$(LOCAL_PATH)/$(LUA_PATH) \
+					$(LOCAL_PATH)/$(FFMPEG_PATH) \
+					$(LOCAL_PATH)/$(FFMPEG_PATH)/libavcodec \
+					$(LOCAL_PATH)/$(FFMPEG_PATH)/libavformat \
+					$(LOCAL_PATH)/$(FFMPEG_PATH)/libavutil \
+					$(LOCAL_PATH)/$(FFMPEG_PATH)/libswresample \
+					$(LOCAL_PATH)/$(FFMPEG_PATH)/libswscale
 					
 LOCAL_CFLAGS := -DPLAY_MOD 
 
@@ -66,7 +73,7 @@ LOCAL_SRC_FILES := $(SDL_PATH)/src/main/android/SDL_android_main.cpp \
 			$(LPEG_SRC)/lpeg.c
 			
 
-LOCAL_SHARED_LIBRARIES := libLUA libSDL libSDL_mixer 
+LOCAL_SHARED_LIBRARIES := libLUA libSDL libSDL_mixer libffmpeg
 LOCAL_STATIC_LIBRARIES := libfreetype2 libSDL_gfx libAGG
 
 LOCAL_LDLIBS := -llog
