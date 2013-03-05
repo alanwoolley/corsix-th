@@ -1994,6 +1994,8 @@ end
 --!param new The current version of the save game format.
 function World:afterLoad(old, new)
 
+  print "World after load"
+
   if not self.original_savegame_version then
     self.original_savegame_version = old
   end

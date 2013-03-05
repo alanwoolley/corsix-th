@@ -190,6 +190,8 @@ void populateConfiguration(JNIEnv* env, jobject configuration) {
 
 	jint fpsLimit = env->CallIntMethod(configuration,
 			env->GetMethodID(configclass, "getFpsLimit", "()I"));
+	jint edgeBordersSize = env->CallIntMethod(configuration,
+			env->GetMethodID(configclass, "getEdgeBordersSize", "()I"));
 	jboolean playSoundFx = env->CallBooleanMethod(configuration,
 			env->GetMethodID(configclass, "getPlaySoundFx", "()Z"));
 	jboolean playMusic = env->CallBooleanMethod(configuration,
@@ -197,7 +199,9 @@ void populateConfiguration(JNIEnv* env, jobject configuration) {
 	jboolean playAnnouncements = env->CallBooleanMethod(configuration,
 			env->GetMethodID(configclass, "getPlayAnnouncements", "()Z"));
 	jboolean adviserEnabled = env->CallBooleanMethod(configuration,
-				env->GetMethodID(configclass, "getAdviser", "()Z"));
+			env->GetMethodID(configclass, "getAdviser", "()Z"));
+	jboolean edgeScrollEnabled = env->CallBooleanMethod(configuration,
+			env->GetMethodID(configclass, "getEdgeScroll", "()Z"));
 
 	masterConfig.cthPath = (char*) env->GetStringUTFChars(cthpath, 0);
 	masterConfig.originalFilesPath = (char*) env->GetStringUTFChars(
@@ -209,7 +213,8 @@ void populateConfiguration(JNIEnv* env, jobject configuration) {
 	masterConfig.playMusic = (unsigned char) playMusic;
 	masterConfig.playAnnouncements = (unsigned char) playAnnouncements;
 	masterConfig.adviserEnabled = (unsigned char) adviserEnabled;
-
+	masterConfig.edgeScroll = (unsigned char) edgeScrollEnabled;
+	masterConfig.edgeScrollSize = (int) edgeBordersSize;
 	LOG_INFO("Done");
 }
 
@@ -249,8 +254,6 @@ int SDL_main(int argc, char** argv, JavaVM* vm, jobject configuration) {
 	// Set FPS Limit
 	set_fps_limit(masterConfig.fpsLimit);
 
-
-
 	LOG_INFO("Starting CTH Android");
 	jvm = vm;
 
@@ -272,7 +275,7 @@ int SDL_main(int argc, char** argv, JavaVM* vm, jobject configuration) {
 
 		if (L == NULL) {
 			fprintf(stderr, "Fatal error starting CorsixTH: "
-			"Cannot open Lua state.\n");
+					"Cannot open Lua state.\n");
 			return 0;
 		}
 		lua_atpanic(L, CorsixTH_lua_panic);

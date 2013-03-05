@@ -294,6 +294,10 @@ static int l_mainloop(lua_State *L) {
 				l_pushtablestring(dispatcher, "language", newConfig->language);
 
 				l_pushtableint(dispatcher, "fpsLimit", newConfig->fpsLimit);
+				l_pushtableint(dispatcher, "edgeScrollSize",
+						newConfig->edgeScrollSize);
+				l_pushtablebool(dispatcher, "edgeScroll",
+						newConfig->edgeScroll);
 				l_pushtablebool(dispatcher, "playSoundFx",
 						newConfig->playSoundFx);
 				l_pushtablebool(dispatcher, "playMusic", newConfig->playMusic);
