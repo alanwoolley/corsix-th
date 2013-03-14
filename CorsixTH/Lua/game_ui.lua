@@ -29,12 +29,6 @@ local SDL = require "sdl"
 local lfs = require "lfs"
 local pathsep = package.config:sub(1, 1)
 
-local scrolling = false
-local auto_dx = 0.0
-local auto_dy = 0.0
-local auto_multiplier = 0.85
-local auto_threshold = 0.5
-
 function GameUI:GameUI(app, local_hospital)
   self:UI(app)
 
@@ -74,6 +68,9 @@ function GameUI:GameUI(app, local_hospital)
   
   self:setRandomAnnouncementTarget()
   self.ticks_since_last_announcement = 0
+  
+  self.momentum = app.config.scrolling_momentum
+  self.current_momentum = {x = 0.0, y = 0.0}
 end
 
 function GameUI:setupGlobalKeyHandlers()
@@ -380,7 +377,6 @@ end
 -- TODO: try to remove duplication with UI:onMouseMove
 function GameUI:onMouseMove(x, y, dx, dy)
   local repaint = UpdateCursorPosition(self.app.video, x, y)
-  scrolling = false
   if self.app.moviePlayer.playing then
     return false
   end
@@ -392,10 +388,8 @@ function GameUI:onMouseMove(x, y, dx, dy)
   end
   if self.buttons_down.mouse_middle then
     local zoom = self.zoom_factor
-    scrolling = true
-    auto_dx = -dx / zoom
-    auto_dy = -dy / zoom
-    self:scrollMap(auto_dx, auto_dy)
+    self.current_momentum = { x = -dx/zoom, y = -dy/zoom}
+    self:scrollMap(self.current_momentum.x, self.current_momentum.y)
     repaint = true
   end
   
@@ -469,7 +463,6 @@ function GameUI:onMouseMove(x, y, dx, dy)
 end
 
 function GameUI:onMouseUp(code, x, y)
-  scrolling = false
   if self.app.moviePlayer.playing then
     return UI.onMouseUp(self, code, x, y)
   end
@@ -529,15 +522,15 @@ end
 
 function GameUI:onTick()
   local repaint = UI.onTick(self)
-  if scrolling == false then
-    if auto_dy < auto_threshold and auto_dy > -auto_threshold and auto_dx < auto_threshold and auto_dx > -auto_threshold then
-      auto_dy = 0
-      auto_dx = 0
-    else
-      auto_dy = auto_dy * auto_multiplier
-      auto_dx = auto_dx * auto_multiplier
-      self:scrollMap(auto_dx, auto_dy)
-    end
+  if not self.buttons_down.mouse_middle then  
+    if math.abs(self.current_momentum.x) < 0.2 and math.abs(self.current_momentum.y) < 0.2 then
+	  -- Stop scrolling
+	  self.current_momentum = {x = 0.0, y = 0.0}
+	else
+	  self.current_momentum.x = self.current_momentum.x * self.momentum
+	  self.current_momentum.y = self.current_momentum.y * self.momentum
+	  self:scrollMap(self.current_momentum.x, self.current_momentum.y)
+	end
   end
   do
     local ticks_since_last_announcement = self.ticks_since_last_announcement

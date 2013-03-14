@@ -108,7 +108,8 @@ local config_defaults = {
   movies = true,
   play_intro = true,
   scroll_region_size = 20,
-  scroll_speed = 15
+  scroll_speed = 15,
+  scrolling_momentum = 0.8
 }
 local fi = io.open(config_filename, "r")
 local config_values = {}
