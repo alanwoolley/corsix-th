@@ -911,6 +911,11 @@ function GameUI:afterLoad(old, new)
     self.adviser.number_frames = 4
   end
 
+  if old < 68 then
+    self.current_momentum = { x = 0, y = 0 }
+    self.momentum = self.app.config.scrolling_momentum
+  end
+  
   return UI.afterLoad(self, old, new)
 end
 
