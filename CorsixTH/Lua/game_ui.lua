@@ -78,6 +78,7 @@ function GameUI:setupGlobalKeyHandlers()
 
   self:addKeyHandler("esc", self, self.setEditRoom, false)
   self:addKeyHandler("esc", self, self.showMenuBar)
+  self:addKeyHandler({"shift", "a"}, self, self.toggleAdviser)
 
   self:addKeyHandler({"ctrl", "d"}, self.app.world, self.app.world.dumpGameLog)
   self:addKeyHandler({"ctrl", "t"}, self.app, self.app.dumpStrings)
@@ -524,13 +525,13 @@ function GameUI:onTick()
   local repaint = UI.onTick(self)
   if not self.buttons_down.mouse_middle then  
     if math.abs(self.current_momentum.x) < 0.2 and math.abs(self.current_momentum.y) < 0.2 then
-	  -- Stop scrolling
-	  self.current_momentum = {x = 0.0, y = 0.0}
-	else
-	  self.current_momentum.x = self.current_momentum.x * self.momentum
-	  self.current_momentum.y = self.current_momentum.y * self.momentum
-	  self:scrollMap(self.current_momentum.x, self.current_momentum.y)
-	end
+      -- Stop scrolling
+      self.current_momentum = {x = 0.0, y = 0.0}
+    else
+      self.current_momentum.x = self.current_momentum.x * self.momentum
+      self.current_momentum.y = self.current_momentum.y * self.momentum
+      self:scrollMap(self.current_momentum.x, self.current_momentum.y)
+    end
   end
   do
     local ticks_since_last_announcement = self.ticks_since_last_announcement
@@ -673,6 +674,11 @@ end
 --! Toggles transparency of walls, i.e. enables if currently disabled, and vice versa
 function GameUI:toggleWallsTransparent()
   self:setWallsTransparent(not self.transparent_walls)
+end
+
+function UI:toggleAdviser()
+  self.app.config.adviser_disabled = not self.app.config.adviser_disabled
+  self.app:saveConfig()
 end
 
 local tutorial_phases
@@ -911,11 +917,14 @@ function GameUI:afterLoad(old, new)
     self.adviser.number_frames = 4
   end
 
-  if old < 68 then
+  if old < 75 then
     self.current_momentum = { x = 0, y = 0 }
     self.momentum = self.app.config.scrolling_momentum
   end
-  
+  if old < 70 then
+    self:addKeyHandler({"shift", "a"}, self, self.toggleAdviser)
+  end
+
   return UI.afterLoad(self, old, new)
 end
 

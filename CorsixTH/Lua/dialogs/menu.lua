@@ -167,6 +167,13 @@ function UIMenuBar:draw(canvas)
   for _, menu in ipairs(self.open_menus) do
     self:drawMenu(menu, canvas)
   end
+  
+  -- Draw clock
+  if self.ui.app.config.twentyfour_hour_clock then  
+    self.white_font:draw(canvas, os.date("%H:%M"), self.width-45, 2,  0)
+  else
+    self.white_font:draw(canvas, os.date("%I:%M %p"), self.width-65, 2,  0)
+  end  
 end
 
 function UIMenuBar:drawMenu(menu, canvas)
@@ -584,18 +591,31 @@ function UIMenuBar:makeMenu(app)
     end
   end
   options:appendCheckItem(_S.menu_options.lock_windows, boolean_runtime_config"lock_windows")
+
   options:appendCheckItem(_S.menu_options.edge_scrolling,
     not app.config.prevent_edge_scrolling,
     function(item) app.config.prevent_edge_scrolling = not item.checked end,
     nil,
     function() return not app.config.prevent_edge_scrolling end)
+
   options:appendCheckItem(_S.menu_options.adviser_disabled, 
     not app.config.adviser_disabled,
     function(item) 
       app.config.adviser_disabled = not item.checked
       app:saveConfig() 
+    end,
+    nil,
+    function() 
+      return not app.config.adviser_disabled
     end)
-  
+
+  options:appendCheckItem(_S.menu_options.twentyfour_hour_clock, 
+    app.config.twentyfour_hour_clock,
+    function(item)
+      app.config.twentyfour_hour_clock = item.checked
+      app:saveConfig()
+    end)
+    
   local function temperatureDisplay(method)
     --local map = app.world.map
     return method == 1, function()

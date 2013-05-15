@@ -384,7 +384,7 @@ information = {
     reputation = "Omdömmet ditt gikk under %d.",
     balance = "Banksaldoen din (minus lån) falt under %d.",
     percentage_killed = "Du drepte mer enn %d prosent av pasientene.", --bruke %-tegn?
-	cheat = "Dette var ditt eget valg, eller trykket du bare på feil knapp? Du klarer ikke engang å jukse skikkelig. Det var ikke så morsomt likevel?",
+    cheat = "Dette var ditt eget valg, eller trykket du bare på feil knapp? Du klarer ikke engang å jukse skikkelig. Det var ikke så morsomt likevel?",
   },
 }
 tooltip.information = {
@@ -1086,6 +1086,7 @@ menu_options = {
   autosave            = "  AUTOLAGRING  ",
   game_speed          = "  SPILLHASTIGHET  ",
   jukebox             = "  JUKEBOX  ",
+  twentyfour_hour_clock = "  24 TIMERS KLOKKE  ",
 }
 
 -- Menu Options Volume
@@ -2206,6 +2207,9 @@ adviser = {
     falling_6 = "Dette er ingen bowlingbane. Syke folk bör ikke behandles slik!",
     research_screen_open_1 = "Du må bygge en forskningsavdeling för du får tilgang til forskningsvinduet.",
     research_screen_open_2 = "Forskning er deaktivert for dette nivået.",
+    researcher_needs_desk_2 = "En av dine Forskere er glad for at du gir ham en pause. Om du ønsker å ha flere ansatte som faktisk forsker, så må du gi dem et skrivebord hver.",
+    researcher_needs_desk_1 = "En Forsker må ha et skrivebord for å kunne arbeide.",
+    researcher_needs_desk_3 = "Hver Forsker må ha hvert sitt skrivebord for å kunne gjøre jobben sin.",
   },
   
   -- Placement info

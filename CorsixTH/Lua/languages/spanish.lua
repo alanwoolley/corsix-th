@@ -1,4 +1,4 @@
---[[ Copyright (c) 2010 Víctor González a.k.a. "mccunyao"
+﻿--[[ Copyright (c) 2010 Víctor González a.k.a. "mccunyao"
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -61,7 +61,6 @@ tooltip.jukebox.fast_forward = "Avance rápido del reproductor de música"
 tooltip.patient_window.close = "Cerrar ventana"
 tooltip.staff_window.close = "Cerrar ventana"
 tooltip.build_room_window.close = "Salir de esta ventana y volver al juego"
-menu_options.jukebox = "  REPRODUCTOR DE MúSICA  "
 
 misc.hospital_open = "Hospital abierto"
 misc.save_success = "Partida guardada correctamente"
@@ -110,12 +109,21 @@ tooltip.casebook.cure_type.unknown = "Todavía no conoces la forma de curar esta
 tooltip.research_policy.no_research = "En este momento no se está investigando ningún apartado de esta categoría."
 tooltip.research_policy.research_progress = "Progreso para terminar el siguiente descubrimiento de esta categoría: %1%/%2%"
 
+menu_file = {
+  load =    " (MAYUS+L) CARGAR   ",
+  save =    " (MAYUS+S) GUARDAR   ",
+  restart = " (MAYUS+R) REINICIAR",
+  quit =    " (MAYUS+Q) SALIR   "
+}
+
 menu_options = {
+  jukebox = "  (J) REPRODUCTOR DE MúSICA  ",
   lock_windows = "  BLOQUEAR VENTANAS  ",
   edge_scrolling = "  DESPLAZAR POR BORDES  ",
   settings = "  CONFIGURACIóN  ",
-  adviser_disabled = "  CONSEJERO  ",
+  adviser_disabled = "  (MAYUS+A) CONSEJERO  ",
   warmth_colors = "  COLORES DE TEMPERATURA  ",
+  twentyfour_hour_clock = "  RELOJ DE 24 HORAS  "
 }
 
 menu_options_game_speed = {
@@ -145,10 +153,6 @@ menu_charts = {
   graphs        = "  (F8) GRáFICAS  ",
   policy        = "  (F9) NORMAS  ",
 }
-
-
--- The demo does not contain this string
-menu_file.restart = "  REINICIAR  "
 
 menu_debug = {
   jump_to_level               = "  CAMBIAR DE NIVEL  ",
@@ -195,6 +199,11 @@ adviser = {
     falling_6 = "¡Esto no es una bolera, no deberías tratar así a los enfermos!",
     research_screen_open_1 = "Tienes que construir un Departamento de Investigación para poder acceder a la pantalla de investigación.",
     research_screen_open_2 = "No se pueden realizar investigaciones en este nivel.",
+    researcher_needs_desk_1 = "Un investigador necesita una mesa en la que trabajar.",
+    researcher_needs_desk_2 = "Tu investigador agradece que le hayas dado un descanso. Si pretendías tener a más personas investigando, tienes que darles a cada uno una mesa para que trabajen.",
+    researcher_needs_desk_3 = "Cada investigador necesita su propia mesa para trabajar.",
+    nurse_needs_desk_1 = "Cada enfermera necesita su propia mesa para trabajar.",
+    nurse_needs_desk_2 = "Tu enfermera agradece que le hayas dado un descanso. Si pretendías tener a más personas trabajando en la enfermería, tienes que darles a cada una una mesa para que trabajen.",
   },
   cheats = {
     th_cheat = "¡Felicidades, has desbloqueado los trucos!",
@@ -222,7 +231,7 @@ fax = {
     decline_new_level = "Seguir jugando un poco más",
   },
   emergency = {
-    num_disease_singular = "Hay 1 persona que tiene %s y necesita atención inmediata.",
+    num_disease_singular = "Hay %d persona con %s y necesita ser atendida inmediatamente.",
     free_build = "Si tienes éxito, mejorarás tu reputación, pero si fracasas tu reputación caerá en picado.",
   },
   vip_visit_result = {
@@ -252,8 +261,8 @@ misc.not_yet_implemented = "(aún no implementado)"
 misc.no_heliport = "O no se han descubierto enfermedades, o no hay un helipuerto en este nivel.  A lo mejor necesitas comprar una mesa de recepción y contratar a una recepcionista."
 
 main_menu = {
-  new_game = "Nueva partida",
-  custom_level = "Nivel personalizado",
+  new_game = "Campaña",
+  custom_level = "Selección de nivel",
   load_game = "Cargar partida",
   options = "Opciones",
   savegame_version = "Versión del guardado: ",
@@ -262,10 +271,10 @@ main_menu = {
 }
 
 tooltip.main_menu = {
-  new_game = "Empezar una partida completamente nueva desde el principio",
-  custom_level = "Construir tu hospital en un nivel personalizado",
-  load_game = "Cargar una partida guardada",
-  options = "Ajustar la configuración",
+  new_game = "Empezar el primer nivel de la campaña.",
+  custom_level = "Construir tu hospital en un nivel concreto.",
+  load_game = "Cargar una partida guardada.",
+  options = "Ajustar la configuración.",
   exit = "¡No, no, por favor, no te vayas!",
 }
 
@@ -306,9 +315,9 @@ menu_list_window = {
 }
 
 tooltip.menu_list_window = {
-  name = "Pulsa aquí para ordenar la lista por el nombre",
-  save_date = "Pulsa aquí para ordenar la lista por la última fecha de modificación",
-  back = "Cerrar esta ventana",
+  name = "Pulsa aquí para ordenar la lista por el nombre.",
+  save_date = "Pulsa aquí para ordenar la lista por la última fecha de modificación.",
+  back = "Cerrar esta ventana.",
 }
 
 options_window = {
