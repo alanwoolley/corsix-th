@@ -36,9 +36,6 @@ SOFTWARE.
 #pragma comment(lib, "D3DX9.lib")
 #pragma warning(disable: 4996) // Deprecated fopen
 #endif
-#if SDL_VERSION_ATLEAST(2,0,0)
-SDL_Window *window;
-#endif
 
 template <class T>
 static void THDX9_OnDeviceChangeThunk(THDX9_DeviceResource *pThis,
@@ -166,16 +163,8 @@ LRESULT CALLBACK WindowProcIntercept(HWND hWnd, UINT iMessage, WPARAM wParam, LP
 
 bool THRenderTarget::create(const THRenderTargetCreationParams* pParams)
 {
-	SDL_Surface *pSDLSurface;
-#if SDL_VERSION_ATLEAST(2,0,0) 	
-	window = SDL_CreateWindow("CorsixTH",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,pParams->iWidth,pParams->iHeight,pParams->iSDLFlags);
-	pSDLSurface = SDL_GetWindowSurface(window);
-#else
-	pSDLSurface = SDL_SetVideoMode(pParams->iWidth,
+    SDL_Surface *pSDLSurface = SDL_SetVideoMode(pParams->iWidth,
         pParams->iHeight, pParams->iBPP, pParams->iSDLFlags);
-#endif
-	
-
     if(pSDLSurface == NULL)
     {
         m_sLastError = SDL_GetError();
@@ -187,16 +176,10 @@ bool THRenderTarget::create(const THRenderTargetCreationParams* pParams)
     oWindowInfo.version.major = SDL_MAJOR_VERSION;
     oWindowInfo.version.minor = SDL_MINOR_VERSION;
     oWindowInfo.version.patch = SDL_PATCHLEVEL;
-#if SDL_VERSION_ATLEAST(2,0,0) 	
-	  if(SDL_GetWindowWMInfo(window,&oWindowInfo) == 1)
-    {
-        hWindow = oWindowInfo.info.win.window;
-#else
-	  if(SDL_GetWMInfo(&oWindowInfo) == 1)
+    if(SDL_GetWMInfo(&oWindowInfo) == 1)
     {
         hWindow = oWindowInfo.window;
-#endif
-	  }
+    }
     else
     {
         m_sLastError = "Could not get HWND from SDL";

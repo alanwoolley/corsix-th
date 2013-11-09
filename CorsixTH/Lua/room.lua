@@ -189,7 +189,7 @@ end
 --! Checks if the room still needs the staff in it and otherwise 
 -- sends them away if they're needed somewhere else.
 function Room:findWorkForStaff()
-  -- It the the staff member is idle we can send him/her somewhere else
+  -- If the staff member is idle we can send him/her somewhere else
   for humanoid in pairs(self.humanoids) do
     -- Don't check handymen
     if class.is(humanoid, Staff) and humanoid.humanoid_class ~= "Handyman" and humanoid:isIdle() then
@@ -209,7 +209,7 @@ function Room:getMissingStaff(criteria)
   local result = {}
   for attribute, count in pairs(criteria) do
     for humanoid in pairs(self.humanoids) do
-      if class.is(humanoid, Staff) and humanoid:fulfillsCriterion(attribute) and not humanoid:isLeaving() then
+      if class.is(humanoid, Staff) and humanoid:fulfillsCriterion(attribute) and not humanoid:isLeaving() and not humanoid.fired then
         count = count - 1
       end
     end

@@ -22,8 +22,6 @@ local TH = require "TH"
 local ipairs, math_floor
     = ipairs, math.floor
 
-local ignore_next = false
-
 -- Visually, it looks better to have the object being placed not attached to a
 -- tile (so that it is always on top of walls, etc.), but for debugging it can
 -- be useful to attach it to a tile.
@@ -448,8 +446,6 @@ function UIPlaceObjects:tryNextOrientation()
 end
 
 function UIPlaceObjects:onMouseUp(button, x, y)
-
-	
   local repaint = Window.onMouseUp(self, button, x, y)
 
   -- We don't want to place objects because we are selecting new objects for adding in a room being built/edited

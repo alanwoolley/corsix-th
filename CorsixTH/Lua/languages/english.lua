@@ -49,7 +49,8 @@ confirmation.restart_level = "Are you sure you want to restart the level?"
 
 -- A small error in the introduction text of level 2
 introduction_texts.level2[6] = "Aim for a reputation of 300 a bank balance of $10,000 and 40 people cured."
-
+-- An override for the squits becoming the the squits see issue 1646
+adviser.research.drug_improved_1 = "%s drug has been improved by your Research Department."
 -------------------------------  NEW STRINGS  -------------------------------
 date_format = {
   daymonth = "%1% %2:months%",
@@ -74,12 +75,15 @@ menu_file = {
 }
 
 menu_options = {
+  sound = "  (ALT+S)  SOUND   ",
+  announcements = "  (ALT+A)  ANNOUNCEMENTS   ",
+  music = "  (ALT+M)  MUSIC   ",
   jukebox = "  (J) JUKEBOX  ",
   lock_windows = "  LOCK WINDOWS  ",
   edge_scrolling = "  EDGE SCROLLING  ",
-  settings = "  SETTINGS  ",
   adviser_disabled = "  (SHIFT+A) ADVISER  ",
   warmth_colors = "  WARMTH COLOURS  ",
+  wage_increase = "  WAGE REQUESTS",
   twentyfour_hour_clock = "  24 HOUR CLOCK  "
 }
 
@@ -96,6 +100,11 @@ menu_options_warmth_colors = {
   choice_1 = "  RED  ",
   choice_2 = "  BLUE GREEN RED  ",
   choice_3 = "  YELLOW ORANGE RED  ",
+}
+ 
+menu_options_wage_increase = {
+  grant = "    GRANT ",
+  deny =  "    DENY ",
 }
 
 -- Add F-keys to entries in charts menu (except briefing), also town_map was added.
@@ -147,7 +156,12 @@ adviser = {
     no_desk_1 = "If you want patients to come to your hospital, you will need to hire a receptionist and build her a desk to work at!",
     no_desk_2 = "Well done, that must be a world record: nearly a year and no patients! If you want to continue as Manager of this hospital, you will need to hire a receptionist and build a reception desk for her to work from!",
     no_desk_3 = "That's just brilliant, nearly a year and you don't have a staffed reception! How do you expect to get any patients, now get it sorted out and stop messing around!",
+    no_desk_4 = "A Receptionist needs to have her own work station to greet your patients as they arrive",
+    no_desk_5 = "Well it's about time, you should start to see some patients arriving soon!", 
+    no_desk_6 = "You have a receptionist, so how about building a reception desk for her to work from?",
+    no_desk_7 = "You've built the reception desk, so how about hiring a receptionist?  You won't see any patients until you get this sorted out you know!",
     cannot_afford = "You don't have enough money in the bank to hire that person!", -- I can't see anything like this in the original strings
+    cannot_afford_2 = "You don't have enough money in the bank to make that purchase!", 
     falling_1 = "Hey! that is not funny, watch where you click that mouse; someone could get hurt!",
     falling_2 = "Stop messing about, how would you like it?",
     falling_3 = "Ouch, that had to hurt, someone call a Doctor!",
@@ -211,7 +225,9 @@ letter = {
 install = {
   title = "--------------------------------- CorsixTH Setup ---------------------------------",
   th_directory = "CorsixTH needs a copy of the data files from the original Theme Hospital game (or demo) in order to run. Please use the below selector to locate the Theme Hospital install directory.",
+  ok = "OK",
   exit = "Exit",
+  cancel = "Cancel",
 }
 
 misc.not_yet_implemented = "(not yet implemented)"
@@ -221,7 +237,7 @@ main_menu = {
   new_game = "Campaign",
   custom_level = "Single Scenario",
   load_game = "Load Game",
-  options = "Options",
+  options = "Settings",
   savegame_version = "Savegame version: ",
   version = "Version: ",
   exit = "Exit",
@@ -233,6 +249,7 @@ tooltip.main_menu = {
   load_game = "Load a saved game",
   options = "Tweak various settings",
   exit = "No, no, please don't leave!",
+  quit = "You are about to quit from CorsixTH.   Are you sure this is what you want to do?",
 }
 
 load_game_window = {
@@ -251,7 +268,7 @@ custom_game_window = {
 }
 
 tooltip.custom_game_window = {
-  start_game_with_name = "Load the level %s",
+  start_game_with_name = "Information about this scenario which is using: %s           Briefing: %s",
   free_build = "Tick this box if you want to play without money or winning and losing conditions",
 }
 
@@ -278,7 +295,7 @@ tooltip.menu_list_window = {
 }
 
 options_window = {
-  caption = "Options",
+  caption = "Settings",
   option_on = "On",
   option_off = "Off",
   fullscreen = "Fullscreen",
@@ -286,13 +303,11 @@ options_window = {
   custom_resolution = "Custom...",
   width = "Width",
   height = "Height",
-  apply = "Apply",
-  cancel = "Cancel",
-  data_location = "Data location",
-  font_location = "Font location",
-  browse = "Browse...",
-  new_th_directory = "Here you can specify a new Theme Hospital installation directory. As soon as you choose the new directory the game will be restarted.",
+  audio = "Global Audio",
+  customise = "Customise",
+  folder = "Folders",
   language = "Game language",
+  apply = "Apply",
   cancel = "Cancel",
   back = "Back",
 }
@@ -306,16 +321,74 @@ tooltip.options_window = {
   height = "Enter desired screen height",
   apply = "Apply the entered resolution",
   cancel = "Return without changing the resolution",
-  data_location = "The directory of the original Theme Hospital installation, which is required to run CorsixTH",
-  font_location = "Location of a font file that is capable of displaying Unicode characters required by your language. If this is not specified you will not be able to choose languages that need more characters than the original game can supply. Example: Russian and Chinese",
+  audio_button = "Turn on or off all game audio", 
+  audio_toggle = "Toggle on or off",   
+  customise_button = "More settings you can change to customise your game play experience",
+  folder_button = "Folder Options",  
   language = "The language texts in the game will appear in",
   select_language = "Select the game language",
   language_dropdown_item = "Choose %s as language",
-  original_path = "The currently chosen directory of the original Theme Hospital installation",
-  browse = "Browse for another location of a Theme Hospital installation (current location: %1%)",
-  browse_font = "Browse for another font file (current location: %1%)",
-  no_font_specified = "No location specified yet!",
-  back = "Close the options window",
+  back = "Close the Settings window",
+}
+
+customise_window = {
+  caption = "Custom Settings",
+  option_on = "On",
+  option_off = "Off",
+  back = "Back",
+  movies = "Global Movie Control",
+  intro = "Play Intro Movie",
+  paused = "Build on Paused",
+  volume = "Volume down hotkey",
+  aliens = "Alien Patients",
+  fractured_bones = "Fractured Bones",
+  average_contents = "Average contents",
+}
+
+tooltip.customise_window = {
+  movies = "Global movie control, this will allow you to disable all the movies",  
+  intro = "Turn off or on the intro movie, global movies will need to be on if you want the intro movie to play each time you load CorsixTH",
+  paused = "In Theme Hospital the player would only be allowed to use the top menu if the game was paused. That is the default setting in CorsixTH too, but by turning this on everything is allowed while the game is paused",
+  volume = "If the volume down button is opening the casebook as well, turn this on to change the hotkey for the casebook to Shift + C",
+  aliens = "Because of the lack of proper animations we have by default made patients with Alien DNA so that they can only come from an emergency. To allow patients with Alien DNA to visit your hospital, other than by an emergency, turn this off",
+  fractured_bones = "Because of a poor animation we have by default made it so there are no patients with Fractured Bones that are female. To allow female patients with Fractured Bones to visit your hospital, turn this off",
+  average_contents = "If you would like the game to remember what extra objects you usually add when you build rooms, then turn this option on",  
+  back = "Close this menu and go back to the Settings Menu",
+}
+
+folders_window = {
+  caption = "Folder Locations",
+  data_label = "TH Data",
+  font_label = "Font",  
+  music_label = "MP3's",
+  savegames_label = "Saves",
+  screenshots_label = "Screenshots",
+  -- next four are the captions for the browser window, which are called from the folder setting menu
+  new_th_location = "Here you can specify a new Theme Hospital installation directory. As soon as you choose the new directory the game will be restarted.", 
+  savegames_location = "Select the directory you want to use for Saves",
+  music_location = "Select the directory you want to use for your Music", 
+  screenshots_location = "Select the directory you want to use for Screenshots",
+  back  = "Back",
+}
+
+tooltip.folders_window = {
+  browse = "Browse for folder location",
+  data_location = "The directory of the original Theme Hospital installation, which is required to run CorsixTH",
+  font_location = "Location of a font file that is capable of displaying Unicode characters required by your language. If this is not specified you will not be able to choose languages that need more characters than the original game can supply. Example: Russian and Chinese",    
+  savegames_location = "By default, the Saves directory is alongside the config file and will be used for storing saved games in. Should this not be suitable, then you can choose your own, just browse to the directory which you want to use.", 
+  screenshots_location = "By default, the Screenshots are stored in a folder alongside the config file. Should this not be suitable, then you can choose your own, just browse to the directory which you want to use.",  
+  music_location = "Select a location for your mp3 music files.  You must have created the directory already, then browse to the directory which you just created.",
+  browse_data = "Browse for another location of a Theme Hospital installation (current location: %1%)", 
+  browse_font = "Browse for another font file ( current location: %1% )",
+  browse_saves = "Browse for another location for your Saves directory  ( Current location: %1% ) ",
+  browse_screenshots = "Browse for another location for your Screenshots directory  ( Current location: %1% ) ",
+  browse_music = "Browse for another location for your Music directory  ( Current location: %1% ) ",  
+  no_font_specified = "No font location specified yet!",  
+  not_specified = "No folder location specified yet!",
+  default = "Default location",
+  reset_to_default = "Reset the directory to its default location",
+ -- original_path = "The currently chosen directory of the original Theme Hospital installation", -- where is this used, I have left if for the time being?
+  back  = "Close this menu and go back to the Settings Menu",
 }
 
 font_location_window = {
@@ -373,13 +446,16 @@ errors = {
   load_prefix = "Error while loading game: ",
   map_file_missing = "Could not find the map file %s for this level!",
   minimum_screen_size = "Please enter a screen size of at least 640x480.",
-  maximum_screen_size = "Please enter a screen size of at most 3000x2000.",
   unavailable_screen_size = "The screen size you requested is not available in fullscreen mode.",
+  alien_dna = "NOTE: There are no animations for Alien patients for sitting down, opening or knocking on doors etc. So, like with Theme Hospital to do these things they will appear to change to normal looking and then change back.  Patients with Alien DNA will only appear if they are set to in the level file", 
+  fractured_bones = "NOTE: The animation for female patients with Fractured Bones is not perfect",
 }
 
 confirmation = {
   needs_restart = "Changing this setting requires CorsixTH to restart. Any unsaved progress will be lost. Are you sure you want to do this?",
   abort_edit_room = "You are currently building or editing a room. If all required objects are placed it will be finished, but otherwise it will be deleted. Continue?",
+  maximum_screen_size = "The screen size you have entered is greater than 3000 x 2000.  Larger resolutions are possible, but will require better hardware in order to maintain a playable frame rate.  Are you sure you want to continue?",
+  music_warning = "Before choosing to use mp3's for your in game music, you will need to have smpeg.dll or the equivalent for your operating system, otherwise you will have no music in the game.  Currently there is no equivalent file for 64bit systems.  Do you want to continue?",
 }
 
 information = {
@@ -478,7 +554,7 @@ tooltip.cheats_window = {
 introduction_texts = {
   demo = {
     "Welcome to the demo hospital!",
-    "Unfortunately the demo version only contains this level (apart from custom levels). However, there is more than enough to do here to keep you busy for a while!",
+    "Unfortunately the demo version only contains this level. However, there is more than enough to do here to keep you busy for a while!",
     "You will encounter various diseases that require different rooms to cure. From time to time, emergencies may occur. And you will need to research additional rooms using a research room.",
     "Your goal is to earn $100,000, have a hospital value of $70,000 and a reputation of 700, while having cured at least 75% of your patients.",
     "Make sure your reputation does not fall below 300 and that you don't kill off more than 40% of your patients, or you will lose.",
@@ -501,6 +577,18 @@ tooltip.calls_dispatcher = {
   close = "Close the calls dispatcher dialog",
 }
 
+update_window = {
+  caption = "Update Available!",
+  new_version = "New Version:",
+  current_version = "Current Version:",
+  download = "Go to download page",
+  ignore = "Skip and go to main menu",
+}
+
+tooltip.update_window = {
+  download = "Go to the download page for the very latest version of CorsixTH",
+  ignore = "Ignore this update for now. You will be notified again when you next open CorsixTH",
+}
 
 --------------------------------  UNUSED  -----------------------------------
 ------------------- (kept for backwards compatibility) ----------------------

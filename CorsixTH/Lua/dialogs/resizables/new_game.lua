@@ -78,13 +78,20 @@ function UINewGame:UINewGame(ui)
 
   self.border_sprites = app.gfx:loadSpriteTable("Bitmap", "aux_ui", true)
   self.start_tutorial = false
-  self.difficulty = 2
+  self.difficulty = 1
   
-  self.available_difficulties = {
-    {text = _S.new_game_window.easy,   tooltip = _S.tooltip.new_game_window.easy,   param = "easy"},
+  
+  local avail_diff = {
     {text = _S.new_game_window.medium, tooltip = _S.tooltip.new_game_window.medium, param = "full"},
-    {text = _S.new_game_window.hard,   tooltip = _S.tooltip.new_game_window.hard,   param = "hard"},
   }
+  if TheApp.fs:getFilePath("Levels", "Easy01.SAM") then
+    table.insert(avail_diff, 1, {text = _S.new_game_window.easy, tooltip = _S.tooltip.new_game_window.easy, param = "easy"})
+    self.difficulty = 2
+  end
+  if TheApp.fs:getFilePath("Levels", "Hard01.SAM") then
+    avail_diff[#avail_diff + 1] = {text = _S.new_game_window.hard, tooltip = _S.tooltip.new_game_window.hard, param = "hard"}
+  end
+  self.available_difficulties = avail_diff
 
   self.default_button_sound = "selectx.wav"
   -- Window parts definition
@@ -93,9 +100,9 @@ function UINewGame:UINewGame(ui)
 
   -- Player Name
   self.player_name = app.config.player_name or os.getenv("USER") or os.getenv("USERNAME") or "PLAYER"
-  self:addBevelPanel(20, 50, 140, 30, col_shadow, col_bg, col_bg)
+  self:addBevelPanel(20, 45, 140, 30, col_shadow, col_bg, col_bg)
     :setLabel(_S.new_game_window.player_name).lowered = true
-  self.name_textbox = self:addBevelPanel(160, 50, 140, 30, col_textbox, col_highlight, col_shadow)
+  self.name_textbox = self:addBevelPanel(165, 45, 140, 30, col_textbox, col_highlight, col_shadow)
     :setTooltip(_S.tooltip.new_game_window.player_name):setAutoClip(true)
     :makeTextbox(
     --[[persistable:new_game_confirm_name]]function()
@@ -113,18 +120,18 @@ function UINewGame:UINewGame(ui)
   -- Tutorial
   self:addBevelPanel(20, 80, 140, 30, col_shadow, col_bg, col_bg)
     :setLabel(_S.new_game_window.tutorial).lowered = true
-  self:addBevelPanel(160, 80, 140, 30, col_bg):setLabel(_S.new_game_window.option_off)
-    :makeToggleButton(0, 0, 140, 30, nil, self.buttonTutorial):setTooltip(_S.tooltip.new_game_window.tutorial)
+  self:addBevelPanel(165, 80, 140, 30, col_bg):setLabel(_S.new_game_window.option_off)
+    :makeToggleButton(0, 0, 135, 30, nil, self.buttonTutorial):setTooltip(_S.tooltip.new_game_window.tutorial)
 
   -- Difficulty
-  self:addBevelPanel(20, 110, 140, 30, col_shadow, col_bg, col_bg)
+  self:addBevelPanel(20, 115, 140, 30, col_shadow, col_bg, col_bg)
     :setLabel(_S.new_game_window.difficulty).lowered = true
-  self:addBevelPanel(160, 110, 140, 30, col_bg):setLabel(self.available_difficulties[self.difficulty].text)
-    :makeToggleButton(0, 0, 140, 30, nil, self.dropdownDifficulty):setTooltip(_S.tooltip.new_game_window.difficulty)
+  self:addBevelPanel(165, 115, 140, 30, col_bg):setLabel(self.available_difficulties[self.difficulty].text)
+    :makeToggleButton(0, 0, 135, 30, nil, self.dropdownDifficulty):setTooltip(_S.tooltip.new_game_window.difficulty)
 
   -- Start and Cancel
-  self:addBevelPanel(20, 160, 135, 40, col_bg):setLabel(_S.new_game_window.start):makeButton(0, 0, 137, 40, nil, self.buttonStart):setTooltip(_S.tooltip.new_game_window.start)
-  self:addBevelPanel(165, 160, 135, 40, col_bg):setLabel(_S.new_game_window.cancel):makeButton(0, 0, 137, 40, nil, self.buttonCancel):setTooltip(_S.tooltip.new_game_window.cancel)
+  self:addBevelPanel(20, 165, 140, 40, col_bg):setLabel(_S.new_game_window.start):makeButton(0, 0, 135, 40, nil, self.buttonStart):setTooltip(_S.tooltip.new_game_window.start)
+  self:addBevelPanel(165, 165, 140, 40, col_bg):setLabel(_S.new_game_window.cancel):makeButton(0, 0, 135, 40, nil, self.buttonCancel):setTooltip(_S.tooltip.new_game_window.cancel)
 end
 
 function UINewGame:saveToConfig()
@@ -168,7 +175,7 @@ function UINewGame:buttonTutorial(checked, button)
 end
 
 function UINewGame:dropdownDifficulty(activate, button)
-  if activate then
+  if activate and #self.available_difficulties > 1 then
     self.difficulty_dropdown = UIDropdown(self.ui, self, button, self.available_difficulties, self.selectDifficulty)
     self:addWindow(self.difficulty_dropdown)
   else

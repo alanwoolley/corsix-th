@@ -182,17 +182,29 @@ function World:setUI(ui)
   self.ui:addKeyHandler("5", self, self.setSpeed, "And then some more")
   
   self.ui:addKeyHandler("+", self, self.adjustZoom,  1)
+  self.ui:addKeyHandler({"shift", "+"}, self, self.adjustZoom, 5)
   self.ui:addKeyHandler("-", self, self.adjustZoom, -1)
+  self.ui:addKeyHandler({"shift", "-"}, self, self.adjustZoom, -5)
 end
 
 function World:adjustZoom(delta)
   local scr_w = self.ui.app.config.width
+  local factor = self.ui.app.config.zoom_speed
   local virtual_width = scr_w / (self.ui.zoom_factor or 1)
-  virtual_width = virtual_width - delta * 40
+  
+  -- The modifier is a normal distribution to make it more difficult to zoom at the extremes
+  local modifier = math.exp(1)^(-((self.ui.zoom_factor-1)^2)/(2 * 1))/(math.sqrt(2*math.pi)*1)
+  
+  if modifier < 0.05 or modifier > 1 then
+    modifier = 0.05
+  end
+
+  virtual_width = virtual_width - delta * factor * modifier
   if virtual_width < 200 then
     return false
   end
-  return self.ui:setZoom(scr_w / virtual_width)
+  
+  return self.ui:setZoom(scr_w/virtual_width)
 end
 
 function World:initLevel(app)
@@ -1409,7 +1421,7 @@ function World:winGame(player_no)
       text[1] = text[1]:format(self.hospitals[player_no].name)
       text[2] = text[2]:format(self.hospitals[player_no].salary_offer)
       text[3] = text[3]:format(_S.level_names[self.map.level_number + 1])
-      if no < 12 then
+      if has_next then
         choice_text = _S.fax.choices.accept_new_level
         choice = 1
       else
@@ -1433,7 +1445,20 @@ function World:winGame(player_no)
         {text = _S.fax.choices.decline_new_level, choice = "stay_on_level"},
       },
     }
-    self.ui.bottom_panel:queueMessage("information", message, nil, 28*24, 2)
+    local --[[persistable:world_win_game_message_close_callback]] function callback ()
+      local world = self.ui.app.world
+      if world then
+        world.hospitals[player_no].game_won = false
+        if world:isCurrentSpeed("Pause") then
+          world:setSpeed(world.prev_speed)
+        end  
+      end
+    end
+    self.hospitals[player_no].game_won = true
+    self:setSpeed("Pause")
+    self.ui.app.video:setBlueFilterActive(false)
+    self.ui.bottom_panel:queueMessage("information", message, nil, 0, 2, callback)
+    self.ui.bottom_panel:openLastMessage()    
   end
 end
 
@@ -1807,6 +1832,10 @@ function World:objectPlaced(entity, id)
     and not self.hospitals[1]:hasStaffOfCategory("Receptionist") then
       -- TODO: Will not work correctly for multiplayer
       self.ui.adviser:say(_A.room_requirements.reception_need_receptionist)
+    elseif self.hospitals[1]:hasStaffOfCategory("Receptionist") and self.object_counts["reception_desk"] == 1 
+    and not self.hospitals[1].receptionist_msg and self.month > 3 then
+      self.ui.adviser:say(_A.warnings.no_desk_5)
+      self.hospitals[1].receptionist_msg = true
     end
     -- A new reception desk? Then add it to the reception desk set.
     self:getLocalPlayerHospital().reception_desks[entity] = true
@@ -1993,8 +2022,6 @@ end
 --!param old The old version of the save game.
 --!param new The current version of the save game format.
 function World:afterLoad(old, new)
-
-  print "World after load"
 
   if not self.original_savegame_version then
     self.original_savegame_version = old
@@ -2226,12 +2253,19 @@ function World:afterLoad(old, new)
       end
     end
   end
-  
+  if old < 77 then
+    self.ui:addKeyHandler({"shift", "+"}, self, self.adjustZoom,  5)
+    self.ui:addKeyHandler({"shift", "-"}, self, self.adjustZoom, -5)  
+  end
   -- Now let things inside the world react.
   for _, cat in pairs({self.hospitals, self.entities, self.rooms}) do
     for _, obj in pairs(cat) do
       obj:afterLoad(old, new)
     end
+  end
+  if old < 77 then
+    self.ui:addKeyHandler({"shift", "+"}, self, self.adjustZoom, 5)
+    self.ui:addKeyHandler({"shift", "-"}, self, self.adjustZoom, -5)  
   end
   
   self.savegame_version = new

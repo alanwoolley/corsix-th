@@ -27,6 +27,7 @@ function Patient:Patient(...)
   self.should_knock_on_doors = true
   self.treatment_history = {}
   self.has_fallen = 1
+  self.has_vomitted = 0
   self.action_string = ""
 end              
 
@@ -179,6 +180,7 @@ function Patient:treated() -- If a drug was used we also need to pay for this
       end
       self.hospital.num_cured = hospital.num_cured + 1
       self.hospital.num_cured_ty = hospital.num_cured_ty + 1
+      self.hospital:msgCured()      
       local casebook = hospital.disease_casebook[self.disease.id]
       casebook.recoveries = casebook.recoveries + 1
       if self.is_emergency then
@@ -222,6 +224,7 @@ function Patient:die()
     local casebook = hospital.disease_casebook[self.disease.id]
     casebook.fatalities = casebook.fatalities + 1
   end
+  hospital:msgKilled()
   self:setMood("dead", "activate")
   self.world.ui:playSound "boo.wav" -- this sound is always heard
   self.going_home = true
@@ -238,7 +241,7 @@ function Patient:die()
 end
 
 function Patient:canPeeOrPuke(current)
-  return ((current.name == "walk" or current.name == "idle" or current.name == "seek_room")
+  return ((current.name == "walk" or current.name == "idle" or current.name == "seek_room" or current.name == "queue")
          and not self.going_home and self.world.map.th:getCellFlags(self.tile_x, self.tile_y).buildable)
 end
   -- animations for when there is an earth quake
@@ -316,7 +319,7 @@ end
 function Patient:vomit()
   local current = self.action_queue[1]
   --Only vomit under these conditions. Maybe I should add a vomit for patients in queues too?
-  if self:canPeeOrPuke(current) then
+  if self:canPeeOrPuke(current) and self.has_vomitted == 0 then
     self:queueAction({
       name = "vomit",
       must_happen = true
@@ -343,6 +346,7 @@ function Patient:vomit()
     else
       self:finishAction()
     end
+    self.has_vomitted = self.has_vomitted + 1
     self:changeAttribute("happiness", -0.02) -- being sick makes you unhappy
   else
     return 
@@ -479,6 +483,9 @@ function Patient:tickDay()
     elseif self.waiting == 30 then
       self:checkWatch()
     end
+  if self.has_vomitted and self.has_vomitted > 0 then 
+    self.has_vomitted = 0
+  end
   end
 
   -- if patients are getting unhappy, then maybe we should see this!
@@ -531,8 +538,12 @@ function Patient:tickDay()
     self.attributes["health"] = 0.0
   -- is there time to say a prayer
   elseif self.attributes["health"] == 0.0 then
+    local room = self:getRoom()
     if not self:getRoom() and not self.action_queue[1].is_leaving then
       self:die()
+    elseif self.in_room and self.attributes["health"] == 0.0 then
+      room:makeHumanoidLeave(self)
+      self:die()     
     end
     --dead people aren't thirsty
     return
@@ -547,8 +558,8 @@ function Patient:tickDay()
   -- Vomitings.
   if self.vomit_anim and not self:getRoom() and not self.action_queue[1].is_leaving and not self.action_queue[1].is_entering then
     --Nausea level is based on health then proximity to vomit is used as a multiplier.
-    --Only a patient with a health value of less than 0.7 can be the inital vomiter, however :)
-    local initialVomitMult = 0.02   --The initial chance of vomiting.
+    --Only a patient with a health value of less than 0.8 can be the inital vomiter, however :)
+    local initialVomitMult = 0.002   --The initial chance of vomiting.
     local proximityVomitMult = 1.5  --The multiplier used when in proximity to vomit.
     local nausea = (1.0 - self.attributes["health"]) * initialVomitMult
     local foundVomit = {}
@@ -580,10 +591,12 @@ function Patient:tickDay()
         self:changeAttribute("happiness", -0.0004)
       end
     end) -- End of findObjectNear
-    
-    if self.attributes["health"] <= 0.7 or numVomit > 0 or self.attributes["happiness"] < 0.4 then
+    -- As we don't yet have rats, rat holes and dead rats the chances of vomitting are slim
+    -- as a temp  fix for this I have added 0.5 to the < nausea equation, 
+    -- this may want adjusting or removing when the other factors are in the game MarkL 
+    if self.attributes["health"] <= 0.8 or numVomit > 0 or self.attributes["happiness"] < 0.6 then
       nausea = nausea * ((numVomit+1) * proximityVomitMult)
-      if math.random() < nausea then
+      if math.random() < nausea + 0.5 then
         self:vomit()
       end
     end

@@ -23,7 +23,7 @@
 ;---------------------------------- Definitions for the game -----------------------------------
 
 !define PRODUCT_NAME "CorsixTH"
-!define PRODUCT_VERSION "Trunk"
+!define PRODUCT_VERSION "0.30"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
 !define PRODUCT_STARTMENU_REGVAL "NSIS:StartMenuDir"
@@ -59,7 +59,7 @@ RequestExecutionLevel admin
 ; Welcome page
 !insertmacro MUI_PAGE_WELCOME
 ; License page
-!insertmacro MUI_PAGE_LICENSE "..\CorsixTH\LICENSE.txt"
+!insertmacro MUI_PAGE_LICENSE "..\LICENSE"
 ; Directory page
 !define MUI_PAGE_CUSTOMFUNCTION_LEAVE ValidateDirectory
 !insertmacro MUI_PAGE_DIRECTORY
@@ -106,9 +106,11 @@ Icon "..\CorsixTH\corsixTH.ico"
 !insertmacro MUI_LANGUAGE "German"
 !insertmacro MUI_LANGUAGE "Hungarian"
 !insertmacro MUI_LANGUAGE "Italian"
+!insertmacro MUI_LANGUAGE "Korean"
 !insertmacro MUI_LANGUAGE "Norwegian"
 !insertmacro MUI_LANGUAGE "Polish"
 !insertmacro MUI_LANGUAGE "Portuguese"
+!insertmacro MUI_LANGUAGE "PortugueseBR"
 !insertmacro MUI_LANGUAGE "Russian"
 !insertmacro MUI_LANGUAGE "SimpChinese"
 !insertmacro MUI_LANGUAGE "Spanish"
@@ -239,8 +241,8 @@ Section "MainSection" SEC01
   SetOutPath "$INSTDIR"
   File ..\CorsixTH\*.lua
   File ..\CorsixTH\changelog.txt
-  File ..\CorsixTH\LICENSE.txt
-  File ..\CorsixTH\README.txt
+  File ..\LICENSE
+  File ..\README
   
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
   !insertmacro MUI_STARTMENU_WRITE_END

@@ -128,7 +128,7 @@ function ResearchRoom:roomFinished()
     Researcher = number,
   }
   -- Is this the first research department built?
-  if not self.hospital.research_dep_built then
+  if not self.hospital.research_dep_built and not TheApp.using_demo_files then
     self.hospital.research_dep_built = true
     self.world.ui.adviser:say(_A.information.initial_general_advice
     .research_now_available)
@@ -197,7 +197,7 @@ end
 function ResearchRoom:getStaffMember()
   local staff
   for staff_member, _ in pairs(self.staff_member_set) do
-    if staff then
+    if staff and not staff.fired then
       if staff.profile.skill > staff_member.profile.skill then
         staff = staff_member
       end

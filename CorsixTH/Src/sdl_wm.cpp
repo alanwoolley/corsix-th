@@ -22,25 +22,15 @@ SOFTWARE.
 
 #include "config.h"
 #include "lua_sdl.h"
-#include "th_gfx.h"
 #ifdef CORSIX_TH_USE_WIN32_SDK
 #include <windows.h>
 #include <SDL_syswm.h>
 #include "../resource.h"
 #endif
 
-#if SDL_VERSION_ATLEAST(2,0,0)
-extern SDL_Window *window;
-#endif
-
 static int l_set_caption(lua_State *L)
 {
-	#if SDL_VERSION_ATLEAST(2,0,0)
-	SDL_SetWindowTitle(window,luaL_checkstring(L, 1));
-	#else
-	SDL_WM_SetCaption(luaL_checkstring(L, 1), NULL);
-	#endif
-
+    SDL_WM_SetCaption(luaL_checkstring(L, 1), NULL);
     return 0;
 }
 
@@ -55,15 +45,9 @@ static int l_set_icon_win32(lua_State *L)
     oWindowInfo.version.major = SDL_MAJOR_VERSION;
     oWindowInfo.version.minor = SDL_MINOR_VERSION;
     oWindowInfo.version.patch = SDL_PATCHLEVEL;
-#if SDL_VERSION_ATLEAST(2,0,0) 	
-	  if(SDL_GetWindowWMInfo(window,&oWindowInfo) == 1)
-    {
-        HWND hWindow = oWindowInfo.info.win.window;
-#else
-	  if(SDL_GetWMInfo(&oWindowInfo) == 1)
+    if(SDL_GetWMInfo(&oWindowInfo) == 1)
     {
         HWND hWindow = oWindowInfo.window;
-#endif
         HICON hIcon = LoadIcon((HINSTANCE)GetModuleHandle(NULL), (LPCTSTR)IDI_CORSIXTH);
         SetClassLongPtr(hWindow, GCLP_HICON, (LONG_PTR)hIcon);
         SetClassLongPtr(hWindow, GCLP_HICONSM, (LONG_PTR)hIcon);

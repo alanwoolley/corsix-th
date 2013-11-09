@@ -93,6 +93,9 @@ high_score = {
 --String text gets outside of window
 confirmation.quit = "¿Seguro que quieres salir del juego?                       "
 
+--Typo found on the official translation
+tooltip.rooms.dna_fixer = "El médico usa el Reparador de ADN para curar a los pacientes con ADN alienígena"
+
 -------------------------------  NEW STRINGS  -------------------------------
 date_format = {
   daymonth = "%1% %2:months%",
@@ -117,12 +120,15 @@ menu_file = {
 }
 
 menu_options = {
+  sound = "  (ALT+S)  SONIDO  ",
+  announcements = "  (ALT+A)  ANUNCIOS  ",
+  music = "  (ALT+M)  MúSICA  ",
   jukebox = "  (J) REPRODUCTOR DE MúSICA  ",
   lock_windows = "  BLOQUEAR VENTANAS  ",
   edge_scrolling = "  DESPLAZAR POR BORDES  ",
-  settings = "  CONFIGURACIóN  ",
   adviser_disabled = "  (MAYUS+A) CONSEJERO  ",
   warmth_colors = "  COLORES DE TEMPERATURA  ",
+  wage_increase = "  PETICIONES DE SUELDO  ",
   twentyfour_hour_clock = "  RELOJ DE 24 HORAS  "
 }
 
@@ -139,6 +145,11 @@ menu_options_warmth_colors = {
   choice_1 = "  ROJO  ",
   choice_2 = "  AZUL, VERDE, ROJO  ",
   choice_3 = "  AMARILLO, NARANJA, ROJO  ",
+}
+ 
+menu_options_wage_increase = {
+  grant = "    CONCEDER ",
+  deny =  "    RECHAZAR ",
 }
 
 -- Add F-keys to entries in charts menu (except briefing), also town_map was added.
@@ -190,7 +201,12 @@ adviser = {
     no_desk_1 = "¡Si quieres que los pacientes vayan a tu hospital, necesitas contratar a una recepcionista y construir una mesa donde pueda trabajar!",
     no_desk_2 = "¡Enhorabuena, has batido un récord mundial: ha pasado un año y no ha aparecido ni un paciente! ¡Si quieres seguir mandando en este hospital, tendrás que contratar a una recepcionista y construirla una mesa donde pueda trabajar!",
     no_desk_3 = "¡Fabuloso, casi ha pasado un año y no tienes personal de recepción! ¿Cómo quieres que vengan a ti los pacientes? ¡Arréglalo y deja de perder el tiempo!",
+    no_desk_4 = "Una recepcionista necesita una mesa para poder atender a los pacientes que vengan.",
+    no_desk_5 = "¡Ya iba siendo hora! Los pacientes deberían empezar a llegar pronto.", 
+    no_desk_6 = "Tienes una recepcionista, ¿qué tal si le construyes una mesa de recepción para que pueda trabajar?",
+    no_desk_7 = "Has construido una mesa de recepción, ¿y si contratas a una recepcionista? No verás a ningún paciente hasta que arregles esto, ¿lo sabes, no?",
     cannot_afford = "¡No tienes dinero en el banco para contratar a esa persona!", -- I can't see anything like this in the original strings
+    cannot_afford_2 = "¡No tienes dinero en el banco para comprar eso!", 
     falling_1 = "¡Eh! Eso no tiene gracia. Mira dónde haces clic con ese ratón, ¡vas a hacerle daño a alguien!",
     falling_2 = "¿Te importaría dejar de perder el tiempo?",
     falling_3 = "¡Ay! Eso ha tenido que doler. ¡Llamen a un médico!",
@@ -202,7 +218,7 @@ adviser = {
     researcher_needs_desk_1 = "Un investigador necesita una mesa en la que trabajar.",
     researcher_needs_desk_2 = "Tu investigador agradece que le hayas dado un descanso. Si pretendías tener a más personas investigando, tienes que darles a cada uno una mesa para que trabajen.",
     researcher_needs_desk_3 = "Cada investigador necesita su propia mesa para trabajar.",
-    nurse_needs_desk_1 = "Cada enfermera necesita su propia mesa para trabajar.",
+    nurse_needs_desk_1 = "Cada enfermera necesita una mesa para trabajar.",
     nurse_needs_desk_2 = "Tu enfermera agradece que le hayas dado un descanso. Si pretendías tener a más personas trabajando en la enfermería, tienes que darles a cada una una mesa para que trabajen.",
   },
   cheats = {
@@ -254,7 +270,9 @@ letter = {
 install = {
   title = "--------------------------------- Configuración de CorsixTH ---------------------------------",
   th_directory = "CorsixTH necesita una copia de los archivos de datos del Theme Hospital original (o de la demo) para poder funcionar. Utiliza el selector de debajo para localizar la carpeta de instalación de Theme Hospital.",
+  ok = "Aceptar",
   exit = "Salir",
+  cancel = "Cancelar",
 }
 
 misc.not_yet_implemented = "(aún no implementado)"
@@ -276,6 +294,7 @@ tooltip.main_menu = {
   load_game = "Cargar una partida guardada.",
   options = "Ajustar la configuración.",
   exit = "¡No, no, por favor, no te vayas!",
+  quit = "Estás a punto de salir de CorsixTH.   ¿Seguro que quieres continuar?",
 }
 
 load_game_window = {
@@ -329,13 +348,11 @@ options_window = {
   custom_resolution = "Personalizada...",
   width = "Ancho",
   height = "Alto",
-  apply = "Apply",
-  cancel = "Cancel",
-  data_location = "Ubicación de datos",
-  font_location = "Ubicación de fuentes",
-  browse = "Buscar...",
-  new_th_directory = "Aquí puedes especificar una nueva carpeta de instalación de Theme Hospital. En cuanto selecciones la nueva carpeta, el juego se reiniciará.",
+  audio = "Sonido",  
+  customise = "Personalizar",
+  folder = "Carpetas",
   language = "Idioma del juego",
+  apply = "Aplicar",
   cancel = "Cancelar",
   back = "Volver",
 }
@@ -349,16 +366,74 @@ tooltip.options_window = {
   height = "Introduce la altura de la pantalla.",
   apply = "Aplica la resolución seleccionada.",
   cancel = "Vuelve sin cambiar la resolución.",
-  data_location = "Indica la carpeta donde está instalado el Theme Hospital original, necesario para ejecutar CorsixTH.",
-  font_location = "Indica un archivo de fuente capaz de mostrar los caracteres Unicode que necesita tu idioma. Si no se especifica, no podrás seleccionar idiomas que necesiten más caracteres de los que dispone el juego original. Por ejemplo: Ruso y Chino.",
+  audio_button = "Activa o desactiva todos los sonidos del juego.", 
+  audio_toggle = "Activar o desactivar",
+  customise_button = "Más opciones para personalizar tu experiencia de juego.",
+  folder_button = "Opciones de carpeta",  
   language = "Selecciona el idioma de los textos.",
   select_language = "Selecciona el idioma del juego.",
   language_dropdown_item = "Utilizar el idioma %s.",
-  original_path = "La carpeta donde está instalado el Theme Hospital original.",
-  browse = "Busca otra ubicación de una instalación de Theme Hospital. (ubicación actual: %1%)",
-  browse_font = "Buscar otro archivo de fuentes (ubicación actual: %1%)",
-  no_font_specified = "¡No se ha especificado una ubicación!",
   back = "Cierra la ventana de opciones.",
+}
+
+customise_window = {
+  caption = "Opciones personalizadas",
+  option_on = "Activado",
+  option_off = "Desactivado",
+  back = "Volver",
+  movies = "Control global de vídeos",
+  intro = "Reproducir introducción",
+  paused = "Construir durante una pausa",
+  volume = "Tecla para bajar el volumen",
+  aliens = "Pacientes alienígenas",
+  fractured_bones = "Fracturas óseas",
+  average_contents = "Contenidos normales",
+}
+
+tooltip.customise_window = {
+  movies = "Control global de vídeos, esto permite desactivar todos los vídeos.",  
+  intro = "Activa o desactiva el vídeo de introducción, si quieres que la introducción se muestre cada vez que arranques CorsixTH, necesitarás que el control global de vídeos esté activado.",
+  paused = "En Theme Hospital, el jugador solo podía utilizar el menú superior si la partida estaba en pausa. Esto también se hace en CorsixTH de forma predeterminada, pero al activar esta opción, podrás acceder a ese menú mientras el juego esté en pausa.",
+  volume = "Si la tecla de bajar volumen abre también el botiquín, utiliza esta opción para cambiar el acceso directo a Mayúsculas + C.",
+  aliens = "Debido a la falta de animaciones decentes disponibles, hemos hecho que los pacientes con ADN alienígena solo aparezcan en una emergencia. Para permitir que los pacientes con ADN alienígena puedan visitar tu hospital, desactiva esta opción.",
+  fractured_bones = "Debido a una animación deficiente que tenemos, hemos hecho que no existan pacientes con Fracturas óseas femeninas. Para permitir que las pacientes con Fracturas óseas visiten tu hospital, desactiva esta opción.",
+  average_contents = "Activa esta opción si quieres que el juego recuerde que objetos adicionales sueles añadir cuando construyes habitaciones.",  
+  back = "Cerrar este menú y volver al menú de Opciones",
+}
+
+folders_window = {
+  caption = "Ubicación de carpetas",
+  data_label = "Datos de TH",
+  font_label = "Fuente",  
+  music_label = "MP3s",
+  savegames_label = "Partidas guardadas",
+  screenshots_label = "Capturas de pantalla",
+  -- next four are the captions for the browser window, which are called from the folder setting menu
+  new_th_location = "Aquí puedes especificar una nueva carpeta de instalación de Theme Hospital. El juego se reiniciará en cuanto selecciones la nueva carpeta.", 
+  savegames_location = "Selecciona la carpeta que quieres utilizar para tus partidas guardadas.",
+  music_location = "Selecciona la carpeta que quieres utilizar para tu música.", 
+  screenshots_location = "Selecciona la carpeta que quieres utilizar para tus capturas de pantalla.",
+  back  = "Volver",
+}
+
+tooltip.folders_window = {
+  browse = "Buscar la ubicación de la carpeta",
+  data_location = "La carpeta con la instalación del Theme Hospital original, necesario para ejecutar CorsixTH.",
+  font_location = "La ubicación de una fuente de letra capaz de mostrar caracteres Unicode necesarios para tu idioma. Si no se indica, no podrás seleccionar idiomas que tengan más caracteres de los que puede dar el juego original, por ejemplo, ruso y chino.",    
+  savegames_location = "La carpeta de partidas guardadas está junto al archivo de configuración de forma predeterminada, y se utilizará para almacenar las partidas guardadas. En caso de que no sea lo más adecuado, puedes seleccionar otra carpeta buscando la carpeta que quieres usar.",
+  screenshots_location = "Las capturas de pantalla se guardan de forma predeterminada en una carpeta junto al archivo de configuración. En caso de que no sea lo más adecuado, puedes seleccionar otra carpeta buscando la carpeta que quieres usar.",
+  music_location = "Selecciona una carpeta con tus archivos de música en formato MP3. Necesitas una carpeta ya existente, entonces podrás buscarla.",
+  browse_data = "Buscar otra ubicación con una instalación de Theme Hospital. (Ubicación actual: %1%)",
+  browse_font = "Buscar otro archivo de fuente de letra. (Ubicación actual: %1%)",
+  browse_saves = "Buscar otra ubicación para tu carpeta de partidas guardadas. (Ubicación actual: %1%)",
+  browse_screenshots = "Buscar otra ubicación para tu carpeta de capturas de pantalla. (Ubicación actual: %1%)",
+  browse_music = "Buscar otra ubicación para tu carpeta de música. (Ubicación actual: %1%)",
+  no_font_specified = "¡Aún no has especificado la ubicación de la fuente!",  
+  not_specified = "¡Aún no has especificado una carpeta!",
+  default = "Ubicación predeterminada",
+  reset_to_default = "Vuelve a asignar la carpeta a su ubicación predeterminada.",
+ -- original_path = "Carpeta actual con la instalación del Theme Hospital original", -- where is this used, I have left if for the time being?
+  back  = "Cerrar este menú y volver al menú de Opciones.",
 }
 
 font_location_window = {
@@ -416,13 +491,16 @@ errors = {
   load_prefix = "Error al cargar la partida: ",
   map_file_missing = "¡No se ha podido encontrar el archivo de mapa %s de este nivel!",
   minimum_screen_size = "Introduce un tamaño de pantalla como mínimo de 640x480.",
-  maximum_screen_size = "Introduce un tamaño de pantalla como máximo de 3000x2000.",
   unavailable_screen_size = "El tamaño de pantalla que has seleccionado no está disponible en el modo de pantalla completa.",
+  alien_dna = "NOTA: Los pacientes alienígenas no tienen animaciones para sentarse, abrir puertas, llamar a puertas, etc. Por lo tanto, al igual que en Theme Hospital, para hacer estas cosas aparentarán cambiar a una imagen normal y luego volverán a su estado.  Los pacientes con ADN alienígena solo aparecerán si el archivo del nivel lo indica.", 
+  fractured_bones = "NOTA: La animación de las pacientes femeninas con Fracturas óseas no es perfecta.",
 }
 
 confirmation = {
   needs_restart = "Para cambiar este ajuste, antes debes reiniciar CorsixTH. Se perderá todo el progreso que no hayas guardado. ¿Seguro que quieres continuar?",
   abort_edit_room = "Ahora mismo estás construyendo o editando una habitación. Si has colocado todos los objetos necesarios será terminada, de lo contrario se borrará. ¿Quieres continuar?",
+  maximum_screen_size = "El tamaño de pantalla que has introducido es mayor que 3000 x 2000.  Es posible utilizar una resolución más grande, pero necesitará de un ordenador mejor para que la velocidad de fotogramas sea aceptable. ¿Seguro que quieres continuar?",
+  music_warning = "Antes de seleccionar el uso de MP3s para tu música dentro del juego, necesitarás tener el archivo smpeg.dll, o el equivalente para tu sistema operativo, o de lo contrario no tendrás música en el juego.  Actualmente no existe un archivo equivalente para sistemas de 64 bits. ¿Quieres continuar?",
 }
 
 information = {
@@ -521,7 +599,7 @@ tooltip.cheats_window = {
 introduction_texts = {
   demo = {
     "¡Bienvenido al hospital de demostración!",
-    "Por desgracia, la versión de demostración solo contiene este nivel (además de los niveles personalizados). Sin embargo, tienes más que suficiente para estar entretenido por un rato.",
+    "Por desgracia, la versión de demostración solo contiene este nivel. Sin embargo, tienes más que suficiente para estar entretenido por un rato.",
     "Te enfrentarás a varias enfermedades que necesitan de ciertas habitaciones para su cura. De vez en cuando pueden surgir emergencias. Y necesitarás investigar sobre las enfermedades construyendo un Departamento de investigación.",
     "Tu objetivo es ganar 100.000 dólares, que el valor de tu hospital llegue hasta 70.000 dólares y tengas una reputación de 700, con un porcentaje de pacientes curados del 75%.",
     "Procura que tu reputación no caiga por debajo de 300 y que no mates a más del 40% de tus pacientes, o fracasarás.",
@@ -544,6 +622,18 @@ tooltip.calls_dispatcher = {
   close = "Cerrar la ventana de llamadas de control.",
 }
 
+update_window = {
+  caption = "¡Actualización disponible!",
+  new_version = "Versión nueva:",
+  current_version = "Versión actual:",
+  download = "Ir a la página de descargas",
+  ignore = "Saltar e ir al menú principal",
+}
+
+tooltip.update_window = {
+  download = "Ir a la página de descargas para obtener la última versión de CorsixTH.",
+  ignore = "Ignorar esta actualización por el momento. Volverás a ser notificado la próxima vez que ejecutes CorsixTH.",
+}
 
 --------------------------------  UNUSED  -----------------------------------
 ------------------- (kept for backwards compatibility) ----------------------

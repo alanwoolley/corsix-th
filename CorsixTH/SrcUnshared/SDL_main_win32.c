@@ -245,10 +245,7 @@ int console_main(int argc, char *argv[])
 	   DirectInput will initialize properly when SDL_RegisterApp()
 	   is called later in the video initialization.
 	 */
-#if !SDL_VERSION_ATLEAST(2,0,0)
 	SDL_SetModuleHandle(GetModuleHandle(NULL));
-#endif
-
 
 	/* Run the application main() code */
 	status = SDL_main(argc, argv);

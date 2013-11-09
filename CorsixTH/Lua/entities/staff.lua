@@ -139,6 +139,7 @@ function Staff:tickDay()
       self:trainSkill(room.staff_member, "is_researcher", res_thres, room_factor, staff_count)
     end
   end
+  self:needsWorkStation()
 end
 
 function Staff:tick()
@@ -208,7 +209,17 @@ function Staff:checkIfWaitedTooLong()
           break
         end
       end
-
+      --If the hospital policy is set to automatically grant wage increases, grant the requested raise 
+      --instead of firing the staff member
+      if self.hospital.policies.grant_wage_increase then
+        local amount = math.floor(math.max(self.profile.wage * 1.1, (self.profile:getFairWage(self.world) + self.profile.wage) / 2) - self.profile.wage)
+        self.quitting_in = nil
+        self:setMood("pay_rise", "deactivate")
+        self.world.ui.bottom_panel:removeMessage(self)
+        self:increaseWage(amount)
+        return
+      end 
+  
       -- Plays the sack sound, but maybe it's good that you hear a staff member leaving?
       if staff_rise_window then
         staff_rise_window:fireStaff()
@@ -344,13 +355,12 @@ function Staff:fire()
   if self.fired then
     return
   end
-
+ 
   -- Ensure that there are no inspection windows open for this staff member.
   local staff_window = self.world.ui:getWindow(UIStaff)
   if staff_window and staff_window.staff == self then
       staff_window:close()
   end
-
   self.hospital:spendMoney(self.profile.wage, _S.transactions.severance .. ": "  .. self.profile.name)
   self.world.ui:playSound "sack.wav"  
   self:setMood("exit", "activate")
@@ -441,6 +451,15 @@ function Staff:setProfile(profile)
   end
   self:setLayer(5, profile.layer5)
   self:updateStaffTitle()
+end
+
+function Staff:needsWorkStation()
+  if self.hospital and not self.hospital.receptionist_msg then  
+    if self.humanoid_class == "Receptionist" and self.world.object_counts["reception_desk"] == 0 then
+      self.world.ui.adviser:say(_A.warnings.no_desk_4)
+      self.hospital.receptionist_msg = true   
+    end 
+  end  
 end
 
 function Staff:updateStaffTitle()
@@ -682,7 +701,7 @@ end
 function Staff:adviseWrongPersonForThisRoom()
   local room = self:getRoom()
   local room_name = room.room_info.long_name
-  local required = room.room_info.maximum_staff or room.room_info.required_staff
+  local required = (room.room_info.maximum_staff or room.room_info.required_staff)
   if self.humanoid_class == "Doctor" and room.room_info.id == "toilets" then
     self.world.ui.adviser:say(_A.staff_place_advice.doctors_cannot_work_in_room:format(room_name))
   elseif self.humanoid_class == "Nurse" then
@@ -855,7 +874,7 @@ function Staff:afterLoad(old, new)
     -- added reference to world for staff profiles
     self.profile.world = self.world
   end
-  if old < 72 then
+  if old < 68 then
     if self.attributes["fatigue"] then
       if self.attributes["fatigue"] >= self.hospital.policies["goto_staffroom"] then
         self:goToStaffRoom()

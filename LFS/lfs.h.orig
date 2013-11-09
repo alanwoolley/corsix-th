@@ -1,0 +1,29 @@
+/*
+** LuaFileSystem
+** Copyright Kepler Project 2003 (http://www.keplerproject.org/luafilesystem)
+**
+<<<<<<< HEAD
+** $Id: lfs.h,v 1.5 2008/02/19 20:08:23 mascarenhas Exp $
+=======
+** $Id$
+>>>>>>> cb82e204785b905358fddf665a929b3b34f372e1
+*/
+
+/* Define 'chdir' for systems that do not implement it */
+#ifdef NO_CHDIR
+<<<<<<< HEAD
+#define chdir(p)	(-1)
+#define chdir_error	"Function 'chdir' not provided by system"
+#else
+#define chdir_error	strerror(errno)
+=======
+#define chdir(p)    (-1)
+#define chdir_error    "Function 'chdir' not provided by system"
+#else
+#define chdir_error    strerror(errno)
+>>>>>>> cb82e204785b905358fddf665a929b3b34f372e1
+#endif
+
+
+int luaopen_lfs (lua_State *L);
+int luaopen_lfs_ext (lua_State *L);

@@ -129,13 +129,8 @@ size_t THSoundArchive::getSoundDuration(size_t iIndex)
         {
             iWaveDataLength = iChunkLength;
         }
-#if SDL_VERSION_ATLEAST(2,0,0)
-		if(SDL_RWseek(pFile, iChunkLength + (iChunkLength & 1), RW_SEEK_CUR) == -1) {
-#else
-		if(SDL_RWseek(pFile, iChunkLength + (iChunkLength & 1), SEEK_CUR) == -1) {
-#endif
+        if(SDL_RWseek(pFile, iChunkLength + (iChunkLength & 1), SEEK_CUR) == -1)
             break;
-		}
     }
     SDL_RWclose(pFile);
     if(iWaveAudioFormat != 1 || iWaveChannelCount == 0 || iWaveSampleRate == 0
@@ -320,6 +315,8 @@ void THSoundEffects::setSoundArchive(THSoundArchive *pArchive) {}
 void THSoundEffects::playSound(size_t iIndex, double dVolume) {}
 void THSoundEffects::playSoundAt(size_t iIndex, int iX, int iY) {}
 void THSoundEffects::playSoundAt(size_t iIndex, double dVolume, int iX, int iY) {}
+int THSoundEffects::reserveChannel() { return 0; }
+void THSoundEffects::releaseChannel(int iChannel) {}
 void THSoundEffects::setCamera(int iX, int iY, int iRadius) {}
 void THSoundEffects::setSoundEffectsVolume(double dVolume) {}
 void THSoundEffects::setSoundEffectsOn(bool iOn) {}

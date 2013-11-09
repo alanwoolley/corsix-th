@@ -25,14 +25,10 @@ SOFTWARE.
 #include <SDL.h>
 #include <assert.h>
 
-#if SDL_VERSION_ATLEAST(2,0,0)
-extern SDL_Window *window;
-#endif
-
 static int l_palette_new(lua_State *L)
 {
-	luaT_stdnew<THPalette>(L);
-	return 1;
+    luaT_stdnew<THPalette>(L);
+    return 1;
 }
 
 static int l_palette_load(lua_State *L)
@@ -541,12 +537,11 @@ static int l_cursor_position(lua_State *L)
     return 1;
 }
 
-
-static int l_surface_new(lua_State *L) 
+static int l_surface_new(lua_State *L)
 {
-	lua_remove(L, 1); // Value inserted by __call
+    lua_remove(L, 1); // Value inserted by __call
 
-   THRenderTargetCreationParams oParams;
+    THRenderTargetCreationParams oParams;
     oParams.iWidth = luaL_checkint(L, 1);
     oParams.iHeight = luaL_checkint(L, 2);
     int iArg = 3;
@@ -565,108 +560,93 @@ static int l_surface_new(lua_State *L)
 #define FLAG(name, field, flag) \
     else if(stricmp(sOption, name) == 0) \
         oParams.field = true, oParams.iSDLFlags |= flag
+    
+    for(int iArgCount = lua_gettop(L); iArg <= iArgCount; ++iArg)
+    {
+        const char* sOption = luaL_checkstring(L, iArg);
+        if(sOption[0] == 0)
+            continue;
+        FLAG("hardware"         , bHardware        , SDL_HWSURFACE );
+        FLAG("doublebuf"        , bDoubleBuffered  , SDL_DOUBLEBUF );
+        FLAG("fullscreen"       , bFullscreen      , SDL_FULLSCREEN);
+        FLAG("present immediate", bPresentImmediate, 0             );
+        FLAG("reuse context"    , bReuseContext    , 0             );
+        FLAG("opengl"           , bOpenGL          , SDL_OPENGL    );
+    }
 
-	for (int iArgCount = lua_gettop(L); iArg <= iArgCount; ++iArg) 
-	{
-		const char* sOption = luaL_checkstring(L, iArg);
-		if (sOption[0] == 0)
-			continue;
-		// TODO - Finish this
-#if SDL_VERSION_ATLEAST(2,0,0)
-		FLAG("fullscreen" , bFullscreen , SDL_WINDOW_FULLSCREEN);
-#else
-		FLAG("hardware" , bHardware , SDL_HWSURFACE );
-		FLAG("doublebuf" , bDoubleBuffered , SDL_DOUBLEBUF );
-		FLAG("fullscreen" , bFullscreen , SDL_FULLSCREEN);
-#endif
-
-		FLAG("present immediate", bPresentImmediate, 0 );
-		FLAG("reuse context", bReuseContext, 0);
-	}
 #undef FLAG
 
 #ifndef CORSIX_TH_USE_DX9_RENDERER
-	if (SDL_WasInit(SDL_INIT_VIDEO)) {
-
-#if SDL_VERSION_ATLEAST(2,0,0)
-		const char *sTitle = SDL_GetWindowTitle(window);
-#else
-		const char *sTitle, *sIcon;
-		SDL_WM_GetCaption(&sTitle, &sIcon);
-		if (sTitle)
-			sTitle = strdup(sTitle);
-		if (sIcon)
-			sIcon = strdup(sIcon);
+    if(SDL_WasInit(SDL_INIT_VIDEO))
+    {
+        char *sTitle, *sIcon;
+        SDL_WM_GetCaption(&sTitle, &sIcon);
+        if(sTitle) sTitle = strdup(sTitle);
+        if(sIcon) sIcon = strdup(sIcon);
+        SDL_QuitSubSystem(SDL_INIT_VIDEO);
+        SDL_InitSubSystem(SDL_INIT_VIDEO);
+        SDL_WM_SetCaption(sTitle, sIcon);
+        if(sTitle) free(sTitle);
+        if(sIcon) free(sIcon);
+    }
 #endif
 
-		SDL_QuitSubSystem(SDL_INIT_VIDEO);
-		SDL_InitSubSystem(SDL_INIT_VIDEO);
+    THRenderTarget* pCanvas = luaT_stdnew<THRenderTarget>(L);
+    if(pCanvas->create(&oParams))
+        return 1;
 
-#if SDL_VERSION_ATLEAST(2,0,0)
-		SDL_SetWindowTitle(window,sTitle);
-#else
-		SDL_WM_SetCaption(sTitle, sIcon);
-#endif
-
-	}
-#endif
-
-	THRenderTarget* pCanvas = luaT_stdnew<THRenderTarget>(L);
-	if (pCanvas->create(&oParams))
-		return 1;
-
-	lua_pushnil(L);
-	lua_pushstring(L, pCanvas->getLastError());
-	return 2;
+    lua_pushnil(L);
+    lua_pushstring(L, pCanvas->getLastError());
+    return 2;
 }
 
-static int l_surface_fill_black(lua_State *L) 
+static int l_surface_fill_black(lua_State *L)
 {
-	THRenderTarget* pCanvas = luaT_testuserdata<THRenderTarget>(L);
-	lua_settop(L, 1);
-	if (pCanvas->fillBlack())
-		return 1;
-	lua_pushnil(L);
-	lua_pushstring(L, pCanvas->getLastError());
-	return 2;
+    THRenderTarget* pCanvas = luaT_testuserdata<THRenderTarget>(L);
+    lua_settop(L, 1);
+    if(pCanvas->fillBlack())
+        return 1;
+    lua_pushnil(L);
+    lua_pushstring(L, pCanvas->getLastError());
+    return 2;
 }
 
-static int l_surface_start_frame(lua_State *L) 
+static int l_surface_start_frame(lua_State *L)
 {
-	THRenderTarget* pCanvas = luaT_testuserdata<THRenderTarget>(L);
-	lua_settop(L, 1);
-	if (pCanvas->startFrame())
-		return 1;
-	lua_pushnil(L);
-	lua_pushstring(L, pCanvas->getLastError());
-	return 2;
+    THRenderTarget* pCanvas = luaT_testuserdata<THRenderTarget>(L);
+    lua_settop(L, 1);
+    if(pCanvas->startFrame())
+        return 1;
+    lua_pushnil(L);
+    lua_pushstring(L, pCanvas->getLastError());
+    return 2;
 }
 
-static int l_surface_end_frame(lua_State *L) 
+static int l_surface_end_frame(lua_State *L)
 {
-	THRenderTarget* pCanvas = luaT_testuserdata<THRenderTarget>(L);
-	lua_settop(L, 1);
-	if (pCanvas->endFrame())
-		return 1;
-	lua_pushnil(L);
-	lua_pushstring(L, pCanvas->getLastError());
-	return 2;
+    THRenderTarget* pCanvas = luaT_testuserdata<THRenderTarget>(L);
+    lua_settop(L, 1);
+    if(pCanvas->endFrame())
+        return 1;
+    lua_pushnil(L);
+    lua_pushstring(L, pCanvas->getLastError());
+    return 2;
 }
 
-static int l_surface_nonoverlapping(lua_State *L) 
+static int l_surface_nonoverlapping(lua_State *L)
 {
-	THRenderTarget* pCanvas = luaT_testuserdata<THRenderTarget>(L);
-	if (lua_isnone(L, 2) || lua_toboolean(L, 2) != 0)
-		pCanvas->startNonOverlapping();
-	else
-		pCanvas->finishNonOverlapping();
-	lua_settop(L, 1);
-	return 1;
+    THRenderTarget* pCanvas = luaT_testuserdata<THRenderTarget>(L);
+    if(lua_isnone(L, 2) || lua_toboolean(L, 2) != 0)
+        pCanvas->startNonOverlapping();
+    else
+        pCanvas->finishNonOverlapping();
+    lua_settop(L, 1);
+    return 1;
 }
 
 static int l_surface_set_blue_filter_active(lua_State *L)
 {
-	THRenderTarget* pCanvas = luaT_testuserdata<THRenderTarget>(L);
+    THRenderTarget* pCanvas = luaT_testuserdata<THRenderTarget>(L);
     //pCanvas->setBlueFilterActive(lua_isnoneornil(L, 2) ? false : lua_toboolean(L, 2));
 	// Keep blue filter off for now. TODO - make this work properly
 

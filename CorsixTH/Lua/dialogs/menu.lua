@@ -546,28 +546,7 @@ function UIMenuBar:makeMenu(app)
           ""
       end
     end
-    local function playSounds(item)
-      app.audio:playSoundEffects(item.checked)
-      app:saveConfig()
-    end
-    local function playAnno(item)
-      app.config.play_announcements = item.checked
-      app:saveConfig()
-    end
-    local function playMusic(item)
-      if not app.audio.background_music then
-        app.config.play_music = true
-        app.audio:playRandomBackgroundTrack() -- play
-      else
-        app.config.play_music = false
-        app.audio:stopBackgroundTrack() -- stop
-      end
-      -- Also save this directly to the configuration file.
-      app:saveConfig()
-    end
-    local function musicStatus(item)
-      return not not app.audio.background_music and not app.audio.background_paused
-    end
+    
     local function appendVolume(setting)
       local menu = UIMenu() -- The three Volume menus
       for level = 10, 100, 10 do
@@ -575,13 +554,50 @@ function UIMenuBar:makeMenu(app)
       end
       return menu
     end
-    options
-    :appendCheckItem(_S.menu_options.sound,         app.config.play_sounds, playSounds)
-    :appendCheckItem(_S.menu_options.announcements, app.config.play_announcements, playAnno)
-    :appendCheckItem(_S.menu_options.music,         app.config.play_music, playMusic, nil, musicStatus)
+    
+  options:appendCheckItem(_S.menu_options.sound,
+    app.config.play_sounds,
+    function(item) 
+      app.audio:playSoundEffects(item.checked) 
+      app:saveConfig()
+    end,
+    nil,
+    function() 
+      return app.config.play_sounds 
+    end)
+     
+    
+  options:appendCheckItem(_S.menu_options.announcements,
+    app.config.play_announcements, 
+    function(item)  
+      app.config.play_announcements = item.checked 
+      app:saveConfig()   
+    end,
+    nil,
+    function() 
+      return app.config.play_announcements 
+    end)
+    
+  local function musicStatus(item)
+    return not not app.audio.background_music and not app.audio.background_paused
+  end 
+    
+ options:appendCheckItem(_S.menu_options.music,
+    app.config.play_music, 
+    function(item)
+      app.config.play_music = item.checked
+      self.ui:togglePlayMusic(item)
+      app:saveConfig()    
+    end,
+    nil,
+    function(musicStatus) 
+      return app.config.play_music 
+    end) 
+    
+    options    
     :appendMenu(_S.menu_options.sound_vol,         appendVolume("sound"))
     :appendMenu(_S.menu_options.announcements_vol, appendVolume("announcement"))
-    :appendMenu(_S.menu_options.music_vol,         appendVolume("music"))
+    :appendMenu(_S.menu_options.music_vol,         appendVolume("music"))    
     :appendItem(_S.menu_options.jukebox, function() self.ui:addWindow(UIJukebox(app)) end)
   end
   
@@ -597,7 +613,7 @@ function UIMenuBar:makeMenu(app)
     function(item) app.config.prevent_edge_scrolling = not item.checked end,
     nil,
     function() return not app.config.prevent_edge_scrolling end)
-
+       
   options:appendCheckItem(_S.menu_options.adviser_disabled, 
     not app.config.adviser_disabled,
     function(item) 
@@ -617,14 +633,29 @@ function UIMenuBar:makeMenu(app)
     end)
     
   local function temperatureDisplay(method)
-    --local map = app.world.map
     return method == 1, function()
       app.world.map:setTemperatureDisplayMethod(method)
     end, "", function () 
       return app.world.map.temperature_display_method == method
     end      
   end
-  
+
+  local function wageIncreaseRequests(grant)
+    return grant, function() 
+      app.world:getLocalPlayerHospital().policies.grant_wage_increase = grant
+    end, "", function ()
+      if app.world:getLocalPlayerHospital().policies.grant_wage_increase == nil then
+        app.world:getLocalPlayerHospital().policies.grant_wage_increase = app.config.grant_wage_increase
+      end
+      return app.world:getLocalPlayerHospital().policies.grant_wage_increase == grant
+    end
+  end
+   
+  options:appendMenu(_S.menu_options.wage_increase, UIMenu()
+    :appendCheckItem(_S.menu_options_wage_increase.grant, wageIncreaseRequests(true))
+    :appendCheckItem(_S.menu_options_wage_increase.deny, wageIncreaseRequests(false))
+  )
+    
   options:appendMenu(_S.menu_options.warmth_colors, UIMenu()
     :appendCheckItem(_S.menu_options_warmth_colors.choice_1, temperatureDisplay(1))
     :appendCheckItem(_S.menu_options_warmth_colors.choice_2, temperatureDisplay(2))
@@ -647,7 +678,6 @@ function UIMenuBar:makeMenu(app)
     :appendCheckItem(_S.menu_options_game_speed.max_speed,          rate("Max speed"))
     :appendCheckItem(_S.menu_options_game_speed.and_then_some_more, rate("And then some more"))
   )
-  options:appendItem(_S.menu_options.settings, function() self.ui:addWindow(UIOptions(self.ui, "game")) end)
   self:addMenu(_S.menu.options, options)
   self:addMenu(_S.menu.charts, UIMenu()
     :appendItem(_S.menu_charts.bank_manager, function() self.ui.bottom_panel:dialogBankManager(true) end)

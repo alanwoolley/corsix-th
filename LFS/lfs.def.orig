@@ -1,0 +1,9 @@
+LIBRARY lfs.dll
+DESCRIPTION "LuaFileSystem"
+<<<<<<< HEAD
+VERSION 1.5.0
+=======
+VERSION 1.4.2
+>>>>>>> cb82e204785b905358fddf665a929b3b34f372e1
+EXPORTS
+luaopen_lfs

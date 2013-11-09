@@ -84,6 +84,7 @@ function Hospital:Hospital(world, name)
   self.visitingVIP = ""
   self.percentage_cured = 0
   self.percentage_killed = 0
+  self.msg_counter = 0
   self.population = 0.25 -- TODO: Percentage showing how much of
   -- the total population that goes to the player's hospital, 
   -- used for one of the goals. Change when competitors are there.
@@ -135,6 +136,7 @@ function Hospital:Hospital(world, name)
   self.policies["guess_cure"] = 0.9
   self.policies["stop_procedure"] = 1 -- Note that this is between 1 and 2 ( = 100% - 200%)
   self.policies["goto_staffroom"] = 0.6
+  self.policies["grant_wage_increase"] = TheApp.config.grant_wage_increase
   -- Randomly select three insurance companies to use, only different by name right now.
   -- The first ones are more likely to come
   self.insurance = {}
@@ -237,6 +239,29 @@ function Hospital:praiseBench()
     self.world.ui.adviser:say(bench_msg[math.random(1, #bench_msg)])
     self.bench_msg = true
   end  
+end
+
+-- Messages regarding numbers cured and killed
+function Hospital:msgCured()
+  local msg_chance = math.random(1, 15)
+  if msg_chance == 3 and self.msg_counter > 10 then
+    self.world.ui.adviser:say(_A.level_progress.another_patient_cured:format(self.num_cured))
+    self.msg_counter = 0
+  elseif msg_chance == 12 and self.msg_counter > 10 then
+    self.world.ui.adviser:say(_A.praise.patients_cured:format(self.num_cured))
+    self.msg_counter = 0   
+  end 
+end
+-- So the messages don't show too often there will need to be at least 10 days before one can show again.
+function Hospital:msgKilled()
+  local msg_chance = math.random(1, 10)      
+  if msg_chance < 4 and self.msg_counter > 10 then
+    self.world.ui.adviser:say(_A.warnings.many_killed:format(self.num_deaths))
+    self.msg_counter = 0
+  elseif msg_chance > 7 and self.msg_counter > 10 then
+    self.world.ui.adviser:say(_A.level_progress.another_patient_killed:format(self.num_deaths))
+    self.msg_counter = 0    
+  end   
 end
 
 -- Warn if the hospital is lacking some basics
@@ -574,7 +599,10 @@ function Hospital:afterLoad(old, new)
 
   if old < 56 then
     self.research_dep_built = false 
-  end  
+  end 
+  if old < 76 then
+    self.msg_counter = 0
+  end    
 end
 
 function Hospital:countPatients()
@@ -593,7 +621,7 @@ end
 
 -- A range of checks to help a new player. These are set days apart and will show no more than once a month
 function Hospital:checkFacilities()
-  if self:isPlayerHospital() then
+  if self.hospital and self:isPlayerHospital() then
     -- Check to see if a staff room has been built
     self.is_staff_room = false
     if self:hasRoomOfType("staff_room") then
@@ -765,9 +793,13 @@ function Hospital:purchasePlot(plot_number)
       -- Also make sure to apply transparency to the new walls, if required. 
       self.world.ui:applyTransparency()
       self:spendMoney(cost, _S.transactions.buy_land, cost)
-      return true
+      return true 
+    else
+    -- Give visual warning that player doesn't have enough $ to build
+    -- Let the message remain unitl cancelled by the player as it is being displayed behind the town map
+      self.world.ui.adviser:say(_A.warnings.cannot_afford_2, true, true)    
     end
-  end
+  end   
   return false
 end
 
@@ -858,7 +890,7 @@ function Hospital:onEndDay()
     self:checkFacilities()
   end
   self.show_progress_screen_warnings = math.random(1, 3) -- used in progress report to limit warnings
-
+  self.msg_counter = self.msg_counter + 1
   if self.balance < 0 then
     -- TODO: Add the extra interest rate to level configuration.
     local overdraft_interest = self.interest_rate + 0.02
@@ -866,7 +898,13 @@ function Hospital:onEndDay()
     local overdraft_payment = (overdraft*overdraft_interest)/365
     self.acc_overdraft = self.acc_overdraft + overdraft_payment
   end
-
+  local hosp = self.world.hospitals[1]
+  hosp.receptionist_count = 0
+  for i, staff in ipairs(self.staff) do
+    if staff.humanoid_class == "Receptionist" then
+      hosp.receptionist_count = hosp.receptionist_count + 1
+    end
+  end    
   -- if there's currently an earthquake going on, possibly give the machines some damage
   if (self.world.active_earthquake) then
     for _, room in pairs(self.world.rooms) do
@@ -1033,8 +1071,14 @@ function Hospital:onEndMonth()
   self.money_out = 0
 
   -- make players aware of the need for a receptionist and desk.
-  if self:isPlayerHospital() and not self:hasStaffedDesk() then
-    if self.world.month == 3 and self.world.year == 1 then
+  if (self:isPlayerHospital() and not self:hasStaffedDesk()) then
+    if self.receptionist_count ~= 0 and self.world.month > 2 and self.world.year == 1 and not self.receptionist_msg then
+      self.world.ui.adviser:say(_A.warnings.no_desk_6)
+      self.receptionist_msg = true 
+    elseif self.receptionist_count == 0 and self.world.month > 2 and self.world.year == 1 and self.world.object_counts["reception_desk"] ~= 0  then
+      self.world.ui.adviser:say(_A.warnings.no_desk_7)
+    --  self.receptionist_msg = true     
+    elseif self.world.month == 3 and self.world.year == 1 then
       self.world.ui.adviser:say(_A.warnings.no_desk, true)
     elseif self.world.month == 8 and self.world.year == 1 then
       self.world.ui.adviser:say(_A.warnings.no_desk_1, true)
@@ -1042,7 +1086,7 @@ function Hospital:onEndMonth()
       self.world.ui.adviser:say(_A.warnings.no_desk_2, true)
     elseif self.world.month == 11 and self.world.year == 1 and self.visitors ~= 0 then
       self.world.ui.adviser:say(_A.warnings.no_desk_3, true)
-    end
+    end      
   end
 end
 
@@ -1052,7 +1096,7 @@ function Hospital:isPlayerHospital()
 end
 
 function Hospital:hasStaffedDesk()
-  return self.world.object_counts["reception_desk"] and self:hasStaffOfCategory("Receptionist")
+  return (self.world.object_counts["reception_desk"] ~= 0 and self:hasStaffOfCategory("Receptionist"))
 end  
 
 --! Called at the end of each year

@@ -70,7 +70,7 @@ function GameUI:GameUI(app, local_hospital)
   self.ticks_since_last_announcement = 0
   
   self.momentum = app.config.scrolling_momentum
-  self.current_momentum = {x = 0.0, y = 0.0}
+  self.current_momentum = {x = 0.0, y = 0.0, z = 0.0}
 end
 
 function GameUI:setupGlobalKeyHandlers()
@@ -82,6 +82,9 @@ function GameUI:setupGlobalKeyHandlers()
 
   self:addKeyHandler({"ctrl", "d"}, self.app.world, self.app.world.dumpGameLog)
   self:addKeyHandler({"ctrl", "t"}, self.app, self.app.dumpStrings)
+  self:addKeyHandler({"alt", "a"}, self, self.togglePlayAnnouncements)
+  self:addKeyHandler({"alt", "s"}, self, self.togglePlaySounds)
+  self:addKeyHandler({"alt", "m"}, self, self.togglePlayMusic)
 
   if self.app.config.debug then
     self:addKeyHandler("f11", self, self.showCheatsWindow)
@@ -93,7 +96,7 @@ function GameUI:makeVisibleDiamond(scr_w, scr_h)
   local map_w = self.app.map.width
   local map_h = self.app.map.height
   assert(map_w == map_h, "UI limiter requires square map")
-  
+
   -- The visible diamond is the region which the top-left corner of the screen
   -- is limited to, and ensures that the map always covers all of the screen.
   -- Its verticies are at (x + w, y), (x - w, y), (x, y + h), (x, y - h).
@@ -389,7 +392,10 @@ function GameUI:onMouseMove(x, y, dx, dy)
   end
   if self.buttons_down.mouse_middle then
     local zoom = self.zoom_factor
-    self.current_momentum = { x = -dx/zoom, y = -dy/zoom}
+    self.current_momentum.x = -dx/zoom
+    self.current_momentum.y = -dy/zoom
+    -- Stop zooming when the middle mouse button is pressed
+    self.current_momentum.z = 0
     self:scrollMap(self.current_momentum.x, self.current_momentum.y)
     repaint = true
   end
@@ -416,7 +422,7 @@ function GameUI:onMouseMove(x, y, dx, dy)
   or y >= self.app.config.height - scroll_region_size) then
     local dx = 0
     local dy = 0
-    
+    local scroll_power = 7
     if x < scroll_region_size then
       dx = -scroll_power
     elseif x >= self.app.config.width - scroll_region_size then
@@ -472,7 +478,11 @@ function GameUI:onMouseUp(code, x, y)
     -- Mouse wheel
     local window = self:getWindow(UIFullscreen)
     if not window or not window:hitTest(x - window.x, y - window.y) then
-      self.app.world:adjustZoom(4.5 - code)
+      
+      -- Apply momentum to the zoom
+      if math.abs(self.current_momentum.z) < 12 then
+        self.current_momentum.z = self.current_momentum.z + (4.5 - code)*2
+      end
     end
   end
   
@@ -526,11 +536,18 @@ function GameUI:onTick()
   if not self.buttons_down.mouse_middle then  
     if math.abs(self.current_momentum.x) < 0.2 and math.abs(self.current_momentum.y) < 0.2 then
       -- Stop scrolling
-      self.current_momentum = {x = 0.0, y = 0.0}
+      self.current_momentum.x = 0.0
+      self.current_momentum.y = 0.0
     else
       self.current_momentum.x = self.current_momentum.x * self.momentum
       self.current_momentum.y = self.current_momentum.y * self.momentum
       self:scrollMap(self.current_momentum.x, self.current_momentum.y)
+    end
+    if math.abs(self.current_momentum.z) < 0.2 then
+      self.current_momentum.z = 0.0
+    else
+      self.current_momentum.z = self.current_momentum.z * self.momentum
+      self.app.world:adjustZoom(self.current_momentum.z)
     end
   end
   do
@@ -569,8 +586,9 @@ function GameUI:onTick()
     end
     
     -- Faster scrolling with shift key
+    local factor = self.app.config.scroll_speed
     if self.buttons_down.shift then
-      mult = mult * 2
+      mult = mult * factor
     end
 
     self:scrollMap(dx * mult, dy * mult)
@@ -678,6 +696,29 @@ end
 
 function UI:toggleAdviser()
   self.app.config.adviser_disabled = not self.app.config.adviser_disabled
+  self.app:saveConfig()
+end
+
+function UI:togglePlaySounds()
+  self.app.config.play_sounds = not self.app.config.play_sounds
+  
+  self.app:saveConfig()
+end
+
+function UI:togglePlayAnnouncements()
+  self.app.config.play_announcements = not self.app.config.play_announcements
+  self.app:saveConfig()
+end
+
+function UI:togglePlayMusic(item)
+  if not self.app.audio.background_music then
+    self.app.config.play_music = true
+    self.app.audio:playRandomBackgroundTrack() -- play
+  else
+    self.app.config.play_music = false
+    self.app.audio:stopBackgroundTrack() -- stop
+  end
+ -- self.app.config.play_music = not self.app.config.play_music
   self.app:saveConfig()
 end
 
@@ -916,15 +957,18 @@ function GameUI:afterLoad(old, new)
     self.adviser.frame = 1
     self.adviser.number_frames = 4
   end
-
+  if old < 70 then
+    self:addKeyHandler({"shift", "a"}, self, self.toggleAdviser)
+  end
   if old < 75 then
     self.current_momentum = { x = 0, y = 0 }
     self.momentum = self.app.config.scrolling_momentum
   end
-  if old < 70 then
-    self:addKeyHandler({"shift", "a"}, self, self.toggleAdviser)
+  if old < 78 then
+    self.current_momentum = { x = 0, y = 0, z = 0}
   end
 
+  
   return UI.afterLoad(self, old, new)
 end
 
