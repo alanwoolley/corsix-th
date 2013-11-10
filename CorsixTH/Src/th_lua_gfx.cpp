@@ -579,15 +579,15 @@ static int l_surface_new(lua_State *L)
 #ifndef CORSIX_TH_USE_DX9_RENDERER
     if(SDL_WasInit(SDL_INIT_VIDEO))
     {
-        char *sTitle, *sIcon;
+        const char *sTitle, *sIcon;
         SDL_WM_GetCaption(&sTitle, &sIcon);
         if(sTitle) sTitle = strdup(sTitle);
         if(sIcon) sIcon = strdup(sIcon);
         SDL_QuitSubSystem(SDL_INIT_VIDEO);
         SDL_InitSubSystem(SDL_INIT_VIDEO);
         SDL_WM_SetCaption(sTitle, sIcon);
-        if(sTitle) free(sTitle);
-        if(sIcon) free(sIcon);
+        if(sTitle) free((void*)sTitle);
+        if(sIcon) free((void*)sIcon);
     }
 #endif
 
