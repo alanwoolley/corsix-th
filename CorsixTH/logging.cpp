@@ -25,7 +25,8 @@ void LOG_ERROR(std::string strtext) {
 	LOGW(strtext.c_str());
 	formatString(&strtext);
 
-	fprintf(stderr, strtext.c_str());
+	//fprintf(stderr, strtext.c_str());
+	fputs(strtext.c_str(), stderr);
 
 }
 
@@ -34,7 +35,8 @@ void LOG_INFO(std::string strtext) {
 	LOGI(strtext.c_str());
 	formatString(&strtext);
 
-	fprintf(stdout, strtext.c_str());
+	//fprintf(stdout, strtext.c_str());
+	fputs(strtext.c_str(),stdout);
 
 }
 
