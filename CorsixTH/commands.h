@@ -20,6 +20,9 @@
 #define COMMAND_SHOW_SETTINGS_DIALOG 10
 #define COMMAND_GAME_SPEED_UPDATED 11
 #define COMMAND_GAME_LOAD_ERROR 12
+#define COMMAND_HIDE_MENU 13
+#define COMMAND_START_VIBRATION 14
+#define COMMAND_STOP_VIBRATION 15
 
 int sendCommandInt(JavaVM* jvm, jint cmd, jint data);
 int sendCommand(JavaVM* jvm, jint cmd);

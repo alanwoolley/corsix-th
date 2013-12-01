@@ -90,11 +90,22 @@ static int showsettingsdialog(lua_State *L) {
 	return sendCommand(jvm, COMMAND_SHOW_SETTINGS_DIALOG);
 }
 
+static int startVibration(lua_State *L) {
+    LOG_INFO("Starting Vibration");
+    int arg = lua_gettop(L);
+    int vibrationCode = lua_tointeger(L, arg);
+
+    return sendCommandInt(jvm, COMMAND_START_VIBRATION, vibrationCode);
+}
+
+static int stopVibration(lua_State *L) {
+    LOG_INFO("Stopping Vibration");
+    return sendCommand(jvm, COMMAND_STOP_VIBRATION);
+}
 static int gamespeedupdated(lua_State *L) {
 	LOG_INFO("Game speed updated");
-	int argc = lua_gettop(L);
-	const char* gamespeed = lua_tostring(L, 1);
-	LOG_INFO(gamespeed);
+	int arg = lua_gettop(L);
+	const char* gamespeed = lua_tostring(L, arg);
 
 	for (int n = 0; n < 6; n++) {
 		if (strcmp(gamespeed, speeds[n]) == 0) {
