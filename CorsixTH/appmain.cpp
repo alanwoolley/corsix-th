@@ -90,15 +90,14 @@ static int showsettingsdialog(lua_State *L) {
 	return sendCommand(jvm, COMMAND_SHOW_SETTINGS_DIALOG);
 }
 
-static int startVibration(lua_State *L) {
+static int startvibration(lua_State *L) {
     LOG_INFO("Starting Vibration");
     int arg = lua_gettop(L);
     int vibrationCode = lua_tointeger(L, arg);
-
     return sendCommandInt(jvm, COMMAND_START_VIBRATION, vibrationCode);
 }
 
-static int stopVibration(lua_State *L) {
+static int stopvibration(lua_State *L) {
     LOG_INFO("Stopping Vibration");
     return sendCommand(jvm, COMMAND_STOP_VIBRATION);
 }
@@ -307,6 +306,8 @@ int SDL_main(int argc, char** argv, JavaVM* vm, jobject configuration) {
 		lua_register(L, "gamespeedupdated", gamespeedupdated);
 		lua_register(L, "showerrordialog", showerrordialog);
 		lua_register(L, "showsettings", showsettingsdialog);
+		lua_register(L, "startvibration", startvibration);
+		lua_register(L, "stopvibration", stopvibration);
 
 		lua_settop(L, 0);
 		lua_pushcfunction(L, CorsixTH_lua_stacktrace);
