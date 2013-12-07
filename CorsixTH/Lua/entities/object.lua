@@ -662,6 +662,7 @@ function Object:onClick(ui, button, data)
     window:setOrientation(direction)
     self.orientation_before = self.direction
     ui:playSound("pickup.wav")
+    startvibration(2);
   end
 end
 
