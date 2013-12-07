@@ -25,7 +25,6 @@ void LOG_ERROR(std::string strtext) {
 	LOGW(strtext.c_str());
 	formatString(&strtext);
 
-	//fprintf(stderr, strtext.c_str());
 	fputs(strtext.c_str(), stderr);
 
 }
@@ -35,7 +34,6 @@ void LOG_INFO(std::string strtext) {
 	LOGI(strtext.c_str());
 	formatString(&strtext);
 
-	//fprintf(stdout, strtext.c_str());
 	fputs(strtext.c_str(),stdout);
 
 }
@@ -45,8 +43,8 @@ void START_LOGGING(const char* root) {
 	std::string logfile = std::string(root) + "/cthlog.txt";
 	std::string errlogfile = std::string(root) + "/ctherrlog.txt";
 	// Redirect stdout and stderr
-	fo = freopen(logfile.c_str(), "w", stdout);
-	fe = freopen(errlogfile.c_str(), "w", stderr);
+	fo = freopen(logfile.c_str(), "a", stdout);
+	fe = freopen(errlogfile.c_str(), "a", stderr);
 
 	// Disable buffering so messages are written instantly
 	setvbuf(fo, 0, _IONBF, 0);
