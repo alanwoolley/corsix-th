@@ -56,6 +56,7 @@ function App:App()
     gamespeed = self.gamespeed,
     tryautosave = self.tryAutoSave,
     configupdate = self.updateConfig,
+    showcheats = self.showCheats,
   }
   self.strings = {}
   self.savegame_version = SAVEGAME_VERSION
@@ -1165,6 +1166,11 @@ function App:tryAutoSave(filename)
   else
     print "Trying to save, but no map is loaded"
   end
+end
+
+function App:showCheats()
+  print "Showing cheats menu"
+  self.ui:showCheatsWindow()
 end
 
 function App:updateConfig(newconfig)

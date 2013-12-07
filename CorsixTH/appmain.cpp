@@ -137,6 +137,15 @@ extern "C" void Java_uk_co_armedpineapple_cth_SDLActivity_cthRestartGame(
 	LOG_INFO("Done");
 }
 
+extern "C" void Java_uk_co_armedpineapple_cth_SDLActivity_cthShowCheats(
+		JNIEnv* env, jclass cls) {
+	LOG_INFO("Showing cheats menu");
+	SDL_Event e;
+	e.type = SDL_USEREVENT_SHOWCHEATS;
+	SDL_PushEvent(&e);
+	LOG_INFO("Done");
+}
+
 extern "C" void Java_uk_co_armedpineapple_cth_SDLActivity_cthTryAutoSave(
 		JNIEnv* env, jclass cls, jstring filename) {
 	const char *nativeString = env->GetStringUTFChars(filename, 0);

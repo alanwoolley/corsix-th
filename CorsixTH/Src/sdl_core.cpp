@@ -327,6 +327,10 @@ static int l_mainloop(lua_State *L) {
 
 			}
 				break;
+			case SDL_USEREVENT_SHOWCHEATS:
+			    lua_pushliteral(dispatcher, "showcheats");
+			    nargs = 1;
+			    break;
             case SDL_USEREVENT_CPCALL:
                 if(luaT_cpcall(L, (lua_CFunction)e.user.data1, e.user.data2))
                 {
