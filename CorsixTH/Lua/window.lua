@@ -639,6 +639,8 @@ function Button:handleClick(mouse_button)
   end
   if self.sound then
     self.ui:playSound(self.sound)
+    -- Play click vibration
+    startvibration(1)
   end
   local callback = mouse_button == "left" and self.on_click or self.on_rightclick
   if callback then
