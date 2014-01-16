@@ -28,7 +28,8 @@ local assert, io, type, dofile, loadfile, pcall, tonumber, print, setmetatable
 
 -- Increment each time a savegame break would occur
 -- and add compatibility code in afterLoad functions
-local SAVEGAME_VERSION = 78
+
+local SAVEGAME_VERSION = 82
 
 class "App"
 
@@ -1023,10 +1024,16 @@ function App:checkLanguageFile()
   error(err)
 end]]
 
+--! Get the directory containing the bitmap files.
+--!return Name of the directory containing the bitmap files, ending with a
+--        directory path separator.
 function App:getBitmapDir()
   return (self.command_line["bitmap-dir"] or "Bitmap") .. pathsep
 end
 
+-- Load bitmap data into memory.
+--!param filename Name of the file to load.
+--!return The loaded data.
 function App:readBitmapDataFile(filename)
   filename = self:getBitmapDir() .. filename
   local file = assert(io.open(filename, "rb"))
@@ -1038,6 +1045,11 @@ function App:readBitmapDataFile(filename)
   return data
 end
 
+-- Read a data file of the application into memory (possibly with decompression).
+--!param dir (string) Directory to read from. "Bitmap" and "Levels" are
+--       meta-directories, and get resolved to real directories in the function.
+--!param filename (string or nil) If specified, the file to load. If 'nil', the
+--       'dir' parameter is the filename in the "Data" directory.
 function App:readDataFile(dir, filename)
   if dir == "Bitmap" then
     return self:readBitmapDataFile(filename)
@@ -1054,6 +1066,10 @@ function App:readDataFile(dir, filename)
   return data
 end
 
+--! Get a level file.
+--!param filename (string) Name of the level file.
+--!return If the file could be found, the data of the file, else a
+--        tuple 'nil', and an error description
 function App:readLevelDataFile(filename)
   local dir = "Levels" .. pathsep .. filename
   -- First look in the original install directory, if not found there
@@ -1144,10 +1160,25 @@ function App:save(filename)
   print "saving"
   return SaveGameFile(self.savegame_dir .. filename)
 end
+-- Omit the usual file extension so this file cannot be seen from the normal load and save screen and cannot be overwritten
+function App:quickSave()
+  local filename = "quicksave"
+  return SaveGameFile(self.savegame_dir .. filename)
+end
 
 function App:load(filename)
   print "loading"
   return LoadGameFile(self.savegame_dir .. filename)
+end
+
+function App:quickLoad()
+  local filename = "quicksave"
+  if lfs.attributes(self.savegame_dir .. filename) then
+    self:load(filename)  
+  else 
+    self:quickSave()  
+    self.ui:addWindow(UIInformation(self.ui, {_S.errors.load_quick_save}))
+  end
 end
 
 function App:gamespeed(speed)

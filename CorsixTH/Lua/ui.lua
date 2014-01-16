@@ -56,7 +56,7 @@ function UI:initKeyAndButtonCodes()
   end})
   do
     local ourpath = debug.getinfo(1, "S").source:sub(2, -7)
-    local result, err = loadfile_envcall(ourpath .. "key_mapping.lua")
+    local result, err = loadfile_envcall(ourpath .. "key_mapping.txt")
     if not result then
       print("Cannot load key mapping:" .. err)
     else
@@ -92,6 +92,8 @@ function UI:initKeyAndButtonCodes()
     down = 274,
     right = 275,
     left = 276,
+    x = 120,
+    z = 122,
     f1 = 282,
     f2 = 283,
     f3 = 284,
@@ -878,6 +880,8 @@ function UI:makeScreenshot()
   local res, err = self.app.video:takeScreenshot(filename) -- Take screenshot
   if not res then
     print("Screenshot failed: " .. err)
+  else
+    self.app.audio:playSound("SNAPSHOT.WAV")
   end
 end
 
